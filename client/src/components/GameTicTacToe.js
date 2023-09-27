@@ -127,7 +127,7 @@ function GameTicTacToe() {
         {gameState === "ongoing" && (
             <p>Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</p>
         )}
-        {gameState === "ended" && <p>Game State: Ended</p>}
+        {gameState === "draw" && <p>Game State: Draw</p>}
         {gameState === "X-wins" && playerSymbol === 'X' && <p>Game State: You Win! </p>}
         {gameState === "X-wins" && playerSymbol === 'O' && <p>Game State: You Lose </p>}
         {gameState === "O-wins" && playerSymbol === 'X' && <p>Game State: You Lose </p>}
