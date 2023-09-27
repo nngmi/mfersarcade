@@ -13,11 +13,12 @@ function GameTicTacToe() {
   const [gameState, setGameState] = useState("waiting");
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [playerSymbol, setPlayerSymbol] = useState(null);
+  const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
 
   useEffect(() => {
     if (!gameId) return;
 
-    const newSocket = io.connect("http://localhost:3001");
+    const newSocket = io.connect(SERVER_URL);
     setSocket(newSocket);
     console.log("before emit");
     newSocket.emit("joinGame", gameId);
