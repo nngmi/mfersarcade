@@ -28,16 +28,30 @@ html {
   font-size: calc(10px + 2vmin);
   color: white;
 }
+button {
+  background-color: red;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 5px 10px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin: 5px;
+  font-family: 'Sartoshi', sans-serif;
+}
+.depress-button {
+  transition: all 0.2s;
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.depress-button:active {
+  box-shadow: none;
+  transform: translateY(2px); 
+}
 
 .App-link {
   color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
 }

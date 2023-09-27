@@ -76,7 +76,24 @@ function GameTicTacToe() {
         <p className="game-info">Your Team: {playerSymbol === 'X' ? 'Team Zombie' : playerSymbol === 'O' ? 'Team Ape' : playerSymbol}</p>
 
         {gameState === "waiting for other player" && (
-            <p>Game State: {gameState} <button onClick={() => navigator.clipboard.writeText(window.location.href)}>Copy Game Link to Share</button></p>
+            <p>Game State: {gameState} 
+            
+            <button 
+                className="depress-button" 
+                onClick={() => { 
+                    const el = document.createElement('textarea');
+                    el.value = `${window.location.origin}/game/${gameId}`;
+                    document.body.appendChild(el);
+                    el.select();
+                    document.execCommand('copy');
+                    document.body.removeChild(el);
+                    alert('Game Link saved! Now share it with friends.');
+                }}
+            >
+                Copy Game Link to Share
+            </button>
+
+            </p>
         )}
         {gameState === "ongoing" && (
             <p>Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</p>
@@ -97,7 +114,7 @@ function GameTicTacToe() {
                             onClick={() => makeMove(rowIndex, cellIndex)}
                         >
                             {cell === 'X' && <img src="/images/heads/3.png" alt="Zombie" className="cell-img" />}
-                            {cell === 'O' && <img src="/images/heads/357.png" alt="Ape" className="cell-img" />}
+                            {cell === 'O' && <img src="/images/heads/7146.png" alt="Ape" className="cell-img" />}
                         </div>
                     ))
                 )}
