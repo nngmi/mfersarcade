@@ -1,91 +1,85 @@
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import React, { useState, useEffect } from "react";
+import io from "socket.io-client";
 
 function App() {
-    const [games, setGames] = useState({});
-    const [selectedGame, setSelectedGame] = useState(null);
-    const [board, setBoard] = useState(Array(3).fill(Array(3).fill(null)));
-    const [currentPlayer, setCurrentPlayer] = useState('X');
-    const [gameState, setGameState] = useState('ongoing');
+  const [gameId, setGameId] = useState("");
+  const [socket, setSocket] = useState(null);
+  const [board, setBoard] = useState([
+    [null, null, null],
+    [null, null, null],
+    [null, null, null],
+  ]);
+  const [gameState, setGameState] = useState("waiting");
+  const [currentPlayer, setCurrentPlayer] = useState("X");
+  const [playerSymbol, setPlayerSymbol] = useState(null);
 
-    const createGame = async () => {
-        try {
-            const res = await axios.post('/api/game');
-            const gameId = res.data.gameId;
-            setGames((prev) => ({ ...prev, [gameId]: { board, currentPlayer, gameState } }));
-            setSelectedGame(gameId);
-        } catch (error) {
-            console.error("Error creating game", error);
-        }
-    };
+  useEffect(() => {
+    const newSocket = io.connect("http://localhost:3001");
+    setSocket(newSocket);
 
-    const makeMove = async (row, col) => {
-        if (!selectedGame || board[row][col] || gameState !== 'ongoing') return;
-        try {
-            const res = await axios.post(`/api/game/${selectedGame}/move`, { row, col, player: currentPlayer });
-            const updatedGame = res.data;
-            setBoard(updatedGame.board);
-            setCurrentPlayer(updatedGame.currentPlayer);
-            setGameState(updatedGame.state);
-        } catch (error) {
-            console.error("Error making move", error);
-        }
-    };
+    newSocket.on("gameUpdated", (game) => {
+      setBoard(game.board);
+      setCurrentPlayer(game.currentPlayer);
+      setGameState(game.state);
+    });
 
-    const getGame = async (gameId) => {
-        try {
-            const res = await axios.get(`/api/game/${gameId}`);
-            const game = res.data;
-            setSelectedGame(gameId);
-            setBoard(game.board);
-            setCurrentPlayer(game.currentPlayer);
-            setGameState(game.state);
-        } catch (error) {
-            console.error("Error getting game", error);
-        }
-    };
+    return () => newSocket.disconnect();
+  }, []);
 
-    useEffect(() => {
-        // Optionally, load existing games when the component mounts
-    }, []);
+  const createGame = () => {
+    const id = prompt("Enter game id:");
+    if (!id) return;
+    setGameId(id);
+    setPlayerSymbol("X");
+    socket.emit("createGame", id);
+  };
 
-    return (
-        <div>
-            <button onClick={createGame}>Create Game</button>
-            <div>
-                <h2>Games</h2>
-                <ul>
-                    {Object.keys(games).map((gameId) => (
-                        <li key={gameId} onClick={() => getGame(gameId)}>
-                            Game {gameId}
-                        </li>
-                    ))}
-                </ul>
+  const joinGame = () => {
+    const id = prompt("Enter game id:");
+    if (!id) return;
+    setGameId(id);
+    setPlayerSymbol("O");
+    socket.emit("joinGame", id);
+  };
+
+  const makeMove = (row, col) => {
+    if (board[row][col] || gameState !== "ongoing" || currentPlayer !== playerSymbol) return;
+    socket.emit("makeMove", gameId, row, col);
+  };
+
+  return (
+    <div>
+      <h1>Tic Tac Toe</h1>
+      <p>Game State: {gameState}</p>
+      <p>Current Player: {currentPlayer}</p>
+      <p>Your Symbol: {playerSymbol}</p>
+      <div>
+        <button onClick={createGame}>Create Game</button>
+        <button onClick={joinGame}>Join Game</button>
+      </div>
+      <div style={{ display: "grid", gridTemplate: "repeat(3, 1fr) / repeat(3, 1fr)" }}>
+        {board.map((row, rowIndex) =>
+          row.map((cell, cellIndex) => (
+            <div
+              key={`${rowIndex}-${cellIndex}`}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "60px",
+                height: "60px",
+                border: "1px solid #000",
+                cursor: "pointer",
+              }}
+              onClick={() => makeMove(rowIndex, cellIndex)}
+            >
+              {cell}
             </div>
-            {selectedGame && (
-                <div>
-                    <h2>Game {selectedGame}</h2>
-                    <div>
-                        {board.map((row, rowIndex) => (
-                            <div key={rowIndex}>
-                                {row.map((cell, colIndex) => (
-                                    <button
-                                        key={colIndex}
-                                        onClick={() => makeMove(rowIndex, colIndex)}
-                                        disabled={cell !== null}
-                                    >
-                                        {cell}
-                                    </button>
-                                ))}
-                            </div>
-                        ))}
-                    </div>
-                    <p>Current Player: {currentPlayer}</p>
-                    <p>Game State: {gameState}</p>
-                </div>
-            )}
-        </div>
-    );
+          ))
+        )}
+      </div>
+    </div>
+  );
 }
 
 export default App;
