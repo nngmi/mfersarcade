@@ -6,7 +6,7 @@ function LandingPage() {
   const [gameLink, setGameLink] = useState("");
   const navigate = useNavigate();
 
-  const createGame = async () => {
+  const createTicTacToeGame = async () => {
     try {
       const response = await fetch("/api/tictactoe/game", { method: "POST" });
       console.log(response);
@@ -23,7 +23,7 @@ function LandingPage() {
   return (
     <div className="landingPageContainer">
       <h1>Mfers Arcade</h1>
-      <button onClick={createGame}>Play Mfer Mfer Toe (Multiplayer)</button>
+      <button onClick={createTicTacToeGame}>Play Mfer Mfer Toe (Multiplayer)</button>
       {gameLink && (
         <p>
           <a href={gameLink}>Go to your game</a>
