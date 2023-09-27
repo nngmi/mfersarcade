@@ -18,7 +18,7 @@ const cleanupGames = () => {
         const game = games[gameId];
         
         // Assume game has a `lastActivity` timestamp and a `status` property
-        if (game.status === 'ended' || (now - game.lastActivity) > timeout) {
+        if ((now - game.lastActivity) > timeout) {
             delete games[gameId];
             console.log(`Game ${gameId} cleaned up.`);
         }

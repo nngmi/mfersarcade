@@ -6,6 +6,17 @@
   height: 40vmin;
   pointer-events: none;
 }
+html {
+  background-color: #FEAC64;
+  font-family: 'Sartoshi', sans-serif;
+}
+@font-face {
+  font-family: 'Sartoshi';
+  src: local('Sartoshi'), 
+       url('./assets/fonts/SartoshiScript-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 .App-header {
   background-color: #282c34;

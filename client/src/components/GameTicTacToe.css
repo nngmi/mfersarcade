@@ -6,6 +6,10 @@
     text-align: center;
 }
 
+.game-container {
+    text-align: center;
+    font-size: 15px;
+}
 
 .grid-container {
     display: flex;
