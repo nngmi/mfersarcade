@@ -10,6 +10,21 @@ const io = socketIo(server);
 
 let games = {};
 
+const cleanupGames = () => {
+    const now = Date.now();
+    const timeout = 10 * 60 * 1000; // 10 minutes in milliseconds
+
+    for (const gameId in games) {
+        const game = games[gameId];
+        
+        // Assume game has a `lastActivity` timestamp and a `status` property
+        if (game.status === 'ended' || (now - game.lastActivity) > timeout) {
+            delete games[gameId];
+            console.log(`Game ${gameId} cleaned up.`);
+        }
+    }
+};
+  
 app.post("/api/game", (req, res) => {
     const gameId = uuidv4();
     if (games[gameId]) return res.status(400).json({ message: "Game already exists" }); // This check is technically redundant now, as UUIDs are unique.
@@ -22,6 +37,7 @@ app.post("/api/game", (req, res) => {
         ],
         currentPlayer: "X",
         state: "waiting",
+        lastActivity: Date.now(),
     };
     res.status(201).json({ gameId });
 });
@@ -50,6 +66,7 @@ io.on("connection", (socket) => {
         if (game.players.length == 2) {
             game.state = "ongoing";
         }
+        game.lastActivity = Date.now(),
         socket.join(gameId);
         io.to(gameId).emit("gameUpdated", game);
         socket.emit("playerSymbol", playerSymbol);
@@ -71,6 +88,7 @@ io.on("connection", (socket) => {
         
         // Make the move
         game.board[row][col] = game.currentPlayer;
+        game.lastActivity = Date.now(),
         
         // Switch the current player
         game.currentPlayer = game.currentPlayer === "X" ? "O" : "X";
