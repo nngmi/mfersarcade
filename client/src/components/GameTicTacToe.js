@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useParams } from 'react-router-dom';
 import './GameTicTacToe.css';
+import { Howl } from 'howler';
 
 function GameTicTacToe() {
   let { gameId } = useParams();
@@ -15,9 +16,27 @@ function GameTicTacToe() {
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [playerSymbol, setPlayerSymbol] = useState(null);
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
-
+  const basicSound = new Howl({
+    src: ["/audio/correct.mp3"], // Replace with your sound file path
+    autoplay: false, // Play the sound right away
+    loop: false, // Do not loop the sound
+    volume: 0.5, // Set the volume to 50%
+  });
+  const winSound = new Howl({
+    src: ["/audio/success.mp3"], // Replace with your sound file path
+    autoplay: false, // Play the sound right away
+    loop: false, // Do not loop the sound
+    volume: 0.5, // Set the volume to 50%
+  });
+  const wrongSound = new Howl({
+    src: ["/audio/wrong_sound.mp3"], // Replace with your sound file path
+    autoplay: false, // Play the sound right away
+    loop: false, // Do not loop the sound
+    volume: 0.5, // Set the volume to 50%
+  });
   useEffect(() => {
     if (!gameId) return;
+    let playerSymbolLocal = null;
 
     const newSocket = io.connect(SERVER_URL);
     setSocket(newSocket);
@@ -29,9 +48,19 @@ function GameTicTacToe() {
       setBoard(game.board);
       setCurrentPlayer(game.currentPlayer);
       setGameState(game.state);
+      console.log(game.state);
+      console.log(playerSymbolLocal);
+      if (game.state === `${playerSymbolLocal}-wins`) {
+        winSound.play();
+      } else if (game.state === "X-wins" || game.state === "O-wins") {
+        wrongSound.play();
+      } else {
+        basicSound.play();
+      }
     });
     newSocket.on("playerSymbol", (symbol) => {
         setPlayerSymbol(symbol);
+        playerSymbolLocal = symbol;
     });
 
     return () => newSocket.disconnect();
