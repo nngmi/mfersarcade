@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useParams } from 'react-router-dom';
+import './GameTicTacToe.css';
 
 function GameTicTacToe() {
   let { gameId } = useParams();
@@ -10,7 +11,7 @@ function GameTicTacToe() {
     [null, null, null],
     [null, null, null],
   ]);
-  const [gameState, setGameState] = useState("waiting");
+  const [gameState, setGameState] = useState("waiting for other player");
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [playerSymbol, setPlayerSymbol] = useState(null);
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
@@ -57,33 +58,33 @@ function GameTicTacToe() {
   };
 
   return (
-    <div>
-      <h1>Tic Tac Toe</h1>
-      <p>Game ID: {gameId}</p>
-      <p>Game State: {gameState}</p>
-      <p>Current Player: {currentPlayer}</p>
-      <p>Your Symbol: {playerSymbol}</p>
-      <div style={{ display: "grid", gridTemplate: "repeat(3, 1fr) / repeat(3, 1fr)" }}>
-        {board.map((row, rowIndex) =>
-          row.map((cell, cellIndex) => (
-            <div
-              key={`${rowIndex}-${cellIndex}`}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                width: "60px",
-                height: "60px",
-                border: "1px solid #000",
-                cursor: "pointer",
-              }}
-              onClick={() => makeMove(rowIndex, cellIndex)}
-            >
-              {cell}
+    <div className="game-info">
+        <h1 className="title">Mfer Mfer Toe</h1>
+        <p className="game-info">Game ID: {gameId}</p>
+        <p className="game-info">Game State: {gameState}</p>
+        <p className="game-info">Current Player: {currentPlayer}</p>
+        <p className="game-info">Your Symbol: {playerSymbol}</p>
+        <div className="grid-container">
+            <div className="grid">
+                {board.map((row, rowIndex) =>
+                    row.map((cell, cellIndex) => (
+                        <div
+                            key={`${rowIndex}-${cellIndex}`}
+                            className="cell"
+                            onClick={() => makeMove(rowIndex, cellIndex)}
+                        >
+                            {cell === 'X' && <img src="/images/heads/3.png" alt="X" className="cell-img" />}
+                            {cell === 'O' && <img src="/images/heads/357.png" alt="O" className="cell-img" />}
+                        </div>
+                    ))
+                )}
             </div>
-          ))
-        )}
-      </div>
+        </div>
+        <p>
+            <a href="/" className="back-button">
+                Back to Home
+            </a>
+        </p>
     </div>
   );
 }

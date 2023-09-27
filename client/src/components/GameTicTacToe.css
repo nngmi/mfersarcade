@@ -1,0 +1,36 @@
+.title {
+    text-align: center;
+}
+
+.game-info {
+    text-align: center;
+}
+
+
+.grid-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.grid {
+    display: grid;
+    grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+}
+
+.cell {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 60px;
+    height: 60px;
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid #000; 
+}
+
+.cell-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}

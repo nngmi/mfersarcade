@@ -36,7 +36,7 @@ app.post("/api/game", (req, res) => {
             [null, null, null]
         ],
         currentPlayer: "X",
-        state: "waiting",
+        state: "waiting for other player",
         lastActivity: Date.now(),
     };
     res.status(201).json({ gameId });
