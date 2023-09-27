@@ -55,8 +55,9 @@ io.on("connection", (socket) => {
     socket.on("joinGame", (gameId) => {
         console.log("joinGame emitted for gameID", gameId);
         const game = games[gameId];
-        console.log("Game found", game);
+
         if (!game) return socket.emit("error", "Game does not exist");
+        console.log("Game found", game);
 
         if (game.players.length >= 2) return socket.emit("error", "Game is full");
         console.log(`Player ${socket.id} joined game ${gameId}`);
@@ -126,7 +127,10 @@ app.use(express.static(path.resolve(__dirname, '../client/build')));
 // Handle any requests that don't match the ones above
 app.get('*', (req, res) => {
     res.sendFile(path.resolve(__dirname, '../client/build', 'index.html'));
-  });
+});
+
 server.listen(PORT, () => {
     console.log(`Server listening on ${PORT}`);
-});
+});  
+
+module.exports = server;
