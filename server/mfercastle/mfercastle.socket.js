@@ -1,4 +1,4 @@
-// tictactoe.socket.js
+// mfercastle.socket.js
 const socketIo = require("socket.io");
 let games = require('./state');
 
@@ -25,7 +25,7 @@ function checkGameState(board) {
 }
 
 module.exports = (io) => {
-    const tictactoe = io.of('/tictactoe');
+    const tictactoe = io.of('/mfercastle');
 
     tictactoe.on("connection", (socket) => {
         console.log("New client connected", socket.id);
