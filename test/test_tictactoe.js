@@ -19,10 +19,10 @@ describe('Tic Tac Toe API', function() {
         done();
     });
 
-  describe('POST /api/game', function() {
+  describe('POST /api/tictactoe/game', function() {
     it('should create a new game and return the gameId', function(done) {
       chai.request(app)
-        .post('/api/game')
+        .post('/api/tictactoe/game')
         .end((err, res) => {
           expect(res).to.have.status(201);
           expect(res.body).to.have.property('gameId');
@@ -31,18 +31,18 @@ describe('Tic Tac Toe API', function() {
     });
   });
 
-  describe('GET /api/game/:gameId', function() {
+  describe('GET /api/tictactoe/game/:gameId', function() {
     it('should return the game state for a valid gameId', function(done) {
       // First, create a game
       chai.request(app)
-        .post('/api/game')
+        .post('/api/tictactoe/game')
         .end((err, res) => {
           expect(res).to.have.status(201);
           
           // Then, fetch the game state for the created gameId
           const gameId = res.body.gameId;
           chai.request(app)
-            .get(`/api/game/${gameId}`)
+            .get(`/api/tictactoe/game/${gameId}`)
             .end((err, res) => {
               expect(res).to.have.status(200);
               expect(res.body).to.have.property('players');
@@ -58,7 +58,7 @@ describe('Tic Tac Toe API', function() {
 
     it('should return 404 for an invalid gameId', function(done) {
       chai.request(app)
-        .get('/api/game/invalid-game-id')
+        .get('/api/tictactoe/game/invalid-game-id')
         .end((err, res) => {
           expect(res).to.have.status(404);
           done();
