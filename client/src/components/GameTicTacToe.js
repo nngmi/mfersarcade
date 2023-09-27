@@ -38,7 +38,7 @@ function GameTicTacToe() {
     if (!gameId) return;
     let playerSymbolLocal = null;
 
-    const newSocket = io.connect(SERVER_URL);
+    const newSocket = io.connect(SERVER_URL + '/tictactoe');
     setSocket(newSocket);
     console.log("before emit");
     newSocket.emit("joinGame", gameId);
@@ -70,7 +70,7 @@ function GameTicTacToe() {
     if (!gameId) return;
     // Here you would typically fetch the existing game state from the backend
     // and update your component state accordingly.
-    fetch(`/api/game/${gameId}`)
+    fetch(`/api/tictactoe/game/${gameId}`)
       .then((response) => response.json())
       .then((game) => {
         if (game.message && game.message === "Game does not exist") {

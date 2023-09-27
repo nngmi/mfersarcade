@@ -8,7 +8,7 @@ function LandingPage() {
 
   const createGame = async () => {
     try {
-      const response = await fetch("/api/game", { method: "POST" });
+      const response = await fetch("/api/tictactoe/game", { method: "POST" });
       console.log(response);
       if (!response.ok) throw new Error("Failed to create game");
       const game = await response.json();
