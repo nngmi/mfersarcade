@@ -11,11 +11,13 @@ const cards = [
 ];
 
 // Function to generate a deck of N cards
-const generateDeck = (n) => {
+const generateDeck = (n, playerID) => {
   let deck = [];
   for (let i = 0; i < n; i++) {
     let randomIndex = Math.floor(Math.random() * cards.length);
-    deck.push(cards[randomIndex]);
+    let card = {...cards[randomIndex]};
+    card.id = playerID + i;
+    deck.push(card);
   }
   return deck;
 };

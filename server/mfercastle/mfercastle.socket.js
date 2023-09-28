@@ -37,8 +37,9 @@ module.exports = (io) => {
     
             game.players.push({ id: socket.id, symbol: playerSymbol });
             // shuffle a deck of cards for the user
-            game.decks[playerSymbol] = {"count": 30, "cards": generateDeck(30)};
+            game.decks[playerSymbol] = {"count": 30, "cards": generateDeck(30, socket.id)};
             game.hands[playerSymbol] = {"count": 0, "cards": []};
+            game.graveyards[playerSymbol] = {"count": 0, "cards": []};
             if (game.players.length == 2) {
                 game.state = "ongoing";
             }
@@ -53,7 +54,7 @@ module.exports = (io) => {
             });
         });
     
-        socket.on("makeMove", (gameId, moveType) => {
+        socket.on("makeMove", (gameId, moveType, moveDetails) => {
             console.log("handling move ", moveType);
             const game = games[gameId];
             if (!game) return socket.emit("error", "Game does not exist");
@@ -67,18 +68,63 @@ module.exports = (io) => {
             if (game.currentPlayer !== player.symbol) return socket.emit("error", "Not your turn");
             console.log("it is our turn", game.currentPlayer);
             if (moveType === "draw") {
-                console.log(game.decks[game.currentPlayer]);
-                if (game.decks[game.currentPlayer] && game.decks[game.currentPlayer].count > 0) {
-                    console.log("drawing a card");
-                    let card = game.decks[game.currentPlayer]["cards"].pop();
-                    game.decks[game.currentPlayer]["count"] = game.decks[game.currentPlayer]["cards"].length;
-                    game.hands[game.currentPlayer]["cards"].push(card);
-                    game.hands[game.currentPlayer]["count"] += 1;
+                console.log(game.decks[player.symbol]);
+                if (game.decks[player.symbol] && game.decks[player.symbol].count > 0) {
+
+                    if (game.hands[player.symbol].count >= 5) {
+                        return socket.emit("error", "Hand is full, cannot draw any more cards");
+                    }
+                    let card = game.decks[player.symbol]["cards"].pop();
+                    game.decks[player.symbol]["count"] = game.decks[player.symbol]["cards"].length;
+                    game.hands[player.symbol]["cards"].push(card);
+                    game.hands[player.symbol]["count"] += 1;
+                    game.players.forEach((player) => {
+                        if (player.id != socket.id) {
+                            console.log("emitting to player ", player.id);
+                            mfercastle.to(player.id).emit("notify", "Opponent drew a card");
+                        }
+                    });
                 } else {
                     return socket.emit("error", "No more cards");
                 }
             } else if (moveType === "yield") {
+                game.players.forEach((player) => {
+                    if (player.id != socket.id) {
+                        console.log("emitting to player ", player.id);
+                        mfercastle.to(player.id).emit("notify", "Opponent has yielded their turn");
+                    }
+                });
                 game.currentPlayer = game.currentPlayer === "X" ? "O" : "X";
+            } else if (moveType === "discard") {
+                const { cardid } = moveDetails;
+                console.log(moveDetails);
+
+                if (!cardid) {
+                  return socket.emit("error", "Error with discard because cardid does not exist");
+                }
+                
+                const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
+                
+                if (cardIndex === -1) {
+                  return socket.emit("error", "Error with discard, card not found in hand");
+                }
+                
+                // removing card from hand
+                const [card] = game.hands[player.symbol].cards.splice(cardIndex, 1);
+                game.hands[player.symbol].count--;
+                
+                // appending card to graveyard
+                game.graveyards[player.symbol].cards.push(card);
+                game.graveyards[player.symbol].count++;
+
+                // notify other players
+                game.players.forEach((player) => {
+                    if (player.id != socket.id) {
+                        mfercastle.to(player.id).emit("notify", "Opponent discarded card " + card.name);
+                    }
+                });
+            } else {
+                return socket.emit("error", "Unknown move " + moveType);
             }
             
             game.lastActivity = Date.now(),

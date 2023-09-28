@@ -26,6 +26,7 @@ router.post("/game", (req, res) => {
         players: [],
         decks: {},
         hands: {},
+        graveyards: {},
         currentPlayer: "X",
         state: "waiting for other player",
         lastActivity: Date.now(),

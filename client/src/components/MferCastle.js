@@ -6,7 +6,11 @@ import { Howl } from 'howler';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'; 
 import { ToastContainer } from 'react-toastify';
-import { Card, CardBack } from './Card';
+import { Card, CardBack, CardEmpty } from './Card';
+import { DndProvider } from 'react-dnd';
+import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useDrop } from 'react-dnd';
+
 
 function MferCastle() {
   let { gameId } = useParams();
@@ -48,7 +52,7 @@ function MferCastle() {
         </div>
         <div className="cards-container">
           {cards.map((card, index) => (
-            <Card card={card}/>
+            <Card key={index} card={card} />
           ))}
         </div>
       </div>
@@ -65,11 +69,44 @@ function MferCastle() {
     return (
       <div className="hand game-info">
         <div className="count">Your Deck: {count} Cards</div>
-        <CardBack/>
+        {count === 0 ? (
+          <CardEmpty />
+        ) : (
+          <CardBack/> 
+        )}
       </div>
     );
   }
-
+  const PlayerGraveyard = ({ game, playerSymbol, isOpponent }) => {
+    const [, ref] = useDrop(() => ({
+      accept: 'CARD',
+      drop: (item, monitor) => {
+        if (item.type === 'Card' && !isOpponent) {
+          makeMove("discard", { "cardid": item.id });
+        }
+      }
+    }));
+  
+    if (!playerSymbol) return null;
+  
+    const playerGraveyard = game.graveyards[playerSymbol] || {};
+    const { cards = [], count = 0 } = playerGraveyard;
+  
+    // Assuming the last card in the array is the top card of the graveyard
+    const topCard = cards[count - 1];
+  
+    return (
+      <div ref={ref} className={`hand game-info ${count === 0 ? 'white-outline' : ''}`}>
+        {isOpponent ? (<div className="count">Your Graveyard: {count} Cards</div>) : (<div className="count">Opponent Graveyard: {count} Cards</div>)}
+        {count === 0 ? (
+          <CardEmpty />
+        ) : (
+          <Card key={topCard.id} card={topCard} /> // Render the top card from the graveyard
+        )}
+      </div>
+    );
+  };
+  
   const OtherPlayerHand = ({ game, playerSymbol }) => {
     if (!playerSymbol) return null;
   
@@ -99,12 +136,15 @@ function MferCastle() {
     return (
       <div className="other-deck hand game-info">
         <div className="count">Opponent Deck: {count} Cards</div>
-        <CardBack/>
+        {count === 0 ? (
+          <CardEmpty />
+        ) : (
+          <CardBack/> 
+        )}
       </div>
     );
   };
     
-
 
   useEffect(() => {
     if (!gameId) return;
@@ -137,6 +177,9 @@ function MferCastle() {
     newSocket.on("error", (error) => {
       toast.error(error);
     });
+    newSocket.on("notify", (info) => {
+      toast.info(info);
+    });
 
     return () => newSocket.disconnect();
   }, [gameId]);
@@ -159,9 +202,9 @@ function MferCastle() {
       .catch((error) => console.error('Error fetching the game:', error));
   }, [gameId]);
 
-  const makeMove = (moveType) => {
+  const makeMove = (moveType, moveDetails) => {
     console.log("in make move", currentPlayer, playerSymbol);
-    socket.emit("makeMove", gameId, moveType);
+    socket.emit("makeMove", gameId, moveType, moveDetails);
   };
 
   return gameState === "error" ? (
@@ -204,14 +247,17 @@ function MferCastle() {
             </button>
             </div>
         ) : (
-<div className="game-board">
+      <div className="game-board">
+      <DndProvider backend={HTML5Backend}>
         <div className="player-area">
           <OtherPlayerHand game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
           <OtherPlayerDeck game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
+          <PlayerGraveyard game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} />
         </div>
         <div className="player-area">
             <PlayerHand game={game} playerSymbol={playerSymbol}/>
             <PlayerDeck game={game} playerSymbol={playerSymbol}/>
+            <PlayerGraveyard game={game} playerSymbol={playerSymbol} isOpponent={false}/>
         </div>
         <div className="player-action-area">
             <button 
@@ -234,8 +280,10 @@ function MferCastle() {
             </a>
         </p>
         <ToastContainer />
+        </DndProvider>
         </div>
         )}
+      
     </div>
 )
 

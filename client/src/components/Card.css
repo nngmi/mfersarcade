@@ -37,3 +37,9 @@
     background-repeat: no-repeat; /* Do not repeat the logo */
     background-size: contain; /* Make sure your logo is fully visible within the card */
 }
+
+/* Style for the back of the card */
+.card-empty {
+    border-radius: 8px;
+    background-color: #ffffff;
+}
