@@ -3,6 +3,10 @@ import io from "socket.io-client";
 import { useParams } from 'react-router-dom';
 import './MferCastle.css';
 import { Howl } from 'howler';
+import { toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css'; 
+import { ToastContainer } from 'react-toastify';
+import { Card, CardBack } from './Card';
 
 function MferCastle() {
   let { gameId } = useParams();
@@ -39,14 +43,17 @@ function MferCastle() {
 
     return (
       <div className="hand game-info">
-        <div className="count">Hand Count: {count}</div>
-        {cards.map((card, index) => (
-          <div key={index} className="card">
-            {cards[index].name}
-          </div>
-        ))}
+        <div className="count">
+          {count > 0 ? `Your Hand Count: ${count}` : "Your Hand is Empty"}
+        </div>
+        <div className="cards-container">
+          {cards.map((card, index) => (
+            <Card card={card}/>
+          ))}
+        </div>
       </div>
     );
+    
   }
   const PlayerDeck = ({ game, playerSymbol }) => {
     if (!playerSymbol) return;
@@ -57,11 +64,46 @@ function MferCastle() {
 
     return (
       <div className="hand game-info">
-        <div className="count">Deck # Cards: {count}</div>
-        <div className="card"></div>
+        <div className="count">Your Deck: {count} Cards</div>
+        <CardBack/>
       </div>
     );
   }
+
+  const OtherPlayerHand = ({ game, playerSymbol }) => {
+    if (!playerSymbol) return null;
+  
+    const playerHand = game.hands[playerSymbol] || {};
+    console.log(playerHand);
+    const { count = 0 } = playerHand;
+  
+    return (
+      <div className="hand game-info">
+        <div className="count">
+          {count > 0 ? `Opponent Hand Count: ${count} Cards` : "Opponent Hand Empty"}
+        </div>
+        <div className="cards-container">
+          {Array.from({ length: count }).map((_, index) => (
+            <CardBack/>
+          ))}
+        </div>
+      </div>
+    );    
+  };
+  const OtherPlayerDeck = ({ game, playerSymbol }) => {
+    if (!playerSymbol) return null;
+  
+    const playerDeck = game.decks[playerSymbol] || {};
+    const { count = 0 } = playerDeck;
+  
+    return (
+      <div className="other-deck hand game-info">
+        <div className="count">Opponent Deck: {count} Cards</div>
+        <CardBack/>
+      </div>
+    );
+  };
+    
 
 
   useEffect(() => {
@@ -92,6 +134,9 @@ function MferCastle() {
         setPlayerSymbol(symbol);
         playerSymbolLocal = symbol;
     });
+    newSocket.on("error", (error) => {
+      toast.error(error);
+    });
 
     return () => newSocket.disconnect();
   }, [gameId]);
@@ -114,9 +159,9 @@ function MferCastle() {
       .catch((error) => console.error('Error fetching the game:', error));
   }, [gameId]);
 
-  const makeMove = (row, col) => {
+  const makeMove = (moveType) => {
     console.log("in make move", currentPlayer, playerSymbol);
-    socket.emit("makeMove", gameId, "draw");
+    socket.emit("makeMove", gameId, moveType);
   };
 
   return gameState === "error" ? (
@@ -131,10 +176,17 @@ function MferCastle() {
 ) : (
     <div className="game-container">
         <h1 className="title">Mfer Castle</h1>
-        <p className="game-info">Your Team: {playerSymbol === 'X' ? 'Team Zombie' : playerSymbol === 'O' ? 'Team Ape' : playerSymbol}</p>
-
-        {gameState === "waiting for other player" && (
-            <p>Game State: {gameState} 
+        {gameState === "ongoing" && (
+            <p>Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</p>
+        )}
+        {gameState === "draw" && <p>Game State: Draw</p>}
+        {gameState === "X-wins" && playerSymbol === 'X' && <p>Game State: You Win! </p>}
+        {gameState === "X-wins" && playerSymbol === 'O' && <p>Game State: You Lose </p>}
+        {gameState === "O-wins" && playerSymbol === 'X' && <p>Game State: You Lose </p>}
+        {gameState === "O-wins" && playerSymbol === 'O' && <p>Game State: You Win! </p>}
+        {gameState === "waiting for other player" ? (
+            <div>
+            <p>Waiting for Another Player to Start Game... </p> 
             
             <button 
                 className="depress-button" 
@@ -150,26 +202,29 @@ function MferCastle() {
             >
                 Copy Game Link to Share
             </button>
-
-            </p>
-        )}
-        {gameState === "ongoing" && (
-            <p>Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</p>
-        )}
-        {gameState === "draw" && <p>Game State: Draw</p>}
-        {gameState === "X-wins" && playerSymbol === 'X' && <p>Game State: You Win! </p>}
-        {gameState === "X-wins" && playerSymbol === 'O' && <p>Game State: You Lose </p>}
-        {gameState === "O-wins" && playerSymbol === 'X' && <p>Game State: You Lose </p>}
-        {gameState === "O-wins" && playerSymbol === 'O' && <p>Game State: You Win! </p>}
+            </div>
+        ) : (
+<div className="game-board">
+        <div className="player-area">
+          <OtherPlayerHand game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
+          <OtherPlayerDeck game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
+        </div>
         <div className="player-area">
             <PlayerHand game={game} playerSymbol={playerSymbol}/>
             <PlayerDeck game={game} playerSymbol={playerSymbol}/>
+        </div>
+        <div className="player-action-area">
             <button 
-                className="draw-button" 
-                onClick={() => makeMove()}
+                onClick={() => makeMove("draw")}
                 disabled={currentPlayer !== playerSymbol || gameState !== "ongoing"}
             >
                 Draw Card
+            </button>
+            <button 
+                onClick={() => makeMove("yield")}
+                disabled={currentPlayer !== playerSymbol || gameState !== "ongoing"}
+            >
+                Yield Turn
             </button>
         </div>
           
@@ -178,6 +233,9 @@ function MferCastle() {
                 Back to Home
             </a>
         </p>
+        <ToastContainer />
+        </div>
+        )}
     </div>
 )
 

@@ -1,0 +1,39 @@
+/* Style for each card */
+.card {
+    width: 100px;
+    height: 150px;
+    border: 1px solid #000;
+    border-radius: 8px;
+    background-color: white;
+    margin: 5px;
+    position: relative;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+}
+
+.card.green {
+    background-color: green;
+}
+.card.red {
+    background-color: red;
+}
+.card.black {
+    background-color: black;
+    color: white;
+}
+.card.blue {
+    background-color: blue;
+}
+.card.white {
+    background-color: white;
+    color: black;
+}
+
+/* Style for the back of the card */
+.card-back {
+    border-radius: 8px;
+    background-color: #2B547E;
+    background-image: url('/public/images/heads/3.png'); /* Replace with the path to your logo image */
+    background-position: center; /* Center the logo */
+    background-repeat: no-repeat; /* Do not repeat the logo */
+    background-size: contain; /* Make sure your logo is fully visible within the card */
+}

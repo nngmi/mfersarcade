@@ -40,6 +40,12 @@ button {
   margin: 5px;
   font-family: 'Sartoshi', sans-serif;
 }
+button:disabled {
+  background-color: grey;
+  color: black;
+  cursor: not-allowed;
+}
+
 .depress-button {
   transition: all 0.2s;
   box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);

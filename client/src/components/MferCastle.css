@@ -13,43 +13,16 @@
 
 .hand {
     display: flex;
+    flex-direction: column; /* Stack children (count and cards container) vertically */
+    align-items: center; /* Center children horizontally */
 }
 
-/* Style for each card */
-.card {
-    width: 100px;
-    height: 150px;
-    border: 1px solid #000;
-    border-radius: 8px;
-    background-color: white;
-    margin: 5px;
-    position: relative;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+.cards-container {
+    display: flex; /* Place cards next to each other */
+    gap: 10px; /* Add some gap between cards */
 }
 
-/* Style for the back of the card */
-.card-back {
-    width: 100%;
-    height: 100%;
-    border-radius: 8px;
-    background-color: #2B547E;
-    position: absolute;
-    backface-visibility: hidden;
-}
 
-/* Style for the front of the card */
-.card-front {
-    width: 100%;
-    height: 100%;
-    border-radius: 8px;
-    position: absolute;
-    backface-visibility: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 20px;
-    font-weight: bold;
-}
 
 .player-area {
     display: flex;

@@ -1,7 +1,7 @@
 // mfercastle.socket.js
 const socketIo = require("socket.io");
 let games = require('./state');
-
+const { cards, generateDeck } = require('./cards');
 function checkGameState() {
     return "ongoing";
 }
@@ -9,8 +9,8 @@ function checkGameState() {
 function maskGameForPlayer(game, playerSymbol) {
     const maskedGame = JSON.parse(JSON.stringify(game)); // deep copy
     maskedGame.players.forEach((player) => {
+        delete maskedGame.decks[player.symbol]["cards"];
         if (player.symbol !== playerSymbol) {
-            delete maskedGame.decks[player.symbol]["cards"];
             delete maskedGame.hands[player.symbol]["cards"];
         }
     });
@@ -37,7 +37,7 @@ module.exports = (io) => {
     
             game.players.push({ id: socket.id, symbol: playerSymbol });
             // shuffle a deck of cards for the user
-            game.decks[playerSymbol] = {"count": 2, "cards": [{"cardid":1, "name":"Forest"}, {"cardid":1, "name":"Dark Ritual"}]};
+            game.decks[playerSymbol] = {"count": 30, "cards": generateDeck(30)};
             game.hands[playerSymbol] = {"count": 0, "cards": []};
             if (game.players.length == 2) {
                 game.state = "ongoing";
@@ -77,13 +77,13 @@ module.exports = (io) => {
                 } else {
                     return socket.emit("error", "No more cards");
                 }
+            } else if (moveType === "yield") {
+                game.currentPlayer = game.currentPlayer === "X" ? "O" : "X";
             }
             
             game.lastActivity = Date.now(),
             game.state = checkGameState() || game.state;
             console.log(game);
-            // Switch the current player
-            // game.currentPlayer = game.currentPlayer === "X" ? "O" : "X";
             game.players.forEach((player) => {
                 console.log("emitting to player ", player.id);
                 mfercastle.to(player.id).emit("gameUpdated", maskGameForPlayer(game, player.symbol));
