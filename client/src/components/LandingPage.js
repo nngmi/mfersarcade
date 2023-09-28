@@ -12,7 +12,21 @@ function LandingPage() {
       console.log(response);
       if (!response.ok) throw new Error("Failed to create game");
       const game = await response.json();
-      const gameLink = `/game/${game.gameId}`;
+      const gameLink = `/mfermfertoe/${game.gameId}`;
+      setGameLink(gameLink); // if you need to set the state
+      navigate(gameLink); // to redirect
+    } catch (error) {
+      console.error("Error creating game:", error);
+    }
+  };
+
+  const createMferCastleGame = async () => {
+    try {
+      const response = await fetch("/api/mfercastle/game", { method: "POST" });
+      console.log(response);
+      if (!response.ok) throw new Error("Failed to create game");
+      const game = await response.json();
+      const gameLink = `/mfercastle/${game.gameId}`;
       setGameLink(gameLink); // if you need to set the state
       navigate(gameLink); // to redirect
     } catch (error) {
@@ -24,11 +38,8 @@ function LandingPage() {
     <div className="landingPageContainer">
       <h1>Mfers Arcade</h1>
       <button onClick={createTicTacToeGame}>Play Mfer Mfer Toe (Multiplayer)</button>
-      {gameLink && (
-        <p>
-          <a href={gameLink}>Go to your game</a>
-        </p>
-      )}
+      <button onClick={createMferCastleGame}>Play Mfer Castle (Multiplayer)</button>
+
     </div>
   );
 }

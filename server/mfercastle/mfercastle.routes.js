@@ -24,11 +24,8 @@ router.post("/game", (req, res) => {
     if (games[gameId]) return res.status(400).json({ message: "Game already exists" }); // This check is technically redundant now, as UUIDs are unique.
     games[gameId] = {
         players: [],
-        board: [
-            [null, null, null],
-            [null, null, null],
-            [null, null, null]
-        ],
+        decks: {},
+        hands: {},
         currentPlayer: "X",
         state: "waiting for other player",
         lastActivity: Date.now(),
