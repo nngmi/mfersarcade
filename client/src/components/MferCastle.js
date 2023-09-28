@@ -6,11 +6,9 @@ import { Howl } from 'howler';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'; 
 import { ToastContainer } from 'react-toastify';
-import { Card, CardBack, CardEmpty } from './Card';
+import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck } from './PlayAreas';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { useDrop } from 'react-dnd';
-
 
 function MferCastle() {
   let { gameId } = useParams();
@@ -38,113 +36,7 @@ function MferCastle() {
     loop: false, // Do not loop the sound
     volume: 0.5, // Set the volume to 50%
   });
-  const PlayerHand = ({ game, playerSymbol }) => {
-    if (!playerSymbol) return;
-
-    const playerHand = game.hands[playerSymbol] || {};
-    console.log(playerHand);
-    const { cards = [], count = 0 } = playerHand;
-
-    return (
-      <div className="hand game-info">
-        <div className="count">
-          {count > 0 ? `Your Hand Count: ${count}` : "Your Hand is Empty"}
-        </div>
-        <div className="cards-container">
-          {cards.map((card, index) => (
-            <Card key={index} card={card} />
-          ))}
-        </div>
-      </div>
-    );
-    
-  }
-  const PlayerDeck = ({ game, playerSymbol }) => {
-    if (!playerSymbol) return;
-
-    const playerDeck = game.decks[playerSymbol] || {};
-    console.log(playerDeck);
-    const { cards = [], count = 0 } = playerDeck;
-
-    return (
-      <div className="hand game-info">
-        <div className="count">Your Deck: {count} Cards</div>
-        {count === 0 ? (
-          <CardEmpty />
-        ) : (
-          <CardBack/> 
-        )}
-      </div>
-    );
-  }
-  const PlayerGraveyard = ({ game, playerSymbol, isOpponent }) => {
-    const [, ref] = useDrop(() => ({
-      accept: 'CARD',
-      drop: (item, monitor) => {
-        if (item.type === 'Card' && !isOpponent) {
-          makeMove("discard", { "cardid": item.id });
-        }
-      }
-    }));
-  
-    if (!playerSymbol) return null;
-  
-    const playerGraveyard = game.graveyards[playerSymbol] || {};
-    const { cards = [], count = 0 } = playerGraveyard;
-  
-    // Assuming the last card in the array is the top card of the graveyard
-    const topCard = cards[count - 1];
-  
-    return (
-      <div ref={ref} className={`hand game-info ${count === 0 ? 'white-outline' : ''}`}>
-        {isOpponent ? (<div className="count">Your Graveyard: {count} Cards</div>) : (<div className="count">Opponent Graveyard: {count} Cards</div>)}
-        {count === 0 ? (
-          <CardEmpty />
-        ) : (
-          <Card key={topCard.id} card={topCard} /> // Render the top card from the graveyard
-        )}
-      </div>
-    );
-  };
-  
-  const OtherPlayerHand = ({ game, playerSymbol }) => {
-    if (!playerSymbol) return null;
-  
-    const playerHand = game.hands[playerSymbol] || {};
-    console.log(playerHand);
-    const { count = 0 } = playerHand;
-  
-    return (
-      <div className="hand game-info">
-        <div className="count">
-          {count > 0 ? `Opponent Hand Count: ${count} Cards` : "Opponent Hand Empty"}
-        </div>
-        <div className="cards-container">
-          {Array.from({ length: count }).map((_, index) => (
-            <CardBack/>
-          ))}
-        </div>
-      </div>
-    );    
-  };
-  const OtherPlayerDeck = ({ game, playerSymbol }) => {
-    if (!playerSymbol) return null;
-  
-    const playerDeck = game.decks[playerSymbol] || {};
-    const { count = 0 } = playerDeck;
-  
-    return (
-      <div className="other-deck hand game-info">
-        <div className="count">Opponent Deck: {count} Cards</div>
-        {count === 0 ? (
-          <CardEmpty />
-        ) : (
-          <CardBack/> 
-        )}
-      </div>
-    );
-  };
-    
+ 
 
   useEffect(() => {
     if (!gameId) return;
@@ -252,12 +144,12 @@ function MferCastle() {
         <div className="player-area">
           <OtherPlayerHand game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
           <OtherPlayerDeck game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
-          <PlayerGraveyard game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} />
+          <PlayerGraveyard game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove} />
         </div>
         <div className="player-area">
             <PlayerHand game={game} playerSymbol={playerSymbol}/>
             <PlayerDeck game={game} playerSymbol={playerSymbol}/>
-            <PlayerGraveyard game={game} playerSymbol={playerSymbol} isOpponent={false}/>
+            <PlayerGraveyard game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
         </div>
         <div className="player-action-area">
             <button 

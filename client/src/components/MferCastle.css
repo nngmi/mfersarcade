@@ -10,25 +10,3 @@
     text-align: center;
     font-size: 24px;
 }
-
-.hand {
-    display: flex;
-    flex-direction: column; /* Stack children (count and cards container) vertically */
-    align-items: center; /* Center children horizontally */
-}
-
-.cards-container {
-    display: flex; /* Place cards next to each other */
-    gap: 10px; /* Add some gap between cards */
-}
-
-
-
-.player-area {
-    display: flex;
-    justify-content: space-between;
-}
-
-.player-area > * {
-    flex: 1;
-}
