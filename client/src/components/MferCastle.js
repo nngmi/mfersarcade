@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useParams } from 'react-router-dom';
 import './MferCastle.css';
-import { Howl } from 'howler';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'; 
 import { ToastContainer } from 'react-toastify';
 import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck } from './PlayAreas';
+import { basicSound, winSound, wrongSound } from './Sounds';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 
@@ -18,25 +18,6 @@ function MferCastle() {
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [playerSymbol, setPlayerSymbol] = useState(null);
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
-  const basicSound = new Howl({
-    src: ["/audio/correct.mp3"], // Replace with your sound file path
-    autoplay: false, // Play the sound right away
-    loop: false, // Do not loop the sound
-    volume: 0.5, // Set the volume to 50%
-  });
-  const winSound = new Howl({
-    src: ["/audio/success.mp3"], // Replace with your sound file path
-    autoplay: false, // Play the sound right away
-    loop: false, // Do not loop the sound
-    volume: 0.5, // Set the volume to 50%
-  });
-  const wrongSound = new Howl({
-    src: ["/audio/wrong_sound.mp3"], // Replace with your sound file path
-    autoplay: false, // Play the sound right away
-    loop: false, // Do not loop the sound
-    volume: 0.5, // Set the volume to 50%
-  });
- 
 
   useEffect(() => {
     if (!gameId) return;
