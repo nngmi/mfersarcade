@@ -8,7 +8,7 @@ import { ToastContainer } from 'react-toastify';
 import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck } from './PlayAreas';
 import { basicSound, winSound, wrongSound } from './Sounds';
 import { DndProvider } from 'react-dnd';
-import { HTML5Backend } from 'react-dnd-html5-backend';
+import { TouchBackend } from 'react-dnd-touch-backend';
 
 function MferCastle() {
   let { gameId } = useParams();
@@ -121,7 +121,8 @@ function MferCastle() {
             </div>
         ) : (
       <div className="game-board">
-      <DndProvider backend={HTML5Backend}>
+        <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
+
         <div className="player-area">
           <OtherPlayerHand game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
           <OtherPlayerDeck game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
