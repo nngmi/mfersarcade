@@ -11,30 +11,51 @@
     font-size: 24px;
 }
 
-.grid-container {
+.hand {
     display: flex;
-    justify-content: center;
-    align-items: center;
 }
 
-.grid {
-    display: grid;
-    grid-template: repeat(3, 1fr) / repeat(3, 1fr);
+/* Style for each card */
+.card {
+    width: 100px;
+    height: 150px;
+    border: 1px solid #000;
+    border-radius: 8px;
+    background-color: white;
+    margin: 5px;
+    position: relative;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
 }
 
-.cell {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 60px;
-    height: 60px;
-    cursor: pointer;
-    overflow: hidden;
-    border: 1px solid #000; 
-}
-
-.cell-img {
+/* Style for the back of the card */
+.card-back {
     width: 100%;
     height: 100%;
-    object-fit: contain;
+    border-radius: 8px;
+    background-color: #2B547E;
+    position: absolute;
+    backface-visibility: hidden;
+}
+
+/* Style for the front of the card */
+.card-front {
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    position: absolute;
+    backface-visibility: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.player-area {
+    display: flex;
+    justify-content: space-between;
+}
+
+.player-area > * {
+    flex: 1;
 }

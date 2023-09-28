@@ -8,6 +8,7 @@ function MferCastle() {
   let { gameId } = useParams();
   const [socket, setSocket] = useState(null);
   const [gameState, setGameState] = useState("waiting for other player");
+  const [game, setGame] = useState(null);
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [playerSymbol, setPlayerSymbol] = useState(null);
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
@@ -29,6 +30,40 @@ function MferCastle() {
     loop: false, // Do not loop the sound
     volume: 0.5, // Set the volume to 50%
   });
+  const PlayerHand = ({ game, playerSymbol }) => {
+    if (!playerSymbol) return;
+
+    const playerHand = game.hands[playerSymbol] || {};
+    console.log(playerHand);
+    const { cards = [], count = 0 } = playerHand;
+
+    return (
+      <div className="hand game-info">
+        <div className="count">Hand Count: {count}</div>
+        {cards.map((card, index) => (
+          <div key={index} className="card">
+            {cards[index].name}
+          </div>
+        ))}
+      </div>
+    );
+  }
+  const PlayerDeck = ({ game, playerSymbol }) => {
+    if (!playerSymbol) return;
+
+    const playerDeck = game.decks[playerSymbol] || {};
+    console.log(playerDeck);
+    const { cards = [], count = 0 } = playerDeck;
+
+    return (
+      <div className="hand game-info">
+        <div className="count">Deck # Cards: {count}</div>
+        <div className="card"></div>
+      </div>
+    );
+  }
+
+
   useEffect(() => {
     if (!gameId) return;
     let playerSymbolLocal = null;
@@ -42,6 +77,7 @@ function MferCastle() {
       console.log("got game", game);
       setCurrentPlayer(game.currentPlayer);
       setGameState(game.state);
+      setGame(game);
       console.log(game.state);
       console.log(playerSymbolLocal);
       if (game.state === `${playerSymbolLocal}-wins`) {
@@ -71,7 +107,8 @@ function MferCastle() {
             setGameState("error");
         } else {
             setCurrentPlayer(game.currentPlayer);
-            setGameState(game.state);    
+            setGameState(game.state); 
+            setGame(game);   
         }
       })
       .catch((error) => console.error('Error fetching the game:', error));
@@ -79,7 +116,7 @@ function MferCastle() {
 
   const makeMove = (row, col) => {
     console.log("in make move", currentPlayer, playerSymbol);
-    //socket.emit("makeMove", gameId, row, col);
+    socket.emit("makeMove", gameId, "draw");
   };
 
   return gameState === "error" ? (
@@ -124,7 +161,18 @@ function MferCastle() {
         {gameState === "X-wins" && playerSymbol === 'O' && <p>Game State: You Lose </p>}
         {gameState === "O-wins" && playerSymbol === 'X' && <p>Game State: You Lose </p>}
         {gameState === "O-wins" && playerSymbol === 'O' && <p>Game State: You Win! </p>}
-
+        <div className="player-area">
+            <PlayerHand game={game} playerSymbol={playerSymbol}/>
+            <PlayerDeck game={game} playerSymbol={playerSymbol}/>
+            <button 
+                className="draw-button" 
+                onClick={() => makeMove()}
+                disabled={currentPlayer !== playerSymbol || gameState !== "ongoing"}
+            >
+                Draw Card
+            </button>
+        </div>
+          
         <p>
             <a href="/" className="back-button">
                 Back to Home
