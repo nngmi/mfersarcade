@@ -85,6 +85,11 @@ module.exports = (io) => {
                     return socket.emit("error", "No more cards");
                 }
             } else if (moveType === "yield") {
+                // increment resources for oher player
+                const otherPlayerSymbol = game.currentPlayer === "X" ? "O" : "X";
+                const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
+                otherPlayer.spendingResources += otherPlayer.generators;
+
                 game.players.forEach((player) => {
                     if (player.id != socket.id) {
                         console.log("emitting to player ", player.id);
@@ -131,11 +136,19 @@ module.exports = (io) => {
                 const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
                 
                 if (cardIndex === -1) {
+                  console.group(game.hands[player.symbol]);
+                  console.group(cardid);
                   return socket.emit("error", "Error with play, card not found in hand");
                 }
-                
+
+                const card = game.hands[player.symbol].cards[cardIndex];
+                if (card.cost > player.spendingResources) {
+                    return socket.emit("error", "Card " + card.name + " costs " + card.cost + " and you only have " + player.spendingResources + " resources");
+                }
+                // spend the resources
+                player.spendingResources -= card.cost;
                 // removing card from hand
-                const [card] = game.hands[player.symbol].cards.splice(cardIndex, 1);
+                game.hands[player.symbol].cards.splice(cardIndex, 1);
                 game.hands[player.symbol].count--;
                 
                 // appending card to battlefield

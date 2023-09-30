@@ -2,7 +2,28 @@ import { Card, CardBack, CardEmpty } from './Card';
 import { useDrop } from 'react-dnd';
 import './PlayAreas.css'; // assuming you have a CSS file for styles
 
-
+export const PlayerGameState = ({ game, playerSymbol }) => {
+  function getPlayerLife(game, playerSymbol) {
+    const player = game.players.find(player => player.symbol === playerSymbol);
+    return player ? player.castleStrength : null;
+  }
+  function getPlayerGenerators(game, playerSymbol) {
+    const player = game.players.find(player => player.symbol === playerSymbol);
+    return player ? player.generators : null;
+  }
+  function getPlayerSpendingResource(game, playerSymbol) {
+    const player = game.players.find(player => player.symbol === playerSymbol);
+    return player ? player.spendingResources : null;
+  }
+  
+  return (
+    <div>
+      <p className="marginSpan">Castle Strength: {getPlayerLife(game, playerSymbol)}</p>
+      <p className="marginSpan">Generators: {getPlayerGenerators(game, playerSymbol)}</p>
+      <p className="marginSpan">Spending Resource: {getPlayerSpendingResource(game, playerSymbol)}</p>
+    </div>
+  );
+}
 
 export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
   function getPlayerLife(game, playerSymbol) {
@@ -19,8 +40,6 @@ export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
   return (
     <div>
       <span className="marginSpan">Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</span>
-      <span className="marginSpan">Your Life: {getPlayerLife(game, playerSymbol)}</span>
-      <span className="marginSpan">Opponent Life: {getPlayerLife(game, getOpponentSymbol(playerSymbol))}</span>
     </div>
   );
 }
@@ -39,7 +58,7 @@ export const PlayerHand = ({ game, playerSymbol }) => {
       </div>
       <div className="cards-container">
         {cards.map((card, index) => (
-          <Card key={index} card={card} />
+          <Card key={card.id} card={card} />
         ))}
       </div>
     </div>
@@ -70,7 +89,6 @@ export const PlayerGraveyard = ({ game, playerSymbol, isOpponent, makeMove={make
     accept: 'CARD',
     drop: (item, monitor) => {
       if (item.type === 'Card' && !isOpponent) {
-        console.log(game);
         makeMove("discard", { "cardid": item.id });
       }
     }
@@ -102,7 +120,6 @@ export const PlayerBattlefield = ({ game, playerSymbol, isOpponent, makeMove={ma
     accept: 'CARD',
     drop: (item, monitor) => {
       if (item.type === 'Card' && !isOpponent) {
-        console.log(game);
         makeMove("play", { "cardid": item.id });
       }
     }

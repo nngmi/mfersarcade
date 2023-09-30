@@ -7,10 +7,17 @@ const [, ref] = useDrag(() => ({
     type: 'CARD',
     item: { type: 'Card', id: card.id }
     }));
-  const { name, color } = card;
+  const { name, color, text, cost } = card;
   return (
-    <div ref={ref} className={`card ${color}`}>
-      {name}
+    <div>
+      <div ref={ref} className={`card ${color}`} alt={card.id}>
+        <div className="cardTitle">
+          {name} {cost}
+        </div>
+        <div className="cardText">
+          {text}
+        </div>
+      </div>
     </div>
   );
 };

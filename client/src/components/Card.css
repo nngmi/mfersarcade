@@ -10,6 +10,13 @@
     box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
 }
 
+.cardTitle {
+    font-size: 0.7em;
+}
+.cardText {
+    font-size: 0.5em;
+}
+
 .card.green {
     background-color: green;
 }
