@@ -3,32 +3,31 @@ import { useDrop } from 'react-dnd';
 import './PlayAreas.css'; // assuming you have a CSS file for styles
 
 export const PlayerGameState = ({ game, playerSymbol }) => {
-  function getCastleStrength(game, playerSymbol) {
-    const player = game.players.find(player => player.symbol === playerSymbol);
-    return player ? player.castleStrength : null;
+  function getPlayer(game, playerSymbol) {
+    return game.players.find(player => player.symbol === playerSymbol) || {};
   }
-  function getWallStrength(game, playerSymbol) {
-    const player = game.players.find(player => player.symbol === playerSymbol);
-    return player ? player.wallStrength : null;
-  }
-  function getPlayerGenerators(game, playerSymbol) {
-    const player = game.players.find(player => player.symbol === playerSymbol);
-    return player ? player.generators : null;
-  }
-  function getPlayerSpendingResource(game, playerSymbol) {
-    const player = game.players.find(player => player.symbol === playerSymbol);
-    return player ? player.spendingResources : null;
-  }
-  
+
+  const {
+    castleStrength = null,
+    wallStrength = null,
+    generators = null,
+    spendingResources = null,
+    drawsLeft = null,
+    discardsLeft = null,
+  } = getPlayer(game, playerSymbol);
+
   return (
     <div>
-      <p className="marginSpan">Castle Strength: {getCastleStrength(game, playerSymbol)}</p>
-      <p className="marginSpan">Wall Strength: {getWallStrength(game, playerSymbol)}</p>
-      <p className="marginSpan">Generators: {getPlayerGenerators(game, playerSymbol)}</p>
-      <p className="marginSpan">Spending Resource: {getPlayerSpendingResource(game, playerSymbol)}</p>
+      <p className="marginSpan">Tower Strength: {castleStrength}</p>
+      <p className="marginSpan">Wall Strength: {wallStrength}</p>
+      <p className="marginSpan">Generators: {generators}</p>
+      <p className="marginSpan">Spending Resource: {spendingResources}</p>
+      <p className="marginSpan">Draws Left: {drawsLeft}</p>
+      <p className="marginSpan">Discards Left: {discardsLeft}</p>
     </div>
   );
 }
+
 
 export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
   function getPlayerLife(game, playerSymbol) {
@@ -51,7 +50,7 @@ export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
 }
 
 export const PlayerHand = ({ game, playerSymbol }) => {
-  if (!playerSymbol) return;
+  if (!playerSymbol) return null;
 
   const playerHand = game.hands[playerSymbol] || {};
   console.log(playerHand);
@@ -63,9 +62,15 @@ export const PlayerHand = ({ game, playerSymbol }) => {
         {count > 0 ? `Your Hand Count: ${count}` : "Your Hand is Empty"}
       </div>
       <div className="cards-container">
-        {cards.map((card, index) => (
-          <Card key={card.id} card={card} />
-        ))}
+        {game.state === "waiting for other player" ?
+          cards.map((card, index) => (
+            <CardBack key={card.id} />
+          ))
+          :
+          cards.map((card, index) => (
+            <Card key={card.id} card={card} />
+          ))
+        }
       </div>
     </div>
   );

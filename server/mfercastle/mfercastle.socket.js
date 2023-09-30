@@ -95,6 +95,10 @@ module.exports = (io) => {
                 console.log(game.decks[player.symbol]);
                 if (game.decks[player.symbol] && game.decks[player.symbol].count > 0) {
 
+                    if (player.drawsLeft == 0) {
+                        return socket.emit("error", "No more draws left");
+                    }
+
                     if (game.hands[player.symbol].count >= 5) {
                         return socket.emit("error", "Hand is full, cannot draw any more cards");
                     }
@@ -102,6 +106,7 @@ module.exports = (io) => {
                     game.decks[player.symbol]["count"] = game.decks[player.symbol]["cards"].length;
                     game.hands[player.symbol]["cards"].push(card);
                     game.hands[player.symbol]["count"] += 1;
+                    player.drawsLeft -= 1;
                     game.players.forEach((player) => {
                         if (player.id != socket.id) {
                             console.log("emitting to player ", player.id);
@@ -135,6 +140,8 @@ module.exports = (io) => {
                 game.battlefields[player.symbol].count = 0;
                 game.turnNumber += 1;
                 otherPlayer.spendingResources += otherPlayer.generators;
+                otherPlayer.drawsLeft = 1;
+                otherPlayer.discardsLeft = 1;
 
                 game.currentPlayer = game.currentPlayer === "X" ? "O" : "X";
                 game.delayedEffects.forEach((effect) => {
@@ -159,6 +166,10 @@ module.exports = (io) => {
                 if (cardIndex === -1) {
                   return socket.emit("error", "Error with discard, card not found in hand");
                 }
+
+                if (player.discardsLeft == 0) {
+                    return socket.emit("error", "No more discards left");
+                }
                 
                 // removing card from hand
                 const [card] = game.hands[player.symbol].cards.splice(cardIndex, 1);
@@ -167,7 +178,7 @@ module.exports = (io) => {
                 // appending card to graveyard
                 game.graveyards[player.symbol].cards.push(card);
                 game.graveyards[player.symbol].count++;
-
+                player.discardsLeft -= 1;
                 // notify other players
                 game.players.forEach((player) => {
                     if (player.id != socket.id) {
