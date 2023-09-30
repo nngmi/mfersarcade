@@ -2,9 +2,33 @@
 const socketIo = require("socket.io");
 const { games, initializePlayer} = require('./state');
 const { cards, generateDeck } = require('./cards');
-function checkGameState() {
-    return "ongoing";
+function checkGameState(game) {
+    let draw = true;
+    let winner = null;
+    
+    game.players.forEach((player) => {
+        if (player.castleStrength > 0) {
+            if (winner === null) {
+                winner = player.symbol; // assuming player has a property 'symbol' which could be 'X' or 'O'
+                draw = false;
+            } else {
+                // If we find another player with castleStrength > 0, the game is ongoing
+                draw = false;
+                winner = null;
+                return "ongoing";
+            }
+        }
+    });
+    
+    if (draw) {
+        return "draw";
+    } else if (winner !== null) {
+        return `${winner}-wins`;
+    } else {
+        return "ongoing";
+    }
 }
+
 
 function maskGameForPlayer(game, playerSymbol) {
     const maskedGame = JSON.parse(JSON.stringify(game)); // deep copy
@@ -59,6 +83,10 @@ module.exports = (io) => {
             const player = game.players.find(p => p.id === socket.id);
             if (!player) return socket.emit("error", "Not a player in this game");
             console.log("after socket error");
+
+            if (game.state !== "ongoing") {
+                return socket.emit("error", "Game is over");
+            }
             
             // Check if it’s this player’s turn
             if (game.currentPlayer !== player.symbol) return socket.emit("error", "Not your turn");
@@ -116,6 +144,7 @@ module.exports = (io) => {
                         effect.effectFunc(game, game.currentPlayer);
                     }
                 });
+                game.state = checkGameState(game) || game.state;
                 
             } else if (moveType === "discard") {
                 const { cardid } = moveDetails;
@@ -189,7 +218,10 @@ module.exports = (io) => {
             }
             
             game.lastActivity = Date.now(),
-            game.state = checkGameState() || game.state;
+            game.state = checkGameState(game) || game.state;
+            if (game.state != "ongoing") {
+                socket.emit("error", "Game has ended!!");              
+            }
             game.players.forEach((player) => {
                 console.log("emitting to player ", player.id);
                 mfercastle.to(player.id).emit("gameUpdated", maskGameForPlayer(game, player.symbol));
