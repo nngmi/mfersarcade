@@ -36,6 +36,19 @@ function conjureGeneratorEffect(game, playerSymbol) {
   console.log(player.generators);
 }
 
+function getPlayers(game, playerSymbol) {
+  const otherPlayerSymbol = playerSymbol === "X" ? "O" : "X";
+  const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
+  const player = game.players.find(p => p.symbol === playerSymbol);
+  
+  return {
+    otherPlayerSymbol,
+    otherPlayer,
+    player
+  };
+}
+
+
 function dealDamage(damage, wallStrength, castleStrength, ignoreWall = false) {
   let remainingDamage;
 
@@ -58,9 +71,7 @@ function dealDamage(damage, wallStrength, castleStrength, ignoreWall = false) {
 }
 
 function violentGeneratorEffect(game, playerSymbol) {
-  const otherPlayerSymbol = playerSymbol === "X" ? "O" : "X";
-  const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
-  const player = game.players.find(p => p.symbol === playerSymbol);
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
   player.generators += 1;
   let { wallStrength, castleStrength } = dealDamage(10, otherPlayer.wallStrength, otherPlayer.castleStrength);
   otherPlayer.wallStrength = wallStrength;
@@ -68,9 +79,8 @@ function violentGeneratorEffect(game, playerSymbol) {
 }
 
 function stealEffect(game, playerSymbol) {
-  const otherPlayerSymbol = playerSymbol === "X" ? "O" : "X";
-  const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
-  const player = game.players.find(p => p.symbol === playerSymbol);
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+
   if (otherPlayer.generators > 0) {
     player.generators += 1;
     otherPlayer.generators -= 1;
@@ -82,57 +92,73 @@ function stealEffect(game, playerSymbol) {
 }
 
 function sneakEffect(game, playerSymbol) {
-  const otherPlayerSymbol = playerSymbol === "X" ? "O" : "X";
-  const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
-  const player = game.players.find(p => p.symbol === playerSymbol);
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+
   let { wallStrength, castleStrength } = dealDamage(7, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=true);
   otherPlayer.wallStrength = wallStrength;
   otherPlayer.castleStrength = castleStrength;
 }
 
+function assassinEffect(game, playerSymbol) {
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+
+  let { wallStrength, castleStrength } = dealDamage(20, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=true);
+  otherPlayer.wallStrength = wallStrength;
+  otherPlayer.castleStrength = castleStrength;
+}
+
 function bloodyBricksEffect(game, playerSymbol) {
-  const otherPlayerSymbol = playerSymbol === "X" ? "O" : "X";
-  const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
-  const player = game.players.find(p => p.symbol === playerSymbol);
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+
   let { wallStrength, castleStrength } = dealDamage(player.wallStrength, otherPlayer.wallStrength, otherPlayer.castleStrength);
   otherPlayer.wallStrength = wallStrength;
   otherPlayer.castleStrength = castleStrength;
 }
 
 function explosionEffect(game, playerSymbol) {
-  const otherPlayerSymbol = playerSymbol === "X" ? "O" : "X";
-  const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
-  const player = game.players.find(p => p.symbol === playerSymbol);
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+
   let { wallStrength, castleStrength } = dealDamage(25, otherPlayer.wallStrength, otherPlayer.castleStrength);
   otherPlayer.wallStrength = wallStrength;
   otherPlayer.castleStrength = castleStrength;
   player.generators += 1;
 }
 
+function levyEffect(game, playerSymbol) {
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+  otherPlayer.castleStrength -= (otherPlayer.castleStrength >= 10 ? 10 : otherPlayer.castleStrength);
+}
+
 function conjureResourcesEffectBase(game, playerSymbol) {
-  const otherPlayerSymbol = playerSymbol === "X" ? "O" : "X";
-  const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
-  const player = game.players.find(p => p.symbol === playerSymbol);
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+
   console.log("executing conjureResourcesEffectBase ", " for player ", playerSymbol);
   player.spendingResources += 7;
 }
 
+
 function splinterEffect(game, playerSymbol) {
-  const otherPlayerSymbol = playerSymbol === "X" ? "O" : "X";
-  const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
-  const player = game.players.find(p => p.symbol === playerSymbol);
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
   let { wallStrength, castleStrength } = dealDamage(2, otherPlayer.wallStrength, otherPlayer.castleStrength);
   otherPlayer.wallStrength = wallStrength;
   otherPlayer.castleStrength = castleStrength;
 
   function nextTurnEffect(game, playerSymbol) {
-    const otherPlayerSymbol = playerSymbol === "X" ? "O" : "X";
-    const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
-    const player = game.players.find(p => p.symbol === playerSymbol);
+    const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
     player.spendingResources += 1;
   }
+  
   delayEffect(2, nextTurnEffect);
+}
+
+function massacreEffect(game, playerSymbol) {
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+
+  let { wallStrength, castleStrength } = dealDamage(5 * game.graveyards[player.symbol].count, otherPlayer.wallStrength, otherPlayer.castleStrength);
+  otherPlayer.wallStrength = wallStrength;
+  otherPlayer.castleStrength = castleStrength;
+
 }
 
 function delayEffect( n_turns, baseEffect) {
@@ -145,13 +171,14 @@ function delayEffect( n_turns, baseEffect) {
 }
 
 function repurposeEffect(game, playerSymbol) {
-  const otherPlayerSymbol = playerSymbol === "X" ? "O" : "X";
-  const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
-  const player = game.players.find(p => p.symbol === playerSymbol);
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
   if (player.castleStrength > 15) {
     player.castleStrength -= 15;
     player.wallStrength += 30;
+  } else if (player.castleStrength > 1) {
+    player.castleStrength = 1;
+    player.wallStrength += 30;  
   }
 }
 
@@ -165,16 +192,16 @@ const cardsData = [
   {cardid: 5, name: "Explosion", cost: 10, text: "Add (1) generator and (3) spending resources. Deal 25 damage", color: "mfer", effect: explosionEffect},
   {cardid: 6, name: "Bloody Bricks", cost: 6, text: "Deal damage equal to your wall", color: "mfer", effect: bloodyBricksEffect},
   {cardid: 7, name: "Sneak", cost: 2, text: "Deal 7 damage. Ignore wall.", color: "mfer", effect: sneakEffect},
-  // {cardid: 8, name: "Assassin", cost: 5, text: "Deal 20 damage. Ignore wall.", color: "mfer"},
+  {cardid: 8, name: "Assassin", cost: 5, text: "Deal 20 damage. Ignore wall.", color: "mfer", effect: assassinEffect},
   // {cardid: 9, name: "Trinity", cost: 333, text: "Costs 3 less for each damage you have dealt to enemy walls or towers this game. Deal 33 damage. Gain 33 wall and 33 tower.", color: "mfer"},
-  // {cardid: 10, name: "Levy", cost: 5, text: "The enemy castle loses 10. Yours gains 10.", color: "mfer"},
+  {cardid: 10, name: "Levy", cost: 5, text: "The enemy tower loses 10. Yours gains 10.", color: "mfer", effect: levyEffect},
   // {cardid: 11, name: "Brick Break", cost: 6, text: "Deal 20 damage. Deals double damage to towers.", color: "mfer"},
   // {cardid: 12, name: "Bloody Ritual", cost: 0, text: "Lose 10 from your tower. Gain (5) spending resources", color: "mfer"},
   // {cardid: 13, name: "Weaken", cost: 4, text: "Deal 5 damage. Your opponents next wall or castle card is 50% less effective", color: "mfer"},
   {cardid: 14, name: "Repurpose", cost: 2, text: "Lose 15 tower. Gain 30 wall", color: "mfer", effect: repurposeEffect},
   // {cardid: 15, name: "Wall Fist", cost: 6, text: "Gain 15 wall. Deal 15 damage.", color: "mfer"},
   // {cardid: 16, name: "Turtle Up", cost: 4, text: "Gain 4 height and 10 wall", color: "mfer"},
-  // {cardid: 17, name: "Massacre", cost: 8, text: "Deal 3 damage for every card in your discard pile", color: "mfer"},
+  {cardid: 17, name: "Massacre", cost: 8, text: "Deal 3 damage for every card in your discard pile", color: "mfer", effect: massacreEffect},
   // {cardid: 18, name: "Abandon", cost: 7, text: "Discard your hand. Deal 5 damage for each card discarded.", color: "mfer"},
   // {cardid: 19, name: "Preparation", cost: 3, text: "Draw 2 cards next turn. Produce double resources next turn. Your attacks do 2 extra damage next turn.", color: "mfer"},
   // {cardid: 20, name: "Split", cost: 6, text: "Combine yours and your enemies wall and castle. Divide it equally, rounding up.", color: "mfer"},
