@@ -10,3 +10,24 @@
     text-align: center;
     font-size: 24px;
 }
+
+
+.player-area {
+    background-color: #3fffff;
+}
+.opponent-area {
+    background-color: #3fff00;
+}
+
+.player-area-row {
+    display: flex;
+    width: 100%;
+}
+
+.grow-width {
+    flex-grow: 1;
+}
+
+.fixed-width {
+    width: 150px; /* adjust as needed */
+}

@@ -120,6 +120,34 @@ module.exports = (io) => {
                         mfercastle.to(player.id).emit("notify", "Opponent discarded card " + card.name);
                     }
                 });
+            } else if (moveType === "play") {
+                const { cardid } = moveDetails;
+                console.log(moveDetails);
+
+                if (!cardid) {
+                  return socket.emit("error", "Error with play because cardid does not exist");
+                }
+                
+                const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
+                
+                if (cardIndex === -1) {
+                  return socket.emit("error", "Error with play, card not found in hand");
+                }
+                
+                // removing card from hand
+                const [card] = game.hands[player.symbol].cards.splice(cardIndex, 1);
+                game.hands[player.symbol].count--;
+                
+                // appending card to battlefield
+                game.battlefields[player.symbol].cards.push(card);
+                game.battlefields[player.symbol].count++;
+
+                // notify other players
+                game.players.forEach((player) => {
+                    if (player.id != socket.id) {
+                        mfercastle.to(player.id).emit("notify", "Opponent played card " + card.name);
+                    }
+                });
             } else {
                 return socket.emit("error", "Unknown move " + moveType);
             }

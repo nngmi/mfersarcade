@@ -10,16 +10,6 @@
 }
 
 
-
-.player-area {
-    display: flex;
-    justify-content: space-between;
-}
-
-.player-area > * {
-    flex: 1;
-}
-
 .marginSpan {
     margin-left: 0px;
     margin-right: 10px;

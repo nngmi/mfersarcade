@@ -6,7 +6,7 @@ const getInitialGameState = () => {
     return {
         players: [],
         decks: {},
-        battlefield: {},
+        battlefields: {},
         hands: {},
         graveyards: {}, 
         currentPlayer: "X",
@@ -20,6 +20,7 @@ const initializePlayer = (n_cards, game, playerSymbol, socketid) => {
     // shuffle a deck of cards for the user
     game.decks[playerSymbol] = {"count": n_cards, "cards": generateDeck(n_cards, socketid)};
     game.hands[playerSymbol] = {"count": 0, "cards": []};
+    game.battlefields[playerSymbol] = {"count": 0, "cards": []};
     game.graveyards[playerSymbol] = {"count": 0, "cards": []};
 };
 

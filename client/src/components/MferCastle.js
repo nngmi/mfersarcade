@@ -5,7 +5,7 @@ import './MferCastle.css';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'; 
 import { ToastContainer } from 'react-toastify';
-import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck, StateArea } from './PlayAreas';
+import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck, StateArea, PlayerBattlefield } from './PlayAreas';
 import { basicSound, winSound, wrongSound } from './Sounds';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
@@ -118,15 +118,25 @@ function MferCastle() {
       <div className="game-board">
         <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
 
-        <div className="player-area">
-          <OtherPlayerHand game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
-          <OtherPlayerDeck game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
-          <PlayerGraveyard game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove} />
+        <div className="player-area opponent-area">
+          <div className="player-area-row">        
+            <OtherPlayerHand className="grow-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
+            <OtherPlayerDeck className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
+          </div>
+          <div className="player-area-row">
+            <PlayerBattlefield className="grow-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove}/>
+            <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove} />
+          </div>
         </div>
         <div className="player-area">
-            <PlayerHand game={game} playerSymbol={playerSymbol}/>
-            <PlayerDeck game={game} playerSymbol={playerSymbol}/>
-            <PlayerGraveyard game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
+          <div className="player-area-row">
+              <PlayerBattlefield className="grow-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
+              <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
+          </div>
+          <div className="player-area-row">
+              <PlayerHand className="grow-width" game={game} playerSymbol={playerSymbol}/>
+              <PlayerDeck className="fixed-width" game={game} playerSymbol={playerSymbol}/>
+          </div>
         </div>
         <div className="player-action-area">
             <button 
