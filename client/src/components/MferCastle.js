@@ -5,7 +5,7 @@ import './MferCastle.css';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'; 
 import { ToastContainer } from 'react-toastify';
-import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck } from './PlayAreas';
+import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck, StateArea } from './PlayAreas';
 import { basicSound, winSound, wrongSound } from './Sounds';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
@@ -93,13 +93,8 @@ function MferCastle() {
     <div className="game-container">
         <h1 className="title">Mfer Castle</h1>
         {gameState === "ongoing" && (
-            <p>Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</p>
+          <StateArea game={game} playerSymbol={playerSymbol} currentPlayer={currentPlayer}/>
         )}
-        {gameState === "draw" && <p>Game State: Draw</p>}
-        {gameState === "X-wins" && playerSymbol === 'X' && <p>Game State: You Win! </p>}
-        {gameState === "X-wins" && playerSymbol === 'O' && <p>Game State: You Lose </p>}
-        {gameState === "O-wins" && playerSymbol === 'X' && <p>Game State: You Lose </p>}
-        {gameState === "O-wins" && playerSymbol === 'O' && <p>Game State: You Win! </p>}
         {gameState === "waiting for other player" ? (
             <div>
             <p>Waiting for Another Player to Start Game... </p> 

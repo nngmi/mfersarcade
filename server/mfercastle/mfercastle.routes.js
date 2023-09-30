@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-let games = require('./state');
+const { games, getInitialGameState} = require('./state');
 
 const cleanupGames = () => {
     const now = Date.now();
@@ -22,15 +22,7 @@ const cleanupGames = () => {
 router.post("/game", (req, res) => {
     const gameId = uuidv4();
     if (games[gameId]) return res.status(400).json({ message: "Game already exists" }); // This check is technically redundant now, as UUIDs are unique.
-    games[gameId] = {
-        players: [],
-        decks: {},
-        hands: {},
-        graveyards: {},
-        currentPlayer: "X",
-        state: "waiting for other player",
-        lastActivity: Date.now(),
-    };
+    games[gameId] = getInitialGameState();
     res.status(201).json({ gameId });
 });
 

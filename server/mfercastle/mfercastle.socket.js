@@ -1,6 +1,6 @@
 // mfercastle.socket.js
 const socketIo = require("socket.io");
-let games = require('./state');
+const { games, initializePlayer} = require('./state');
 const { cards, generateDeck } = require('./cards');
 function checkGameState() {
     return "ongoing";
@@ -35,11 +35,8 @@ module.exports = (io) => {
             console.log(`Player ${socket.id} joined game ${gameId}`);
             const playerSymbol = game.players.length === 0 ? "X" : "O";
     
-            game.players.push({ id: socket.id, symbol: playerSymbol });
-            // shuffle a deck of cards for the user
-            game.decks[playerSymbol] = {"count": 30, "cards": generateDeck(30, socket.id)};
-            game.hands[playerSymbol] = {"count": 0, "cards": []};
-            game.graveyards[playerSymbol] = {"count": 0, "cards": []};
+            initializePlayer(30, game, playerSymbol, socket.id);
+            
             if (game.players.length == 2) {
                 game.state = "ongoing";
             }

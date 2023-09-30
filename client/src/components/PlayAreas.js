@@ -2,6 +2,30 @@ import { Card, CardBack, CardEmpty } from './Card';
 import { useDrop } from 'react-dnd';
 import './PlayAreas.css'; // assuming you have a CSS file for styles
 
+
+
+export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
+  function getPlayerLife(game, playerSymbol) {
+    // Find the player object where symbol equals playerSymbol
+    const player = game.players.find(player => player.symbol === playerSymbol);
+    
+    // Return the life of the player if found, otherwise return null
+    return player ? player.life : null;
+  }
+  function getOpponentSymbol(playerSymbol) {
+    return playerSymbol === 'X' ? 'O' : 'X';
+  }
+  
+  return (
+    <div>
+      <span className="marginSpan">Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</span>
+      <span className="marginSpan">Your Life: {getPlayerLife(game, playerSymbol)}</span>
+      <span className="marginSpan">Opponent Life: {getPlayerLife(game, getOpponentSymbol(playerSymbol))}</span>
+    </div>
+  );
+
+}
+
 export const PlayerHand = ({ game, playerSymbol }) => {
     if (!playerSymbol) return;
 
