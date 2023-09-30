@@ -3,9 +3,13 @@ import { useDrop } from 'react-dnd';
 import './PlayAreas.css'; // assuming you have a CSS file for styles
 
 export const PlayerGameState = ({ game, playerSymbol }) => {
-  function getPlayerLife(game, playerSymbol) {
+  function getCastleStrength(game, playerSymbol) {
     const player = game.players.find(player => player.symbol === playerSymbol);
     return player ? player.castleStrength : null;
+  }
+  function getWallStrength(game, playerSymbol) {
+    const player = game.players.find(player => player.symbol === playerSymbol);
+    return player ? player.wallStrength : null;
   }
   function getPlayerGenerators(game, playerSymbol) {
     const player = game.players.find(player => player.symbol === playerSymbol);
@@ -18,7 +22,8 @@ export const PlayerGameState = ({ game, playerSymbol }) => {
   
   return (
     <div>
-      <p className="marginSpan">Castle Strength: {getPlayerLife(game, playerSymbol)}</p>
+      <p className="marginSpan">Castle Strength: {getCastleStrength(game, playerSymbol)}</p>
+      <p className="marginSpan">Wall Strength: {getWallStrength(game, playerSymbol)}</p>
       <p className="marginSpan">Generators: {getPlayerGenerators(game, playerSymbol)}</p>
       <p className="marginSpan">Spending Resource: {getPlayerSpendingResource(game, playerSymbol)}</p>
     </div>
@@ -40,6 +45,7 @@ export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
   return (
     <div>
       <span className="marginSpan">Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</span>
+      <span className="marginSpan">Turn Number: {game.turnNumber}</span>
     </div>
   );
 }

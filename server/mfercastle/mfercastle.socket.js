@@ -41,7 +41,6 @@ module.exports = (io) => {
                 game.state = "ongoing";
             }
             game.lastActivity = Date.now(),
-            console.log(game);
             socket.join(gameId);
             //smfercastle.to(gameId).emit("gameUpdated", game);
             socket.emit("playerSymbol", playerSymbol);
@@ -85,10 +84,10 @@ module.exports = (io) => {
                     return socket.emit("error", "No more cards");
                 }
             } else if (moveType === "yield") {
+                console.log("YIELDING TURN!!! on Turn ", game.turnNumber);
                 // increment resources for oher player
                 const otherPlayerSymbol = game.currentPlayer === "X" ? "O" : "X";
                 const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
-                otherPlayer.spendingResources += otherPlayer.generators;
 
                 game.players.forEach((player) => {
                     if (player.id != socket.id) {
@@ -96,7 +95,28 @@ module.exports = (io) => {
                         mfercastle.to(player.id).emit("notify", "Opponent has yielded their turn");
                     }
                 });
+                // clean up move everything from battlefield onto the graveyard
+                // Combine the two arrays
+                game.graveyards[player.symbol].cards = [...game.graveyards[player.symbol].cards, ...game.battlefields[player.symbol].cards];
+
+                // Update the count
+                game.graveyards[player.symbol].count += game.battlefields[player.symbol].count;
+
+                // Reset the battlefield cards and count
+                game.battlefields[player.symbol].cards = [];
+                game.battlefields[player.symbol].count = 0;
+                game.turnNumber += 1;
+                otherPlayer.spendingResources += otherPlayer.generators;
+
                 game.currentPlayer = game.currentPlayer === "X" ? "O" : "X";
+                game.delayedEffects.forEach((effect) => {
+                    console.log(effect);
+                    console.log(game.turnNumber);
+                    if (game.turnNumber === effect.turnNumber) {
+                        effect.effectFunc(game, game.currentPlayer);
+                    }
+                });
+                
             } else if (moveType === "discard") {
                 const { cardid } = moveDetails;
                 console.log(moveDetails);
@@ -161,13 +181,15 @@ module.exports = (io) => {
                         mfercastle.to(player.id).emit("notify", "Opponent played card " + card.name);
                     }
                 });
+                console.log("right before apply effect");
+                card.applyEffect(game, player.symbol);
+
             } else {
                 return socket.emit("error", "Unknown move " + moveType);
             }
             
             game.lastActivity = Date.now(),
             game.state = checkGameState() || game.state;
-            console.log(game);
             game.players.forEach((player) => {
                 console.log("emitting to player ", player.id);
                 mfercastle.to(player.id).emit("gameUpdated", maskGameForPlayer(game, player.symbol));
