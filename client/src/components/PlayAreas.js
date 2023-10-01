@@ -73,8 +73,13 @@ export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
   
   return (
     <div>
-      <span className="marginSpan">Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</span>
-      <span className="marginSpan">Turn Number: {game.turnNumber}</span>
+      <div className="marginSpan">Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</div>
+      <div className="marginSpan">Turn Number: {game.turnNumber}</div>
+      <div>
+        <a href="/" className="back-button">
+            Quit Game
+        </a>
+      </div>
     </div>
   );
 }
@@ -83,7 +88,6 @@ export const PlayerHand = ({ game, playerSymbol }) => {
   if (!playerSymbol) return null;
 
   const playerHand = game.hands[playerSymbol] || {};
-  console.log(playerHand);
   const { cards = [], count = 0 } = playerHand;
 
   return (
@@ -110,7 +114,6 @@ export const PlayerDeck = ({ game, playerSymbol }) => {
   if (!playerSymbol) return;
 
   const playerDeck = game.decks[playerSymbol] || {};
-  console.log(playerDeck);
   const { cards = [], count = 0 } = playerDeck;
 
   return (
@@ -187,7 +190,6 @@ export const OtherPlayerHand = ({ game, playerSymbol }) => {
   if (!playerSymbol) return null;
 
   const playerHand = game.hands[playerSymbol] || {};
-  console.log(playerHand);
   const { count = 0 } = playerHand;
 
   return (

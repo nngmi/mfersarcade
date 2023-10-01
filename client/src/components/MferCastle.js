@@ -77,7 +77,7 @@ function MferCastle() {
   }, [gameId]);
 
   const makeMove = (moveType, moveDetails) => {
-    console.log("in make move", currentPlayer, playerSymbol);
+    console.log(currentPlayer, "attempting to make move ", moveType, moveDetails, currentPlayer);
     socket.emit("makeMove", gameId, moveType, moveDetails);
   };
 
@@ -149,11 +149,6 @@ function MferCastle() {
               <PlayerDeck className="fixed-width" game={game} playerSymbol={playerSymbol}/>
           </div>
         </div>
-        <p>
-            <a href="/" className="back-button">
-                Back to Home
-            </a>
-        </p>
         <ToastContainer />
         </DndProvider>
         </div>

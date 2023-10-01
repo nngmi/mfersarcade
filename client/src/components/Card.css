@@ -8,6 +8,7 @@
     margin: 5px;
     position: relative;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    cursor: pointer; /* change cursor to a hand when it’s over the card */
 }
 
 .cardTitle {
