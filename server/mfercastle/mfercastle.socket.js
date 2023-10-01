@@ -1,33 +1,7 @@
 // mfercastle.socket.js
 const socketIo = require("socket.io");
-const { games, initializePlayer} = require('./state');
+const { games, initializePlayer, endTurn, beginTurn, checkGameState} = require('./state');
 const { cards, generateDeck } = require('./cards');
-function checkGameState(game) {
-    let draw = true;
-    let winner = null;
-    
-    game.players.forEach((player) => {
-        if (player.castleStrength > 0) {
-            if (winner === null) {
-                winner = player.symbol; // assuming player has a property 'symbol' which could be 'X' or 'O'
-                draw = false;
-            } else {
-                // If we find another player with castleStrength > 0, the game is ongoing
-                draw = false;
-                winner = null;
-                return "ongoing";
-            }
-        }
-    });
-    
-    if (draw) {
-        return "draw";
-    } else if (winner !== null) {
-        return `${winner}-wins`;
-    } else {
-        return "ongoing";
-    }
-}
 
 
 function maskGameForPlayer(game, playerSymbol) {
@@ -63,10 +37,11 @@ module.exports = (io) => {
             
             if (game.players.length == 2) {
                 game.state = "ongoing";
+                // beginTurn sets currentPlayer
+                beginTurn(game, "X");
             }
             game.lastActivity = Date.now(),
             socket.join(gameId);
-            //smfercastle.to(gameId).emit("gameUpdated", game);
             socket.emit("playerSymbol", playerSymbol);
             game.players.forEach((player) => {
                 console.log("emitting to player ", player.id);
@@ -117,41 +92,21 @@ module.exports = (io) => {
                     return socket.emit("error", "No more cards");
                 }
             } else if (moveType === "yield") {
-                console.log("YIELDING TURN!!! on Turn ", game.turnNumber);
-                // increment resources for oher player
                 const otherPlayerSymbol = game.currentPlayer === "X" ? "O" : "X";
                 const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
 
+                endTurn(game, player.symbol);
+
+                // notify the player
                 game.players.forEach((player) => {
                     if (player.id != socket.id) {
                         console.log("emitting to player ", player.id);
                         mfercastle.to(player.id).emit("notify", "Opponent has yielded their turn");
                     }
                 });
-                // clean up move everything from battlefield onto the graveyard
-                // Combine the two arrays
-                game.graveyards[player.symbol].cards = [...game.graveyards[player.symbol].cards, ...game.battlefields[player.symbol].cards];
 
-                // Update the count
-                game.graveyards[player.symbol].count += game.battlefields[player.symbol].count;
-
-                // Reset the battlefield cards and count
-                game.battlefields[player.symbol].cards = [];
-                game.battlefields[player.symbol].count = 0;
-                game.turnNumber += 1;
-                otherPlayer.spendingResources += otherPlayer.generators;
-                otherPlayer.drawsLeft = 1;
-                otherPlayer.discardsLeft = 1;
-
-                game.currentPlayer = game.currentPlayer === "X" ? "O" : "X";
-                game.delayedEffects.forEach((effect) => {
-                    console.log(effect);
-                    console.log(game.turnNumber);
-                    if (game.turnNumber === effect.turnNumber) {
-                        effect.effectFunc(game, game.currentPlayer);
-                    }
-                });
-                game.state = checkGameState(game) || game.state;
+                // beginTurn sets currentPlayer
+                beginTurn(game, otherPlayer.symbol);
                 
             } else if (moveType === "discard") {
                 const { cardid } = moveDetails;

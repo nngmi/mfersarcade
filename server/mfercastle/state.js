@@ -1,6 +1,32 @@
 const { cards, generateDeck } = require('./cards');
 
 let games = {};
+function checkGameState(game) {
+    let draw = true;
+    let winner = null;
+    
+    game.players.forEach((player) => {
+        if (player.castleStrength > 0) {
+            if (winner === null) {
+                winner = player.symbol; // assuming player has a property 'symbol' which could be 'X' or 'O'
+                draw = false;
+            } else {
+                // If we find another player with castleStrength > 0, the game is ongoing
+                draw = false;
+                winner = null;
+                return "ongoing";
+            }
+        }
+    });
+    
+    if (draw) {
+        return "draw";
+    } else if (winner !== null) {
+        return `${winner}-wins`;
+    } else {
+        return "ongoing";
+    }
+}
 
 const getInitialGameState = () => {
     return {
@@ -36,10 +62,44 @@ const initializePlayer = (n_cards, game, playerSymbol, socketid) => {
     game.graveyards[playerSymbol] = {"count": 0, "cards": []};
 };
 
+const endTurn = (game, playerSymbol) => {
+    // clean up move everything from battlefield onto the graveyard
+    // Combine the two arrays
+    game.graveyards[playerSymbol].cards = [...game.graveyards[playerSymbol].cards, ...game.battlefields[playerSymbol].cards];
+
+    // Update the count
+    game.graveyards[playerSymbol].count += game.battlefields[playerSymbol].count;
+
+    // Reset the battlefield cards and count
+    game.battlefields[playerSymbol].cards = [];
+    game.battlefields[playerSymbol].count = 0;
+};
+
+const beginTurn = (game, playerSymbol) => {
+    const player = game.players.find(p => p.symbol === playerSymbol);
+    game.turnNumber += 1;
+    player.spendingResources += player.generators;
+    player.drawsLeft = 1;
+    player.discardsLeft = 1;
+
+    game.currentPlayer = player.symbol;
+    game.delayedEffects.forEach((effect) => {
+        console.log(effect);
+        console.log(game.turnNumber);
+        if (game.turnNumber === effect.turnNumber) {
+            effect.effectFunc(game, player.symbol);
+        }
+    });
+    game.state = checkGameState(game) || game.state;
+}
+
 
 
 module.exports = {
     games,
     getInitialGameState,
     initializePlayer,
+    endTurn,
+    beginTurn,
+    checkGameState,
 };

@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "jest test/cards.test",
+    "test": "jest test/*.test.js",
     "start": "node server/index.js",
     "build": "cd client && npm install && npm run build"
   },
