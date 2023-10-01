@@ -40,6 +40,7 @@ const getInitialGameState = () => {
         state: "waiting for other player",
         lastActivity: Date.now(),
         delayedEffects: [],
+        lock: false,
     };
 };
 
@@ -91,8 +92,56 @@ const beginTurn = (game, playerSymbol) => {
         }
     });
     game.state = checkGameState(game) || game.state;
-}
+};
 
+const drawCard = (game, playerSymbol) => {
+    const player = game.players.find(p => p.symbol === playerSymbol);
+    if (game.decks[player.symbol] && game.decks[player.symbol].count > 0) {
+
+        if (player.drawsLeft <= 0) {
+            return "No more draws left";
+        }
+
+        if (game.hands[player.symbol].count >= 5) {
+            return "Hand is full, cannot draw any more cards";
+        }
+        let card = game.decks[player.symbol]["cards"].pop();
+        game.decks[player.symbol]["count"] = game.decks[player.symbol]["cards"].length;
+        game.hands[player.symbol]["cards"].push(card);
+        game.hands[player.symbol]["count"] += 1;
+        player.drawsLeft -= 1;
+    } else {
+        return "No more cards in deck";
+    }
+    return null;
+};
+
+const discardCard = (game, cardid, playerSymbol) => {
+    const player = game.players.find(p => p.symbol === playerSymbol);
+    if (!cardid) {
+        return "Error with discard because cardid does not exist";
+    }
+    
+    const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
+    
+    if (cardIndex === -1) {
+    return "Error with discard, card not found in hand";
+    }
+
+    if (player.discardsLeft == 0) {
+        return "error", "No more discards left";
+    }
+    
+    // removing card from hand
+    const [card] = game.hands[player.symbol].cards.splice(cardIndex, 1);
+    game.hands[player.symbol].count--;
+    
+    // appending card to graveyard
+    game.graveyards[player.symbol].cards.push(card);
+    game.graveyards[player.symbol].count++;
+    player.discardsLeft -= 1;
+    return null;
+};
 
 
 module.exports = {
@@ -102,4 +151,6 @@ module.exports = {
     endTurn,
     beginTurn,
     checkGameState,
+    drawCard,
+    discardCard,
 };
