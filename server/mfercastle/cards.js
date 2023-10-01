@@ -127,8 +127,9 @@ function explosionEffect(game, playerSymbol) {
 }
 
 function levyEffect(game, playerSymbol) {
-  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+  const { otherPlayer, player } = getPlayers(game, playerSymbol);
   otherPlayer.castleStrength -= (otherPlayer.castleStrength >= 10 ? 10 : otherPlayer.castleStrength);
+  player.castleStrength += 10;
 }
 
 function conjureResourcesEffectBase(game, playerSymbol) {
@@ -155,7 +156,7 @@ function splinterEffect(game, playerSymbol) {
 }
 
 function bloodyRitualEffect(game, playerSymbol) {
-  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+  const { player } = getPlayers(game, playerSymbol);
 
   if (player.castleStrength > 10) {
     player.castleStrength -= 10;
@@ -167,8 +168,6 @@ function bloodyRitualEffect(game, playerSymbol) {
     // does not activate
   }
 
-
-  game.delayedEffects.push({turnNumber: game.turnNumber + 2, effectFunc: nextTurnEffect});
 }
 
 function brickBreakEffect(game, playerSymbol) {
