@@ -251,7 +251,7 @@ const cards = cardsData.map((data, index) => {
 
 const cardMap = {};
 cards.forEach(card => {
-  cardMap[card.id] = card;
+  cardMap[card.cardid] = card;
 });
 
 const getCardByID = (id) => {
@@ -277,7 +277,7 @@ const generateDeck = (n, playerID) => {
 };
 
 module.exports = {
-  cards,
+  cardMap,
   generateDeck,
   getCardByID,
   repurposeEffect,

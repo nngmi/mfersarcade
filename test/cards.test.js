@@ -1,24 +1,25 @@
-const { repurposeEffect, splinterEffect, getPlayers } = require('../server/mfercastle/cards');
+const { cardMap, getPlayers } = require('../server/mfercastle/cards');
 const { initializePlayer, getInitialGameState } = require('../server/mfercastle/state');
 
 describe('repurposeEffect function', () => {
   let game;
   const playerSymbol = "X";
   const otherPlayerSymbol = "O";
+  const repurposeCard = cardMap[14];
 
   beforeEach(() => {
+    expect(repurposeCard.name === "Repurpose");
     game = getInitialGameState();
     initializePlayer(30, game, playerSymbol, "1234");
     initializePlayer(30, game, otherPlayerSymbol, "3456");
     let { player } = getPlayers(game, playerSymbol);
     player.wallStrength = 5;
-    
   });
 
   test('should decrease castleStrength by 15 and increase wallStrength by 30 when castleStrength > 15', () => {
     let { player } = getPlayers(game, playerSymbol);
     player.castleStrength = 20;
-    repurposeEffect(game, playerSymbol);
+    repurposeCard.effect(game, playerSymbol);
     expect(player.castleStrength).toBe(5);
     expect(player.wallStrength).toBe(35);
   });
@@ -26,7 +27,7 @@ describe('repurposeEffect function', () => {
   test('should set castleStrength to 1 and increase wallStrength by 30 when 1 < castleStrength <= 15', () => {
     let { player } = getPlayers(game, playerSymbol);
     player.castleStrength = 10;
-    repurposeEffect(game, playerSymbol);
+    repurposeCard.effect(game, playerSymbol);
     expect(player.castleStrength).toBe(1);
     expect(player.wallStrength).toBe(35);
   });
@@ -34,7 +35,7 @@ describe('repurposeEffect function', () => {
   test('should not change castleStrength and wallStrength when castleStrength <= 1', () => {
     let { player } = getPlayers(game, playerSymbol);
     player.castleStrength = 1;
-    repurposeEffect(game, playerSymbol);    
+    repurposeCard.effect(game, playerSymbol);    
     expect(player.castleStrength).toBe(1);
     expect(player.wallStrength).toBe(5);
   });
@@ -45,8 +46,11 @@ describe('splinterEffect function', () => {
   let game;
   const playerSymbol = "X";
   const otherPlayerSymbol = "O";
+  const splinterCard = cardMap[21];
 
   beforeEach(() => {
+    console.log(splinterCard);
+    expect(splinterCard.name === "Splinter");
     game = getInitialGameState();
     initializePlayer(30, game, playerSymbol, "1234");
     initializePlayer(30, game, otherPlayerSymbol, "3456");
@@ -60,7 +64,7 @@ describe('splinterEffect function', () => {
     const initialCastleStrength = otherPlayer.castleStrength;
 
     
-    splinterEffect(game, playerSymbol);
+    splinterCard.effect(game, playerSymbol);
     
     // Check that the damage has been dealt correctly
     expect(otherPlayer.wallStrength).toBe(Math.max(0, initialWallStrength - 2));
