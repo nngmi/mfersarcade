@@ -19,7 +19,7 @@ describe('repurposeEffect function', () => {
   test('should decrease castleStrength by 15 and increase wallStrength by 30 when castleStrength > 15', () => {
     let { player } = getPlayers(game, playerSymbol);
     player.castleStrength = 20;
-    repurposeCard.effect(game, playerSymbol);
+    expect(repurposeCard.effect(game, playerSymbol)).toBe(null);
     expect(player.castleStrength).toBe(5);
     expect(player.wallStrength).toBe(35);
   });
@@ -27,7 +27,7 @@ describe('repurposeEffect function', () => {
   test('should set castleStrength to 1 and increase wallStrength by 30 when 1 < castleStrength <= 15', () => {
     let { player } = getPlayers(game, playerSymbol);
     player.castleStrength = 10;
-    repurposeCard.effect(game, playerSymbol);
+    expect(repurposeCard.effect(game, playerSymbol)).toBe(null);
     expect(player.castleStrength).toBe(1);
     expect(player.wallStrength).toBe(35);
   });
@@ -35,7 +35,7 @@ describe('repurposeEffect function', () => {
   test('should not change castleStrength and wallStrength when castleStrength <= 1', () => {
     let { player } = getPlayers(game, playerSymbol);
     player.castleStrength = 1;
-    repurposeCard.effect(game, playerSymbol);    
+    expect(repurposeCard.effect(game, playerSymbol)).toBe("tower strength is at 1");
     expect(player.castleStrength).toBe(1);
     expect(player.wallStrength).toBe(5);
   });
@@ -131,7 +131,7 @@ describe('bloodyRitualEffect function', () => {
   test('should decrease player castleStrength by 10 and increase spendingResources by 5 when player castleStrength > 10', () => {
     let { player } = getPlayers(game, playerSymbol);
     player.castleStrength = 20;
-    bloodyRitualCard.effect(game, playerSymbol);
+    expect(bloodyRitualCard.effect(game, playerSymbol)).toBe(null);
     expect(player.castleStrength).toBe(10);
     expect(player.spendingResources).toBe(8);
   });
@@ -139,7 +139,7 @@ describe('bloodyRitualEffect function', () => {
   test('should set player castleStrength to 1 and increase spendingResources by 5 when 1 < player castleStrength <= 10', () => {
     let { player } = getPlayers(game, playerSymbol);
     player.castleStrength = 10;
-    bloodyRitualCard.effect(game, playerSymbol);
+    expect(bloodyRitualCard.effect(game, playerSymbol)).toBe(null);
     expect(player.castleStrength).toBe(1);
     expect(player.spendingResources).toBe(8);
   });
@@ -147,7 +147,7 @@ describe('bloodyRitualEffect function', () => {
   test('should not change player castleStrength and spendingResources when player castleStrength <= 1', () => {
     let { player } = getPlayers(game, playerSymbol);
     player.castleStrength = 1;
-    bloodyRitualCard.effect(game, playerSymbol);
+    expect(bloodyRitualCard.effect(game, playerSymbol)).toBe("towerStrength is at 1");
     expect(player.castleStrength).toBe(1);
     expect(player.spendingResources).toBe(3);
   });
