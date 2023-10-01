@@ -1,6 +1,7 @@
 import { Card, CardBack, CardEmpty } from './Card';
 import { useDrop } from 'react-dnd';
 import './PlayAreas.css'; // assuming you have a CSS file for styles
+import CastleVisualization from './CastleVisualization';
 
 export const PlayerGameState = ({ game, playerSymbol }) => {
   function getPlayer(game, playerSymbol) {
@@ -18,6 +19,7 @@ export const PlayerGameState = ({ game, playerSymbol }) => {
 
   return (
     <div>
+      <CastleVisualization towerHealth={castleStrength} wallHealth={wallStrength}/>
       <p className="marginSpan">Tower Strength: {castleStrength}</p>
       <p className="marginSpan">Wall Strength: {wallStrength}</p>
       <p className="marginSpan">Generators: {generators}</p>
