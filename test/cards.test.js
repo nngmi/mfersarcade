@@ -95,6 +95,7 @@ describe('levyEffect function', () => {
   test('should decrease otherPlayer castleStrength by 10 and increase player castleStrength by 10 when otherPlayer castleStrength >= 10', () => {
     let { otherPlayer, player } = getPlayers(game, playerSymbol);
     otherPlayer.castleStrength = 20;
+    player.castleStrength = 20;
     levyCard.effect(game, playerSymbol);
     expect(otherPlayer.castleStrength).toBe(10);
     expect(player.castleStrength).toBe(30);
@@ -103,6 +104,7 @@ describe('levyEffect function', () => {
   test('should set otherPlayer castleStrength to 0 and increase player castleStrength by 10 when 0 < otherPlayer castleStrength < 10', () => {
     let { otherPlayer, player } = getPlayers(game, playerSymbol);
     otherPlayer.castleStrength = 5;
+    player.castleStrength = 20;
     levyCard.effect(game, playerSymbol);
     expect(otherPlayer.castleStrength).toBe(0);
     expect(player.castleStrength).toBe(30);
@@ -111,6 +113,7 @@ describe('levyEffect function', () => {
   test('should not change otherPlayer castleStrength and increase player castleStrength by 10 when otherPlayer castleStrength <= 0', () => {
     let { otherPlayer, player } = getPlayers(game, playerSymbol);
     otherPlayer.castleStrength = 0;
+    player.castleStrength = 20;
     levyCard.effect(game, playerSymbol);
     expect(otherPlayer.castleStrength).toBe(0);
     expect(player.castleStrength).toBe(30);
