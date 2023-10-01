@@ -73,11 +73,11 @@ function dealDamage(damage, wallStrength, towerStrength, ignoreWall = false, wal
 }
 
 function violentGeneratorEffect(game, playerSymbol) {
-  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+  const { otherPlayer, player } = getPlayers(game, playerSymbol);
   player.generators += 1;
-  let { wallStrength, castleStrength } = dealDamage(10, otherPlayer.wallStrength, otherPlayer.castleStrength);
+  let { wallStrength, towerStrength } = dealDamage(10, otherPlayer.wallStrength, otherPlayer.castleStrength);
   otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = castleStrength;
+  otherPlayer.castleStrength = towerStrength;
 }
 
 function stealEffect(game, playerSymbol) {
@@ -96,33 +96,33 @@ function stealEffect(game, playerSymbol) {
 function sneakEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, castleStrength } = dealDamage(7, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=true);
+  let { wallStrength, towerStrength } = dealDamage(7, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=true);
   otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = castleStrength;
+  otherPlayer.castleStrength = towerStrength;
 }
 
 function assassinEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, castleStrength } = dealDamage(20, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=true);
+  let { wallStrength, towerStrength } = dealDamage(20, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=true);
   otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = castleStrength;
+  otherPlayer.castleStrength = towerStrength;
 }
 
 function bloodyBricksEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, castleStrength } = dealDamage(player.wallStrength, otherPlayer.wallStrength, otherPlayer.castleStrength);
+  let { wallStrength, towerStrength } = dealDamage(player.wallStrength, otherPlayer.wallStrength, otherPlayer.castleStrength);
   otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = castleStrength;
+  otherPlayer.castleStrength = towerStrength;
 }
 
 function explosionEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, castleStrength } = dealDamage(25, otherPlayer.wallStrength, otherPlayer.castleStrength);
+  let { wallStrength, towerStrength } = dealDamage(25, otherPlayer.wallStrength, otherPlayer.castleStrength);
   otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = castleStrength;
+  otherPlayer.castleStrength = towerStrength;
   player.generators += 1;
 }
 
@@ -140,11 +140,11 @@ function conjureResourcesEffectBase(game, playerSymbol) {
 
 
 function splinterEffect(game, playerSymbol) {
-  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+  let { otherPlayer } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, castleStrength } = dealDamage(2, otherPlayer.wallStrength, otherPlayer.castleStrength);
+  let { wallStrength, towerStrength } = dealDamage(2, otherPlayer.wallStrength, otherPlayer.castleStrength);
   otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = castleStrength;
+  otherPlayer.castleStrength = towerStrength;
 
   function nextTurnEffect(game, playerSymbol) {
     const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
@@ -174,17 +174,17 @@ function bloodyRitualEffect(game, playerSymbol) {
 function brickBreakEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, castleStrength } = dealDamage(6, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=false, wallDamageMultiplier = 2);
+  let { wallStrength, towerStrength } = dealDamage(6, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=false, wallDamageMultiplier = 2);
   otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = castleStrength;
+  otherPlayer.castleStrength = towerStrength;
 }
 
 function massacreEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, castleStrength } = dealDamage(5 * game.graveyards[player.symbol].count, otherPlayer.wallStrength, otherPlayer.castleStrength);
+  let { wallStrength, towerStrength } = dealDamage(5 * game.graveyards[player.symbol].count, otherPlayer.wallStrength, otherPlayer.castleStrength);
   otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = castleStrength;
+  otherPlayer.castleStrength = towerStrength;
 
 }
 
@@ -280,5 +280,7 @@ module.exports = {
   cards,
   generateDeck,
   getCardByID,
-  repurposeEffect
+  repurposeEffect,
+  splinterEffect,
+  getPlayers
 };
