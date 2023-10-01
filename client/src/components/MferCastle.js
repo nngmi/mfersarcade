@@ -19,6 +19,7 @@ function MferCastle() {
   const [playerSymbol, setPlayerSymbol] = useState(null);
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
 
+  
   useEffect(() => {
     if (!gameId) return;
     let playerSymbolLocal = null;
