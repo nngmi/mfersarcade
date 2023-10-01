@@ -148,8 +148,8 @@ function splinterEffect(game, playerSymbol) {
     const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
     player.spendingResources += 1;
   }
-  
-  delayEffect(2, nextTurnEffect);
+
+  game.delayedEffects.push({turnNumber: game.turnNumber + 2, effectFunc: nextTurnEffect});
 }
 
 function massacreEffect(game, playerSymbol) {
@@ -179,6 +179,8 @@ function repurposeEffect(game, playerSymbol) {
   } else if (player.castleStrength > 1) {
     player.castleStrength = 1;
     player.wallStrength += 30;  
+  } else {
+    // does not activate
   }
 }
 
