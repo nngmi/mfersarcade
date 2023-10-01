@@ -13,7 +13,7 @@ describe('repurposeEffect function', () => {
     initializePlayer(30, game, playerSymbol, "1234");
     initializePlayer(30, game, otherPlayerSymbol, "3456");
     let { player } = getPlayers(game, playerSymbol);
-    player.wallStrength = 5;
+    player.wallStrength = 5 ;
   });
 
   test('should decrease castleStrength by 15 and increase wallStrength by 30 when castleStrength > 15', () => {
