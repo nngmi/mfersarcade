@@ -10,6 +10,9 @@
     text-align: center;
     font-size: 24px;
 }
+.game-container button{
+    font-size: 24px;
+}
 
 
 .player-area {
@@ -29,5 +32,14 @@
 }
 
 .fixed-width {
-    width: 150px; /* adjust as needed */
+    width: 200px; /* adjust as needed */
+}
+.header-container {
+    display: flex;
+    align-items: center; /* Align items vertically centered */
+}
+
+.state-area-container {
+    width: 200px; /* Your fixed width */
+    margin-left: 20px; /* Space between h1 and StateArea */
 }

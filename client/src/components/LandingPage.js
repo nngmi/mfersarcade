@@ -37,7 +37,6 @@ function LandingPage() {
   return (
     <div className="landingPageContainer">
       <h1>Mfers Arcade</h1>
-      <button onClick={createTicTacToeGame}>Play Mfer Mfer Toe (Multiplayer)</button>
       <button onClick={createMferCastleGame}>Play Mfer Castle (Multiplayer)</button>
 
     </div>

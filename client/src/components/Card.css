@@ -1,7 +1,7 @@
 /* Style for each card */
 .card {
-    width: 100px;
-    height: 150px;
+    width: 150px;
+    height: 200px;
     border: 1px solid #000;
     border-radius: 8px;
     background-color: white;
@@ -11,10 +11,10 @@
 }
 
 .cardTitle {
-    font-size: 0.7em;
+    font-size: 0.9em;
 }
 .cardText {
-    font-size: 0.5em;
+    font-size: 0.6em;
 }
 
 .card.green {

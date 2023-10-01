@@ -1,4 +1,7 @@
 .landingPageContainer {
     text-align: center;
+    font-size: 30px;
 }
-
+.landingPageContainer button {
+    font-size: 40px; /* or whatever size you prefer */
+}

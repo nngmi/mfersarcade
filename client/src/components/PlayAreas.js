@@ -3,7 +3,7 @@ import { useDrop } from 'react-dnd';
 import './PlayAreas.css'; // assuming you have a CSS file for styles
 import CastleVisualization from './CastleVisualization';
 
-export const PlayerGameState = ({ game, playerSymbol }) => {
+export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) => {
   function getPlayer(game, playerSymbol) {
     return game.players.find(player => player.symbol === playerSymbol) || {};
   }
@@ -25,6 +25,20 @@ export const PlayerGameState = ({ game, playerSymbol }) => {
       <div className="marginSpan">Spending Resource: {spendingResources}</div>
       <div className="marginSpan">Draws Left: {drawsLeft}</div>
       <div className="marginSpan">Discards Left: {discardsLeft}</div>
+      <div className="player-action-area">
+            <button 
+                onClick={() => makeMove("draw")}
+                disabled={isOpponent || game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
+            >
+                Draw Card
+            </button>
+            <button 
+                onClick={() => makeMove("yield")}
+                disabled={isOpponent || game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
+            >
+                Yield Turn
+            </button>
+      </div>
     </div>
   );
 }
@@ -101,7 +115,7 @@ export const PlayerDeck = ({ game, playerSymbol }) => {
 
   return (
     <div className="fixed-width hand game-info">
-      <div className="count">Your Deck: {count} Cards</div>
+      <div className="count">Deck: {count} Cards</div>
       {count === 0 ? (
         <CardEmpty />
       ) : (
@@ -130,8 +144,8 @@ export const PlayerGraveyard = ({ game, playerSymbol, isOpponent, makeMove={make
   const topCard = cards[count - 1];
 
   return (
-    <div ref={ref} className={`fixed-width game-info ${count === 0 ? 'white-outline' : ''}`}>
-      {isOpponent ? (<div className="count">Opponent Graveyard: {count} Cards</div>) : (<div className="count">Your Graveyard: {count} Cards</div>)}
+    <div ref={ref} className={`fixed-width hand game-info ${count === 0 ? 'white-outline' : ''}`}>
+      {isOpponent ? (<div className="count">Discard: {count} Cards</div>) : (<div className="count">Discard: {count} Cards</div>)}
       {count === 0 ? (
         <CardEmpty />
       ) : (
@@ -159,7 +173,6 @@ export const PlayerBattlefield = ({ game, playerSymbol, isOpponent, makeMove={ma
 
   return (
     <div ref={ref} className={`grow-width hand game-info ${count === 0 ? 'white-outline' : ''}`}>
-      {isOpponent ? (<div className="count">Opponent Battlefield: {count} Cards</div>) : (<div className="count">Your Battlefield: {count} Cards</div>)}
       <div className="cards-container">
         {cards.map((card, index) => (
           <Card key={index} card={card} />
@@ -199,7 +212,7 @@ export const OtherPlayerDeck = ({ game, playerSymbol }) => {
 
   return (
     <div className="fixed-width other-deck hand game-info">
-      <div className="count">Opponent Deck: {count} Cards</div>
+      <div className="count">Deck: {count} Cards</div>
       {count === 0 ? (
         <CardEmpty />
       ) : (

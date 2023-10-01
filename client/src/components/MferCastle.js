@@ -40,8 +40,6 @@ function MferCastle() {
         winSound.play();
       } else if (game.state === "X-wins" || game.state === "O-wins") {
         wrongSound.play();
-      } else {
-        basicSound.play();
       }
     });
     newSocket.on("playerSymbol", (symbol) => {
@@ -49,9 +47,11 @@ function MferCastle() {
         playerSymbolLocal = symbol;
     });
     newSocket.on("error", (error) => {
+      wrongSound.play();
       toast.error(error);
     });
     newSocket.on("notify", (info) => {
+      basicSound.play();
       toast.info(info);
     });
 
@@ -92,10 +92,16 @@ function MferCastle() {
     </div>
 ) : (
     <div className="game-container">
-        <h1 className="title">Mfer Castle</h1>
-        {gameState === "ongoing" && (
-          <StateArea game={game} playerSymbol={playerSymbol} currentPlayer={currentPlayer}/>
-        )}
+        <div className="header-container">
+            <div className="grow-width">
+              <h1 className="title">Mfer Castle</h1>
+            </div>
+            {gameState === "ongoing" && (
+                <div className="fixed-width">
+                    <StateArea game={game} playerSymbol={playerSymbol} currentPlayer={currentPlayer}/>
+                </div>
+            )}
+        </div>
         {gameState === "waiting for other player" ? (
             <div>
             <p>Waiting for Another Player to Start Game... </p> 
@@ -121,7 +127,7 @@ function MferCastle() {
 
         <div className="player-area opponent-area">
           <div className="player-area-row">        
-            <PlayerGameState className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null}/>  
+            <PlayerGameState className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove}/>  
             <OtherPlayerHand className="grow-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
             <OtherPlayerDeck className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
           </div>
@@ -138,26 +144,11 @@ function MferCastle() {
               <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
           </div>
           <div className="player-area-row">
-              <PlayerGameState className="fixed-width" game={game} playerSymbol={playerSymbol}/>
+              <PlayerGameState className="fixed-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
               <PlayerHand className="grow-width" game={game} playerSymbol={playerSymbol}/>
               <PlayerDeck className="fixed-width" game={game} playerSymbol={playerSymbol}/>
           </div>
         </div>
-        <div className="player-action-area">
-            <button 
-                onClick={() => makeMove("draw")}
-                disabled={currentPlayer !== playerSymbol || gameState !== "ongoing"}
-            >
-                Draw Card
-            </button>
-            <button 
-                onClick={() => makeMove("yield")}
-                disabled={currentPlayer !== playerSymbol || gameState !== "ongoing"}
-            >
-                Yield Turn
-            </button>
-        </div>
-          
         <p>
             <a href="/" className="back-button">
                 Back to Home
