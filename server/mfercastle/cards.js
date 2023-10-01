@@ -21,7 +21,6 @@ class Card {
 
   // This method is optional. It can be used to call the effect function (if it exists) with given parameters.
   applyEffect(game, playerSymbol) {
-    console.log("runing applyeffect");
     if (this.effect) {
       let errMessage = this.effect(game, playerSymbol);
       return errMessage;
@@ -35,7 +34,6 @@ function conjureGeneratorEffect(game, playerSymbol) {
   const otherPlayer = game.players.find(p => p.symbol === otherPlayerSymbol);
   const player = game.players.find(p => p.symbol === playerSymbol);
   player.generators += 1;
-  console.log(player.generators);
 }
 
 function getPlayers(game, playerSymbol) {

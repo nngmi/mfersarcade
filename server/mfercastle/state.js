@@ -84,12 +84,14 @@ const beginTurn = (game, playerSymbol) => {
     player.discardsLeft = 1;
 
     game.currentPlayer = player.symbol;
-    game.delayedEffects.forEach((effect) => {
-        console.log(effect);
-        console.log(game.turnNumber);
+
+    // Execute effects and remove them after they have been run
+    game.delayedEffects = game.delayedEffects.filter((effect) => {
         if (game.turnNumber === effect.turnNumber) {
             effect.effectFunc(game, player.symbol);
+            return false; // This effect should be removed (not included in the new array)
         }
+        return true; // Keep the effect in the array
     });
     game.state = checkGameState(game) || game.state;
 };
@@ -143,6 +145,35 @@ const discardCard = (game, cardid, playerSymbol) => {
     return null;
 };
 
+const playCard = (game, cardid, playerSymbol) => {
+    const player = game.players.find(p => p.symbol === playerSymbol);
+    if (!cardid) {
+        return "Error with play because cardid does not exist";
+    }
+    const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
+    const card = game.hands[player.symbol].cards[cardIndex];
+    if (card.cost > player.spendingResources) {
+        return "Card " + card.name + " costs " + card.cost + " and you only have " + player.spendingResources + " resources";
+    }
+
+    let errMessage = card.applyEffect(game, player.symbol);
+    if (errMessage) {
+        return "Could not play " + card.name + " because " + errMessage;
+    }
+
+    player.spendingResources -= card.cost;
+    // removing card from hand
+    game.hands[player.symbol].cards.splice(cardIndex, 1);
+    game.hands[player.symbol].count--;
+    
+    // appending card to battlefield
+    game.battlefields[player.symbol].cards.push(card);
+    game.battlefields[player.symbol].count++;
+    return null;
+
+
+}
+
 
 module.exports = {
     games,
@@ -153,4 +184,5 @@ module.exports = {
     checkGameState,
     drawCard,
     discardCard,
+    playCard,
 };

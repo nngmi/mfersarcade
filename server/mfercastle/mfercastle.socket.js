@@ -1,6 +1,6 @@
 // mfercastle.socket.js
 const socketIo = require("socket.io");
-const { games, initializePlayer, endTurn, beginTurn, checkGameState, drawCard, discardCard} = require('./state');
+const { games, initializePlayer, endTurn, beginTurn, checkGameState, drawCard, discardCard, playCard} = require('./state');
 const { cards, generateDeck } = require('./cards');
 
 
@@ -113,42 +113,22 @@ module.exports = (io) => {
                     
                 } else if (moveType === "play") {
                     const { cardid } = moveDetails;
-                    console.log(moveDetails);
-
                     if (!cardid) {
-                    return socket.emit("error", "Error with play because cardid does not exist");
+                        return socket.emit("error", "Error with play because cardid does not exist");
                     }
-                    
                     const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
-                    
                     if (cardIndex === -1) {
-                    console.group(game.hands[player.symbol]);
-                    console.group(cardid);
-                    return socket.emit("error", "Error with play, card not found in hand");
+                        return socket.emit("error", "Card not found in hand");
                     }
-
                     const card = game.hands[player.symbol].cards[cardIndex];
                     if (card.cost > player.spendingResources) {
                         return socket.emit("error", "Card " + card.name + " costs " + card.cost + " and you only have " + player.spendingResources + " resources");
                     }
 
-                    // notify other players
-
-                    console.log("right before apply effect");
-                    let errMessage = card.applyEffect(game, player.symbol);
+                    let errMessage = playCard(game, cardid, player.symbol);
                     if (errMessage) {
-                        return socket.emit("error", "Could not play " + card.name + " because " + errMessage);
+                        return socket.emit("error", errMessage);
                     }
-                
-                    // spend the resources
-                    player.spendingResources -= card.cost;
-                    // removing card from hand
-                    game.hands[player.symbol].cards.splice(cardIndex, 1);
-                    game.hands[player.symbol].count--;
-                    
-                    // appending card to battlefield
-                    game.battlefields[player.symbol].cards.push(card);
-                    game.battlefields[player.symbol].count++;
 
                     // notify the other players
                     game.players.forEach((player) => {
