@@ -49,25 +49,27 @@ function getPlayers(game, playerSymbol) {
 }
 
 
-function dealDamage(damage, wallStrength, castleStrength, ignoreWall = false) {
-  let remainingDamage;
+function dealDamage(damage, wallStrength, towerStrength, ignoreWall = false, wallDamageMultiplier = 1) {
+  let effectiveWallDamage;
+  let remainingDamage = 0;
 
-  if(ignoreWall) {
-    remainingDamage = damage; // if we are ignoring the wall, all damage goes to the castle.
+  if (ignoreWall) {
+    remainingDamage = damage; // if we are ignoring the wall, all damage goes to the tower.
   } else {
-    if(damage < wallStrength) {
-      wallStrength -= damage;
-      remainingDamage = 0;
+    effectiveWallDamage = damage * wallDamageMultiplier; // amplify damage applied to the wall
+    
+    if (effectiveWallDamage < wallStrength) {
+      wallStrength -= effectiveWallDamage; // subtract the amplified damage from wall strength
     } else {
-      remainingDamage = damage - wallStrength;
-      wallStrength = 0;
+      remainingDamage = (effectiveWallDamage - wallStrength) / wallDamageMultiplier; // convert the excess damage back to original scale
+      wallStrength = 0; // wall is broken, remaining damage will go to the tower
     }
   }
 
-  castleStrength -= remainingDamage;
-  if(castleStrength < 0) castleStrength = 0;
+  towerStrength -= remainingDamage; // Apply the remaining damage to the towerStrength normally.
+  if (towerStrength < 0) towerStrength = 0; // Ensure that the towerStrength doesn't go below 0.
 
-  return {wallStrength, castleStrength};
+  return { wallStrength, towerStrength };
 }
 
 function violentGeneratorEffect(game, playerSymbol) {
@@ -152,6 +154,31 @@ function splinterEffect(game, playerSymbol) {
   game.delayedEffects.push({turnNumber: game.turnNumber + 2, effectFunc: nextTurnEffect});
 }
 
+function bloodyRitualEffect(game, playerSymbol) {
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+
+  if (player.castleStrength > 10) {
+    player.castleStrength -= 10;
+    player.spendingResources += 5;
+  } else if (player.castleStrength > 1) {
+    player.castleStrength = 1;
+    player.spendingResources += 5;
+  } else {
+    // does not activate
+  }
+
+
+  game.delayedEffects.push({turnNumber: game.turnNumber + 2, effectFunc: nextTurnEffect});
+}
+
+function brickBreakEffect(game, playerSymbol) {
+  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+
+  let { wallStrength, castleStrength } = dealDamage(6, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=false, wallDamageMultiplier = 2);
+  otherPlayer.wallStrength = wallStrength;
+  otherPlayer.castleStrength = castleStrength;
+}
+
 function massacreEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
@@ -184,7 +211,6 @@ function repurposeEffect(game, playerSymbol) {
   }
 }
 
-
 // Define Cards
 const cardsData = [
   {cardid: 1, name: "Conjure Generator", cost: 2, text: "Add (1) generator", color: "mfer", effect: conjureGeneratorEffect},
@@ -195,10 +221,9 @@ const cardsData = [
   {cardid: 6, name: "Bloody Bricks", cost: 6, text: "Deal damage equal to your wall", color: "mfer", effect: bloodyBricksEffect},
   {cardid: 7, name: "Sneak", cost: 2, text: "Deal 7 damage. Ignore wall.", color: "mfer", effect: sneakEffect},
   {cardid: 8, name: "Assassin", cost: 5, text: "Deal 20 damage. Ignore wall.", color: "mfer", effect: assassinEffect},
-  // {cardid: 9, name: "Trinity", cost: 333, text: "Costs 3 less for each damage you have dealt to enemy walls or towers this game. Deal 33 damage. Gain 33 wall and 33 tower.", color: "mfer"},
   {cardid: 10, name: "Levy", cost: 5, text: "The enemy tower loses 10. Yours gains 10.", color: "mfer", effect: levyEffect},
-  // {cardid: 11, name: "Brick Break", cost: 6, text: "Deal 20 damage. Deals double damage to towers.", color: "mfer"},
-  // {cardid: 12, name: "Bloody Ritual", cost: 0, text: "Lose 10 from your tower. Gain (5) spending resources", color: "mfer"},
+  {cardid: 11, name: "Brick Break", cost: 6, text: "Deal 20 damage. Deals double damage to walls.", color: "mfer", effect: brickBreakEffect},
+  {cardid: 12, name: "Bloody Ritual", cost: 0, text: "Lose 10 from your tower. Gain (5) spending resources", color: "mfer", effect: bloodyRitualEffect},
   // {cardid: 13, name: "Weaken", cost: 4, text: "Deal 5 damage. Your opponents next wall or castle card is 50% less effective", color: "mfer"},
   {cardid: 14, name: "Repurpose", cost: 2, text: "Lose 15 tower. Gain 30 wall", color: "mfer", effect: repurposeEffect},
   // {cardid: 15, name: "Wall Fist", cost: 6, text: "Gain 15 wall. Deal 15 damage.", color: "mfer"},
@@ -254,5 +279,6 @@ const generateDeck = (n, playerID) => {
 module.exports = {
   cards,
   generateDeck,
-  getCardByID
+  getCardByID,
+  repurposeEffect
 };
