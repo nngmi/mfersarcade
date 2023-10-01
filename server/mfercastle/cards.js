@@ -189,6 +189,36 @@ function massacreEffect(game, playerSymbol) {
 
 }
 
+function wallFistEffect(game, playerSymbol) {
+  let { otherPlayer, player } = getPlayers(game, playerSymbol);
+
+  let { wallStrength, towerStrength } = dealDamage(15, otherPlayer.wallStrength, otherPlayer.castleStrength);
+  otherPlayer.wallStrength = wallStrength;
+  otherPlayer.castleStrength = towerStrength;
+
+  player.wallStrength += 15;
+
+}
+
+function abandonEffect(game, playerSymbol) {
+  let { otherPlayer, player } = getPlayers(game, playerSymbol);
+
+  let n_cards_to_discard = game.hands[player.symbol].count;
+  let { wallStrength, towerStrength } = dealDamage(5 * n_cards_to_discard, otherPlayer.wallStrength, otherPlayer.castleStrength);
+  otherPlayer.wallStrength = wallStrength;
+  otherPlayer.castleStrength = towerStrength;
+  
+  // Move all cards from hand to the graveyard
+  const discardedCards = game.hands[player.symbol].cards;
+  game.graveyards[player.symbol].cards.push(...discardedCards);
+  game.graveyards[player.symbol].count += discardedCards.length;
+
+  // Empty the hand
+  game.hands[player.symbol].cards = [];
+  game.hands[player.symbol].count = 0;
+  return null;
+}
+
 function delayEffect( n_turns, baseEffect) {
 
   function inner(game, playerSymbol) {
@@ -230,9 +260,10 @@ const cardsData = [
   {cardid: 17, name: "Massacre", cost: 8, text: "Deal 3 damage for every card in your discard pile", color: "mfer", effect: massacreEffect},
   {cardid: 21, name: "Splinter", cost: 1, text: "Deal 2 damage. Gain (1) extra spending resources next turn", color: "mfer", effect: splinterEffect},
   // {cardid: 13, name: "Weaken", cost: 4, text: "Deal 5 damage. Your opponents next wall or castle card is 50% less effective", color: "mfer"},
-  // {cardid: 15, name: "Wall Fist", cost: 6, text: "Gain 15 wall. Deal 15 damage.", color: "mfer"},
+  {cardid: 15, name: "Wall Fist", cost: 6, text: "Gain 15 wall. Deal 15 damage.", color: "mfer", effect: wallFistEffect},
   // {cardid: 16, name: "Turtle Up", cost: 4, text: "Gain 4 height and 10 wall", color: "mfer"},   
-  // {cardid: 18, name: "Abandon", cost: 7, text: "Discard your hand. Deal 5 damage for each card discarded.", color: "mfer"},
+  {cardid: 18, name: "Abandon", cost: 7, text: "Discard your hand. Deal 5 damage for each card discarded.", color: "mfer", effect: abandonEffect},
+  //{cardid: 19, name: "Preparation", cost: 3, text: "Draw 2 cards next turn. Produce double resources next turn.", color: "mfer", effect: preparationEffect},
   // {cardid: 19, name: "Preparation", cost: 3, text: "Draw 2 cards next turn. Produce double resources next turn. Your attacks do 2 extra damage next turn.", color: "mfer"},
   // {cardid: 20, name: "Split", cost: 6, text: "Combine yours and your enemies wall and castle. Divide it equally, rounding up.", color: "mfer"},
   // {cardid: 22, name: "Mirror", cost: 4, text: "Copy your opponents next card", color: "mfer"},
@@ -260,7 +291,7 @@ const getCardByID = (id) => {
   return cardMap[id];
 };
 
-const generateDeck = (n, playerID) => {
+const generateRandomDeck = (n, playerID) => {
   let deck = [];
   for (let i = 0; i < n; i++) {
     let randomIndex = Math.floor(Math.random() * cards.length);
@@ -278,9 +309,65 @@ const generateDeck = (n, playerID) => {
   return deck;
 };
 
+const generateSetDeck = (n, playerID) => {
+  const cardList = [
+    [3, 'Splinter'],
+    [3, 'Steal'],
+    [3, 'Abandon'],
+    [3, 'Wall Fist'],
+    [3, 'Repurpose'],
+    [3, 'Conjure Generator'],
+    [2, 'Bloody Ritual'],
+    [2, 'Conjure Resources'],
+    [3, 'Violent Generator'],
+    // [3, 'Preparation'],
+    // [2, 'Reaper']
+  ];
+
+  let deck = [];
+
+  cardList.forEach(([count, name]) => {
+    let cardTemplate;
+
+    for (const [id, card] of Object.entries(cardMap)) {
+      if (card.name === name) {
+        cardTemplate = card;
+        break;
+      }
+    }
+
+    if (!cardTemplate) {
+      throw new Error(`Card with name ${name} not found in cardMap.`);
+    }
+
+    for (let i = 0; i < count; i++) {
+      let card = new Card(
+        cardTemplate.cardid,
+        cardTemplate.name,
+        cardTemplate.cost,
+        cardTemplate.text,
+        cardTemplate.color,
+        cardTemplate.effect,
+      );
+      card.setID(playerID, deck.length);
+      deck.push(card);
+    }
+  });
+
+  // Shuffling the deck using Fisher-Yates (aka Knuth) Shuffle
+  for (let i = deck.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [deck[i], deck[j]] = [deck[j], deck[i]];
+  }
+
+  return deck;
+};
+
+
 module.exports = {
   cardMap,
-  generateDeck,
+  generateRandomDeck,
+  generateSetDeck,
   getCardByID,
   repurposeEffect,
   splinterEffect,

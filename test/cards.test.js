@@ -155,3 +155,32 @@ describe('bloodyRitualEffect function', () => {
     expect(player.spendingResources).toBe(3);
   });
 });
+
+describe('abandonEffect function', () => {
+  let game;
+  const playerSymbol = "X";
+  const otherPlayerSymbol = "O";
+  const abandonCardId = 18; // replace with the actual ID of your Abandon card
+  let abandonCard;
+
+  beforeEach(() => {
+    game = getInitialGameState();
+    initializePlayer(30, game, playerSymbol, "1234");
+    initializePlayer(30, game, otherPlayerSymbol, "3456");
+    abandonCard = cardMap[abandonCardId];
+    expect(abandonCard.name).toBe("Abandon");
+  });
+
+  test('should deal damage to the other player and move all cards to the graveyard', () => {
+    let { otherPlayer, player } = getPlayers(game, playerSymbol);
+    otherPlayer.wallStrength = 1;
+    otherPlayer.castleStrength = 25;
+
+    expect(abandonCard.effect(game, playerSymbol)).toBe(null);
+    console.log(otherPlayer);
+
+    expect(otherPlayer.castleStrength).toBe(1); // Assuming there were 5 cards in hand, so 2*5 = 10 damage
+    expect(game.hands[player.symbol].count).toBe(0); // Hand should be empty
+    expect(game.graveyards[player.symbol].count).toBe(5); // 5 cards should be in the graveyard
+  });
+});

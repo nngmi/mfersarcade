@@ -19,17 +19,31 @@ export const PlayerGameState = ({ game, playerSymbol }) => {
 
   return (
     <div>
-      <CastleVisualization towerHealth={castleStrength} wallHealth={wallStrength}/>
-      <p className="marginSpan">Tower Strength: {castleStrength}</p>
-      <p className="marginSpan">Wall Strength: {wallStrength}</p>
-      <p className="marginSpan">Generators: {generators}</p>
-      <p className="marginSpan">Spending Resource: {spendingResources}</p>
-      <p className="marginSpan">Draws Left: {drawsLeft}</p>
-      <p className="marginSpan">Discards Left: {discardsLeft}</p>
+      <div className="marginSpan">Tower Strength: {castleStrength}</div>
+      <div className="marginSpan">Wall Strength: {wallStrength}</div>
+      <div className="marginSpan">Generators: {generators}</div>
+      <div className="marginSpan">Spending Resource: {spendingResources}</div>
+      <div className="marginSpan">Draws Left: {drawsLeft}</div>
+      <div className="marginSpan">Discards Left: {discardsLeft}</div>
     </div>
   );
 }
+export const PlayerCastleVisualization = ({ game, playerSymbol }) => {
+  function getPlayer(game, playerSymbol) {
+    return game.players.find(player => player.symbol === playerSymbol) || {};
+  }
 
+  const {
+    castleStrength = null,
+    wallStrength = null,
+  } = getPlayer(game, playerSymbol);
+
+  return (
+    <div>
+      <CastleVisualization towerHealth={castleStrength} wallHealth={wallStrength}/>
+    </div>
+  );
+}
 
 export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
   function getPlayerLife(game, playerSymbol) {

@@ -5,7 +5,7 @@ import './MferCastle.css';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'; 
 import { ToastContainer } from 'react-toastify';
-import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck, StateArea, PlayerBattlefield, PlayerGameState } from './PlayAreas';
+import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck, StateArea, PlayerBattlefield, PlayerGameState, PlayerCastleVisualization } from './PlayAreas';
 import { basicSound, winSound, wrongSound } from './Sounds';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
@@ -19,7 +19,7 @@ function MferCastle() {
   const [playerSymbol, setPlayerSymbol] = useState(null);
   const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
 
-  
+
   useEffect(() => {
     if (!gameId) return;
     let playerSymbolLocal = null;
@@ -126,12 +126,14 @@ function MferCastle() {
             <OtherPlayerDeck className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
           </div>
           <div className="player-area-row">
+            <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null}/> 
             <PlayerBattlefield className="grow-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove}/>
             <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove} />
           </div>
         </div>
         <div className="player-area">
           <div className="player-area-row">
+              <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol}/>
               <PlayerBattlefield className="grow-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
               <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
           </div>

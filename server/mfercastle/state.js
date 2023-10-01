@@ -1,4 +1,4 @@
-const { cards, generateDeck } = require('./cards');
+const { cards, generateRandomDeck, generateSetDeck } = require('./cards');
 
 let games = {};
 function checkGameState(game) {
@@ -48,7 +48,7 @@ const initializePlayer = (n_cards, game, playerSymbol, socketid) => {
     game.players.push({ id: socketid, symbol: playerSymbol, castleStrength: 100, wallStrength: 30, generators: 1, spendingResources: 3, drawsLeft: 1, discardsLeft: 1 });
     
     // shuffle a deck of cards for the user
-    const deck = generateDeck(n_cards, socketid);
+    const deck = generateSetDeck(n_cards, socketid);
     game.decks[playerSymbol] = {"count": n_cards, "cards": deck};
     
     // draw the top 5 cards from the deck and put them in the hand
