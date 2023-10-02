@@ -72,7 +72,7 @@ function getPlayers(game, playerSymbol) {
   };
 }
 
-
+// returns total damage dealt
 function dealDamage(game, playerSymbol, damage, ignoreWall = false, wallDamageMultiplier = 1) {
 
   const { otherPlayer } = getPlayers(game, playerSymbol);
@@ -85,7 +85,7 @@ function dealDamage(game, playerSymbol, damage, ignoreWall = false, wallDamageMu
       }
     });
   }
-
+  let totalDamage = 0;
   let effectiveWallDamage;
   let remainingDamage = 0;
 
@@ -96,17 +96,25 @@ function dealDamage(game, playerSymbol, damage, ignoreWall = false, wallDamageMu
     
     if (effectiveWallDamage < wallStrength) {
       wallStrength -= effectiveWallDamage; // subtract the amplified damage from wall strength
+      totalDamage += effectiveWallDamage;
     } else {
       remainingDamage = (effectiveWallDamage - wallStrength) / wallDamageMultiplier; // convert the excess damage back to original scale
+      totalDamage += wallStrength;
       wallStrength = 0; // wall is broken, remaining damage will go to the tower
     }
-  }
 
-  towerStrength -= remainingDamage; // Apply the remaining damage to the towerStrength normally.
-  if (towerStrength < 0) towerStrength = 0; // Ensure that the towerStrength doesn't go below 0.
+  }
+  if (towerStrength > remainingDamage) {
+    towerStrength -= remainingDamage; // Apply the remaining damage to the towerStrength normally.
+    totalDamage += remainingDamage;
+  } else {
+    totalDamage += towerStrength;
+    towerStrength = 0;
+  }
 
   otherPlayer.wallStrength = wallStrength;
   otherPlayer.towerStrength = towerStrength;
+  return totalDamage;
 
 }
 
@@ -404,5 +412,6 @@ module.exports = {
   repurposeEffect,
   splinterEffect,
   getPlayers,
-  drawCard
+  drawCard,
+  dealDamage
 };
