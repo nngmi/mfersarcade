@@ -1,6 +1,7 @@
 const { cards, generateRandomDeck, generateSetDeck } = require('./cards');
 
 let games = {};
+
 function checkGameState(game) {
 
     // Checking for a draw scenario based on deck counts
@@ -11,19 +12,22 @@ function checkGameState(game) {
     let draw = true;
     let winner = null;
     
-    game.players.forEach((player) => {
+    for (const player of game.players) {
+        if (player.towerStrength >= 100) {
+            return `${player.symbol}-wins`; // If a player’s towerStrength is 100 or more, they win.
+        }
+
         if (player.towerStrength > 0) {
             if (winner === null) {
                 winner = player.symbol; // assuming player has a property 'symbol' which could be 'X' or 'O'
                 draw = false;
             } else {
-                // If we find another player with castleStrength > 0, the game is ongoing
+                // If we find another player with towerStrength > 0, the game is ongoing
                 draw = false;
                 winner = null;
-                return "ongoing";
             }
         }
-    });
+    }
     
     if (draw) {
         return "draw";
