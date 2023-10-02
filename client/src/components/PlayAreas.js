@@ -19,8 +19,8 @@ export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) =>
 
   return (
     <div>
-      <div className="marginSpan">Tower Strength: {towerStrength}</div>
-      <div className="marginSpan">Wall Strength: {wallStrength}</div>
+      <div className="marginSpan">Tower Height: {towerStrength}</div>
+      <div className="marginSpan">Wall Height: {wallStrength}</div>
       <div className="marginSpan">Generators: {generators}</div>
       <div className="marginSpan">Spending Resource: {spendingResources}</div>
       <div className="marginSpan">Draws Left: {drawsLeft}</div>

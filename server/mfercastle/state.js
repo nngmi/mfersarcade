@@ -52,7 +52,7 @@ const getInitialGameState = () => {
 };
 
 const initializePlayer = (n_cards, game, playerSymbol, socketid) => {
-    game.players.push({ id: socketid, symbol: playerSymbol, towerStrength: 100, wallStrength: 30, generators: 1, spendingResources: 3, drawsLeft: 1, discardsLeft: 1 });
+    game.players.push({ id: socketid, symbol: playerSymbol, towerStrength: 50, wallStrength: 30, generators: 1, spendingResources: 3, drawsLeft: 1, discardsLeft: 1 });
     
     // shuffle a deck of cards for the user
     const deck = generateSetDeck(n_cards, socketid);
