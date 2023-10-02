@@ -1,7 +1,7 @@
 // mfercastle.socket.js
 const socketIo = require("socket.io");
-const { games, initializePlayer, endTurn, beginTurn, checkGameState, drawCard, discardCard, playCard} = require('./state');
-const { cards, generateDeck } = require('./cards');
+const { games, initializePlayer, endTurn, beginTurn, checkGameState, discardCard, playCard} = require('./state');
+const { cards, generateSetDeck, drawCard } = require('./cards');
 
 
 function maskGameForPlayer(game, playerSymbol) {

@@ -2,11 +2,17 @@ const { cards, generateRandomDeck, generateSetDeck } = require('./cards');
 
 let games = {};
 function checkGameState(game) {
+
+    // Checking for a draw scenario based on deck counts
+    if (game.decks['X'].count === 0 && game.decks['O'].count === 0) {
+        return "draw";
+    }
+
     let draw = true;
     let winner = null;
     
     game.players.forEach((player) => {
-        if (player.castleStrength > 0) {
+        if (player.towerStrength > 0) {
             if (winner === null) {
                 winner = player.symbol; // assuming player has a property 'symbol' which could be 'X' or 'O'
                 draw = false;
@@ -39,13 +45,14 @@ const getInitialGameState = () => {
         currentPlayer: "X",
         state: "waiting for other player",
         lastActivity: Date.now(),
-        delayedEffects: [],
+        delayedEffects: [], // trigger on certain turns
+        persistentEffects: [], // type is "damageModifier", playerSymbol, effect is a function which take in damage
         lock: false,
     };
 };
 
 const initializePlayer = (n_cards, game, playerSymbol, socketid) => {
-    game.players.push({ id: socketid, symbol: playerSymbol, castleStrength: 100, wallStrength: 30, generators: 1, spendingResources: 3, drawsLeft: 1, discardsLeft: 1 });
+    game.players.push({ id: socketid, symbol: playerSymbol, towerStrength: 100, wallStrength: 30, generators: 1, spendingResources: 3, drawsLeft: 1, discardsLeft: 1 });
     
     // shuffle a deck of cards for the user
     const deck = generateSetDeck(n_cards, socketid);
@@ -74,6 +81,15 @@ const endTurn = (game, playerSymbol) => {
     // Reset the battlefield cards and count
     game.battlefields[playerSymbol].cards = [];
     game.battlefields[playerSymbol].count = 0;
+
+    // clean up any persistent effects that are past
+    // Execute effects and remove them after they have been run
+    game.persistentEffects = game.persistentEffects.filter((effect) => {
+        if (game.turnNumber >= effect.turnNumber) {
+            return false; // This effect should be removed (not included in the new array)
+        }
+        return true; // Keep the effect in the array
+    });
 };
 
 const beginTurn = (game, playerSymbol) => {
@@ -94,28 +110,6 @@ const beginTurn = (game, playerSymbol) => {
         return true; // Keep the effect in the array
     });
     game.state = checkGameState(game) || game.state;
-};
-
-const drawCard = (game, playerSymbol) => {
-    const player = game.players.find(p => p.symbol === playerSymbol);
-    if (game.decks[player.symbol] && game.decks[player.symbol].count > 0) {
-
-        if (player.drawsLeft <= 0) {
-            return "No more draws left";
-        }
-
-        if (game.hands[player.symbol].count >= 5) {
-            return "Hand is full, cannot draw any more cards";
-        }
-        let card = game.decks[player.symbol]["cards"].pop();
-        game.decks[player.symbol]["count"] = game.decks[player.symbol]["cards"].length;
-        game.hands[player.symbol]["cards"].push(card);
-        game.hands[player.symbol]["count"] += 1;
-        player.drawsLeft -= 1;
-    } else {
-        return "No more cards in deck";
-    }
-    return null;
 };
 
 const discardCard = (game, cardid, playerSymbol) => {
@@ -182,7 +176,6 @@ module.exports = {
     endTurn,
     beginTurn,
     checkGameState,
-    drawCard,
     discardCard,
     playCard,
 };

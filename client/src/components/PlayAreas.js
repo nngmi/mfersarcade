@@ -9,7 +9,7 @@ export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) =>
   }
 
   const {
-    castleStrength = null,
+    towerStrength = null,
     wallStrength = null,
     generators = null,
     spendingResources = null,
@@ -19,25 +19,25 @@ export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) =>
 
   return (
     <div>
-      <div className="marginSpan">Tower Strength: {castleStrength}</div>
+      <div className="marginSpan">Tower Strength: {towerStrength}</div>
       <div className="marginSpan">Wall Strength: {wallStrength}</div>
       <div className="marginSpan">Generators: {generators}</div>
       <div className="marginSpan">Spending Resource: {spendingResources}</div>
       <div className="marginSpan">Draws Left: {drawsLeft}</div>
       <div className="marginSpan">Discards Left: {discardsLeft}</div>
       <div className="player-action-area">
-            <button 
-                onClick={() => makeMove("draw")}
-                disabled={isOpponent || game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
-            >
-                Draw Card
-            </button>
-            <button 
-                onClick={() => makeMove("yield")}
-                disabled={isOpponent || game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
-            >
-                Yield Turn
-            </button>
+        <button 
+            onClick={() => makeMove("draw")}
+            disabled={isOpponent || game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
+        >
+            Draw Card
+        </button>
+        <button 
+            onClick={() => makeMove("yield")}
+            disabled={isOpponent || game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
+        >
+            Yield Turn
+        </button>
       </div>
     </div>
   );
@@ -48,13 +48,13 @@ export const PlayerCastleVisualization = ({ game, playerSymbol }) => {
   }
 
   const {
-    castleStrength = null,
+    towerStrength = null,
     wallStrength = null,
   } = getPlayer(game, playerSymbol);
 
   return (
     <div>
-      <CastleVisualization towerHealth={castleStrength} wallHealth={wallStrength}/>
+      <CastleVisualization towerHealth={towerStrength} wallHealth={wallStrength}/>
     </div>
   );
 }

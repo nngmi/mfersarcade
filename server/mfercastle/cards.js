@@ -1,6 +1,30 @@
 const express = require('express');
 const router = express.Router();
 
+const drawCard = (game, playerSymbol, ignoreLimits=false) => {
+  const player = game.players.find(p => p.symbol === playerSymbol);
+  if (game.decks[player.symbol] && game.decks[player.symbol].count > 0) {
+
+      if (player.drawsLeft <= 0 && !ignoreLimits) {
+          return "No more draws left";
+      }
+
+      if (game.hands[player.symbol].count >= 5 && !ignoreLimits) {
+          return "Hand is full, cannot draw any more cards";
+      }
+      let card = game.decks[player.symbol]["cards"].pop();
+      game.decks[player.symbol]["count"] = game.decks[player.symbol]["cards"].length;
+      game.hands[player.symbol]["cards"].push(card);
+      game.hands[player.symbol]["count"] += 1;
+      if (!ignoreLimits) {
+          player.drawsLeft -= 1;
+      }
+  } else {
+      return "No more cards in deck";
+  }
+  return null;
+};
+
 class Card {
   constructor(cardid, name, cost, text, color, effect) {
     this.cardid = cardid;
@@ -49,7 +73,19 @@ function getPlayers(game, playerSymbol) {
 }
 
 
-function dealDamage(damage, wallStrength, towerStrength, ignoreWall = false, wallDamageMultiplier = 1) {
+function dealDamage(game, playerSymbol, damage, ignoreWall = false, wallDamageMultiplier = 1) {
+
+  const { otherPlayer } = getPlayers(game, playerSymbol);
+  let wallStrength = otherPlayer.wallStrength;
+  let towerStrength = otherPlayer.towerStrength;
+  if(game.persistentEffects) {
+    game.persistentEffects.forEach(effect => {
+      if(effect.turnNumber === game.turnNumber && effect.type === 'damageModifier') {
+        damage = effect.effectFunc(damage);
+      }
+    });
+  }
+
   let effectiveWallDamage;
   let remainingDamage = 0;
 
@@ -69,15 +105,15 @@ function dealDamage(damage, wallStrength, towerStrength, ignoreWall = false, wal
   towerStrength -= remainingDamage; // Apply the remaining damage to the towerStrength normally.
   if (towerStrength < 0) towerStrength = 0; // Ensure that the towerStrength doesn't go below 0.
 
-  return { wallStrength, towerStrength };
+  otherPlayer.wallStrength = wallStrength;
+  otherPlayer.towerStrength = towerStrength;
+
 }
 
 function violentGeneratorEffect(game, playerSymbol) {
   const { otherPlayer, player } = getPlayers(game, playerSymbol);
   player.generators += 1;
-  let { wallStrength, towerStrength } = dealDamage(10, otherPlayer.wallStrength, otherPlayer.castleStrength);
-  otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = towerStrength;
+  dealDamage(game, playerSymbol, 10);
 }
 
 function stealEffect(game, playerSymbol) {
@@ -96,44 +132,35 @@ function stealEffect(game, playerSymbol) {
 function sneakEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, towerStrength } = dealDamage(7, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=true);
-  otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = towerStrength;
+  dealDamage(game, playerSymbol, 7, ignoreWall=true);
 }
 
 function assassinEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, towerStrength } = dealDamage(20, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=true);
-  otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = towerStrength;
+  dealDamage(game, playerSymbol, 20, ignoreWall=true);
 }
 
 function bloodyBricksEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
-
-  let { wallStrength, towerStrength } = dealDamage(player.wallStrength, otherPlayer.wallStrength, otherPlayer.castleStrength);
-  otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = towerStrength;
+  dealDamage(game, playerSymbol, player.wallStrength);
 }
 
 function explosionEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, towerStrength } = dealDamage(25, otherPlayer.wallStrength, otherPlayer.castleStrength);
-  otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = towerStrength;
+  dealDamage(game, playerSymbol, 25);
   player.generators += 1;
 }
 
 function levyEffect(game, playerSymbol) {
   const { otherPlayer, player } = getPlayers(game, playerSymbol);
-  otherPlayer.castleStrength -= (otherPlayer.castleStrength >= 10 ? 10 : otherPlayer.castleStrength);
-  player.castleStrength += 10;
+  otherPlayer.towerStrength -= (otherPlayer.towerStrength >= 10 ? 10 : otherPlayer.towerStrength);
+  player.towerStrength += 10;
 }
 
 function conjureResourcesEffectBase(game, playerSymbol) {
-  const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+  const { player } = getPlayers(game, playerSymbol);
 
   console.log("executing conjureResourcesEffectBase ", " for player ", playerSymbol);
   player.spendingResources += 7;
@@ -143,9 +170,7 @@ function conjureResourcesEffectBase(game, playerSymbol) {
 function splinterEffect(game, playerSymbol) {
   let { otherPlayer } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, towerStrength } = dealDamage(2, otherPlayer.wallStrength, otherPlayer.castleStrength);
-  otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = towerStrength;
+  dealDamage(game, playerSymbol, 2);
 
   function nextTurnEffect(game, playerSymbol) {
     const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
@@ -155,14 +180,32 @@ function splinterEffect(game, playerSymbol) {
   game.delayedEffects.push({turnNumber: game.turnNumber + 2, effectFunc: nextTurnEffect});
 }
 
+function preparationEffect(game, playerSymbol) {
+  let { otherPlayer } = getPlayers(game, playerSymbol);
+
+  function nextTurnEffect(game, playerSymbol) {
+    const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+    player.spendingResources += player.generators;
+    drawCard(game, playerSymbol, ignoreLimits=true);
+    drawCard(game, playerSymbol, ignoreLimits=true);
+  }
+
+  function persistentDamageEffect(damage) {
+    return damage + 2;
+  }
+
+  game.persistentEffects.push({turnNumber: game.turnNumber + 2, type: "damageModifier", effectFunc: persistentDamageEffect});
+  game.delayedEffects.push({turnNumber: game.turnNumber + 2, effectFunc: nextTurnEffect});
+}
+
 function bloodyRitualEffect(game, playerSymbol) {
   const { player } = getPlayers(game, playerSymbol);
 
-  if (player.castleStrength > 10) {
-    player.castleStrength -= 10;
+  if (player.towerStrength > 10) {
+    player.towerStrength -= 10;
     player.spendingResources += 5;
-  } else if (player.castleStrength > 1) {
-    player.castleStrength = 1;
+  } else if (player.towerStrength > 1) {
+    player.towerStrength = 1;
     player.spendingResources += 5;
   } else {
     return "towerStrength is at 1"
@@ -172,27 +215,21 @@ function bloodyRitualEffect(game, playerSymbol) {
 
 function brickBreakEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
+  dealDamage(game, playerSymbol, 6, ignoreWall=false, wallDamageMultiplier = 2);
 
-  let { wallStrength, towerStrength } = dealDamage(6, otherPlayer.wallStrength, otherPlayer.castleStrength, ignoreWall=false, wallDamageMultiplier = 2);
-  otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = towerStrength;
 }
 
 function massacreEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, towerStrength } = dealDamage(5 * game.graveyards[player.symbol].count, otherPlayer.wallStrength, otherPlayer.castleStrength);
-  otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = towerStrength;
+  dealDamage(game, playerSymbol, 5 * game.graveyards[player.symbol].count);
 
 }
 
 function wallFistEffect(game, playerSymbol) {
   let { otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  let { wallStrength, towerStrength } = dealDamage(15, otherPlayer.wallStrength, otherPlayer.castleStrength);
-  otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = towerStrength;
+  dealDamage(game, playerSymbol, 15);
 
   player.wallStrength += 15;
 
@@ -202,9 +239,7 @@ function abandonEffect(game, playerSymbol) {
   let { otherPlayer, player } = getPlayers(game, playerSymbol);
 
   let n_cards_to_discard = game.hands[player.symbol].count;
-  let { wallStrength, towerStrength } = dealDamage(5 * n_cards_to_discard, otherPlayer.wallStrength, otherPlayer.castleStrength);
-  otherPlayer.wallStrength = wallStrength;
-  otherPlayer.castleStrength = towerStrength;
+  dealDamage(game, playerSymbol, 5 * n_cards_to_discard);
   
   // Move all cards from hand to the graveyard
   const discardedCards = game.hands[player.symbol].cards;
@@ -229,11 +264,11 @@ function delayEffect( n_turns, baseEffect) {
 function repurposeEffect(game, playerSymbol) {
   const { otherPlayerSymbol, otherPlayer, player } = getPlayers(game, playerSymbol);
 
-  if (player.castleStrength > 15) {
-    player.castleStrength -= 15;
+  if (player.towerStrength > 15) {
+    player.towerStrength -= 15;
     player.wallStrength += 30;
-  } else if (player.castleStrength > 1) {
-    player.castleStrength = 1;
+  } else if (player.towerStrength > 1) {
+    player.towerStrength = 1;
     player.wallStrength += 30;  
   } else {
     return "tower strength is at 1"
@@ -261,8 +296,7 @@ const cardsData = [
   {cardid: 15, name: "Wall Fist", cost: 6, text: "Gain 15 wall. Deal 15 damage.", color: "mfer", effect: wallFistEffect},
   // {cardid: 16, name: "Turtle Up", cost: 4, text: "Gain 4 height and 10 wall", color: "mfer"},   
   {cardid: 18, name: "Abandon", cost: 7, text: "Discard your hand. Deal 5 damage for each card discarded.", color: "mfer", effect: abandonEffect},
-  //{cardid: 19, name: "Preparation", cost: 3, text: "Draw 2 cards next turn. Produce double resources next turn.", color: "mfer", effect: preparationEffect},
-  // {cardid: 19, name: "Preparation", cost: 3, text: "Draw 2 cards next turn. Produce double resources next turn. Your attacks do 2 extra damage next turn.", color: "mfer"},
+  {cardid: 19, name: "Preparation", cost: 3, text: "Draw 2 cards next turn. Produce double resources next turn. Your attacks do 2 extra damage next turn.", color: "mfer", effect: preparationEffect},
   // {cardid: 20, name: "Split", cost: 6, text: "Combine yours and your enemies wall and castle. Divide it equally, rounding up.", color: "mfer"},
   // {cardid: 22, name: "Mirror", cost: 4, text: "Copy your opponents next card", color: "mfer"},
   // {cardid: 23, name: "Bunker Down", cost: 5, text: "Add a bunker", color: "mfer"},
@@ -318,7 +352,7 @@ const generateSetDeck = (n, playerID) => {
     [2, 'Bloody Ritual'],
     [2, 'Conjure Resources'],
     [3, 'Violent Generator'],
-    // [3, 'Preparation'],
+    [3, 'Preparation'],
     // [2, 'Reaper']
   ];
 
@@ -369,5 +403,6 @@ module.exports = {
   getCardByID,
   repurposeEffect,
   splinterEffect,
-  getPlayers
+  getPlayers,
+  drawCard
 };
