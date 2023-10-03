@@ -2,7 +2,6 @@ import React, { useRef, useEffect } from 'react';
 
 const TILE_WIDTH = 8;
 const TILE_HEIGHT = 8;
-const TILES_ACROSS = 18;
 const PADDING = 2;
 
 const CastleTile = ({ x, y }) => ({
@@ -33,7 +32,7 @@ const CastleVisualization = ({ maxTowerHeight=10, towerHeight=10, scaleFactor=3 
       const diagonalLeftTile = CastleTile({ x: 13, y: 9 });
       const diagonalRightTile = CastleTile({ x: 14, y: 9 });
 
-      let currentHeight = maxHeight;
+      let currentHeight = maxHeight - TILE_HEIGHT * scaleFactor;
       for (let i = 0; i < towerHeight; i++) {
           for (let j = 1; j < towerWidth + 1; j++) {
               const tile = (i == towerHeight-1 && i > 2 && (j == 2 || j == 4)) ? windowTile : castleTile;
@@ -93,7 +92,7 @@ const CastleVisualization = ({ maxTowerHeight=10, towerHeight=10, scaleFactor=3 
     };
   }, [towerHeight]);
 
-  return <canvas ref={canvasRef} width={TILE_WIDTH * scaleFactor * (4 + towerWidth)} height={maxHeight} />;
+  return <canvas ref={canvasRef} width={TILE_WIDTH * scaleFactor * (2 + towerWidth)} height={maxHeight} />;
 };
 
 export default CastleVisualization;

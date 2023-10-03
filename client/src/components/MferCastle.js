@@ -137,9 +137,9 @@ function MferCastle() {
         </div>
         <div className="player-area">       
           <div className="player-area-row battlefield-area">
-              <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol}/>
+              <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol} isFlipped={true}/>
               <Battlefield className="grow-width" game={game} playerSymbol={playerSymbol} makeMove={makeMove}/>
-              <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null}/> 
+              <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isFlipped={false}/> 
           </div>        
         </div>
         <div className="player-area">

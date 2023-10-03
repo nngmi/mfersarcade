@@ -2,6 +2,7 @@ import { Card, CardBack, CardEmpty } from './Card';
 import { useDrop } from 'react-dnd';
 import './PlayAreas.css'; // assuming you have a CSS file for styles
 import CastleVisualization from './CastleVisualization';
+import WallVisualization from './WallVisualization';
 
 export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) => {
   function getPlayer(game, playerSymbol) {
@@ -43,7 +44,7 @@ export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) =>
   );
 }
 
-export const PlayerCastleVisualization = ({ game, playerSymbol }) => {
+export const PlayerCastleVisualization = ({ game, playerSymbol, isFlipped }) => {
   function getPlayer(game, playerSymbol) {
     return game.players.find(player => player.symbol === playerSymbol) || {};
   }
@@ -55,13 +56,25 @@ export const PlayerCastleVisualization = ({ game, playerSymbol }) => {
 
   // Map towerStrength to towerHeight
   const towerHeight = Math.round(towerStrength / 10);
+  const wallHeight = Math.round(wallStrength / 10);
 
   return (
     <div>
-      <CastleVisualization towerHeight={towerHeight} scaleFactor={2}/>
+      {isFlipped ? (
+        <>
+          <CastleVisualization towerHeight={towerHeight} scaleFactor={2} isFlipped={isFlipped} />
+          <WallVisualization wallHeight={wallHeight} scaleFactor={2} isFlipped={isFlipped} />
+        </>
+      ) : (
+        <>
+          <WallVisualization wallHeight={wallHeight} scaleFactor={2} isFlipped={isFlipped} />
+          <CastleVisualization towerHeight={towerHeight} scaleFactor={2} isFlipped={isFlipped} />
+        </>
+      )}
     </div>
   );
 }
+
 
 
 export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
