@@ -9,7 +9,10 @@
     gap: 10px; /* Add some gap between cards */
 }
 
+.playState {
 
+    min-width: 250px;
+}
 .marginSpan {
     margin-left: 0px;
     margin-right: 10px;

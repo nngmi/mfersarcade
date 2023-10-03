@@ -19,27 +19,31 @@ export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) =>
   } = getPlayer(game, playerSymbol);
 
   return (
-    <div>
+    <div className="playState">
       <div className="marginSpan">Tower Height: {towerStrength}</div>
       <div className="marginSpan">Wall Height: {wallStrength}</div>
       <div className="marginSpan">Generators: {generators}</div>
       <div className="marginSpan">Spending Resource: {spendingResources}</div>
       <div className="marginSpan">Draws Left: {drawsLeft}</div>
       <div className="marginSpan">Discards Left: {discardsLeft}</div>
-      <div className="player-action-area">
-        <button 
-            onClick={() => makeMove("draw")}
-            disabled={isOpponent || game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
-        >
-            Draw Card
-        </button>
-        <button 
-            onClick={() => makeMove("yield")}
-            disabled={isOpponent || game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
-        >
-            Yield Turn
-        </button>
-      </div>
+
+      {/* Conditionally render buttons based on isOpponent */}
+      {!isOpponent && (
+        <div className="player-action-area">
+          <button 
+              onClick={() => makeMove("draw")}
+              disabled={game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
+          >
+              Draw Card
+          </button>
+          <button 
+              onClick={() => makeMove("yield")}
+              disabled={game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
+          >
+              Yield Turn
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -62,13 +66,13 @@ export const PlayerCastleVisualization = ({ game, playerSymbol, isFlipped }) => 
     <div>
       {isFlipped ? (
         <>
-          <CastleVisualization towerHeight={towerHeight} scaleFactor={2} isFlipped={isFlipped} />
-          <WallVisualization wallHeight={wallHeight} scaleFactor={2} isFlipped={isFlipped} />
+          <CastleVisualization towerHeight={towerHeight} scaleFactor={3} isFlipped={isFlipped} />
+          <WallVisualization wallHeight={wallHeight} scaleFactor={3} isFlipped={isFlipped} />
         </>
       ) : (
         <>
-          <WallVisualization wallHeight={wallHeight} scaleFactor={2} isFlipped={isFlipped} />
-          <CastleVisualization towerHeight={towerHeight} scaleFactor={2} isFlipped={isFlipped} />
+          <WallVisualization wallHeight={wallHeight} scaleFactor={3} isFlipped={isFlipped} />
+          <CastleVisualization towerHeight={towerHeight} scaleFactor={3} isFlipped={isFlipped} />
         </>
       )}
     </div>
@@ -175,6 +179,7 @@ export const PlayerGraveyard = ({ game, playerSymbol, isOpponent, makeMove={make
     </div>
   );
 };
+
 
 
 export const Battlefield = ({ game, playerSymbol, makeMove = { makeMove } }) => {

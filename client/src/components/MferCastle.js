@@ -9,6 +9,7 @@ import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDe
 import { basicSound, winSound, wrongSound } from './Sounds';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
+import CastleVisualization from './CastleVisualization';
 
 function MferCastle() {
   let { gameId } = useParams();
@@ -93,9 +94,10 @@ function MferCastle() {
 ) : (
     <div className="game-container">
         <div className="header-container">
-            <div className="grow-width">
-              <h1 className="title">Mfer Castle</h1>
-            </div>
+          <div className="grow-width flex-container">
+            <CastleVisualization maxTowerHeight={5} towerHeight={5} scaleFactor={1} isFlipped={false} />
+            <h1 className="title marginLeft">Mfer Castle</h1>
+          </div>
             {gameState === "ongoing" && (
                 <div className="fixed-width">
                     <StateArea game={game} playerSymbol={playerSymbol} currentPlayer={currentPlayer}/>

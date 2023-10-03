@@ -19,7 +19,7 @@
     background-color: #3fffff;
 }
 .opponent-area {
-    background-color: #3fff00;
+    background-color: #888888;
 }
 .battlefield-area {
     background-color: #4CAF50;
@@ -28,7 +28,14 @@
     display: flex;
     width: 100%;
 }
-
+.flex-container {
+    display: flex;
+    justify-content: center;   /* Horizontally center the items */
+    align-items: center;       /* Vertically align the items in the center, if desired */
+}
+.marginLeft {
+    margin-left: 10px;
+}
 .grow-width {
     flex-grow: 1;
 }
