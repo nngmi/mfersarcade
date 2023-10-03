@@ -42,6 +42,7 @@ export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) =>
     </div>
   );
 }
+
 export const PlayerCastleVisualization = ({ game, playerSymbol }) => {
   function getPlayer(game, playerSymbol) {
     return game.players.find(player => player.symbol === playerSymbol) || {};
@@ -52,12 +53,16 @@ export const PlayerCastleVisualization = ({ game, playerSymbol }) => {
     wallStrength = null,
   } = getPlayer(game, playerSymbol);
 
+  // Map towerStrength to towerHeight
+  const towerHeight = Math.round(towerStrength / 10);
+
   return (
     <div>
-      <CastleVisualization towerHealth={towerStrength} wallHealth={wallStrength}/>
+      <CastleVisualization towerHeight={towerHeight} scaleFactor={2}/>
     </div>
   );
 }
+
 
 export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
   function getPlayerLife(game, playerSymbol) {
@@ -93,7 +98,7 @@ export const PlayerHand = ({ game, playerSymbol }) => {
   return (
     <div className="grow-width hand game-info">
       <div className="count">
-        {count > 0 ? `Your Hand Count: ${count}` : "Your Hand is Empty"}
+        {count > 0 ? `Your Hand` : "Your Hand is Empty"}
       </div>
       <div className="cards-container">
         {game.state === "waiting for other player" ?
@@ -117,7 +122,7 @@ export const PlayerDeck = ({ game, playerSymbol }) => {
   const { cards = [], count = 0 } = playerDeck;
 
   return (
-    <div className="fixed-width hand game-info">
+    <div className="fixed-width-card hand game-info">
       <div className="count">Deck: {count} Cards</div>
       {count === 0 ? (
         <CardEmpty />
@@ -147,7 +152,7 @@ export const PlayerGraveyard = ({ game, playerSymbol, isOpponent, makeMove={make
   const topCard = cards[count - 1];
 
   return (
-    <div ref={ref} className={`fixed-width hand game-info ${count === 0 ? 'white-outline' : ''}`}>
+    <div ref={ref} className={`fixed-width-card hand game-info ${count === 0 ? 'white-outline' : ''}`}>
       {isOpponent ? (<div className="count">Discard: {count} Cards</div>) : (<div className="count">Discard: {count} Cards</div>)}
       {count === 0 ? (
         <CardEmpty />
@@ -159,31 +164,41 @@ export const PlayerGraveyard = ({ game, playerSymbol, isOpponent, makeMove={make
 };
 
 
-export const PlayerBattlefield = ({ game, playerSymbol, isOpponent, makeMove={makeMove} }) => {
-  const [, ref] = useDrop(() => ({
+export const Battlefield = ({ game, playerSymbol, makeMove = { makeMove } }) => {
+
+  const [, playerRef] = useDrop(() => ({
     accept: 'CARD',
     drop: (item, monitor) => {
-      if (item.type === 'Card' && !isOpponent) {
+      if (item.type === 'Card') {
         makeMove("play", { "cardid": item.id });
       }
     }
   }));
-
   if (!playerSymbol) return null;
 
-  const battlefield = game.battlefields[playerSymbol] || {};
-  const { cards = [], count = 0 } = battlefield;
+  const playerBattlefield = game.battlefields[playerSymbol] || {};
+  const { cards: playerCards = [], count: playerCount = 0 } = playerBattlefield;
+
+  const opponentSymbol = game.players.find(p => p.symbol !== playerSymbol)?.symbol;
+  const opponentBattlefield = game.battlefields[opponentSymbol] || {};
+  const { cards: opponentCards = [], count: opponentCount = 0 } = opponentBattlefield;
+
+
 
   return (
-    <div ref={ref} className={`grow-width hand game-info ${count === 0 ? 'white-outline' : ''}`}>
-      <div className="cards-container">
-        {cards.map((card, index) => (
-          <Card key={index} card={card} />
-        ))}
+      <div ref={playerRef} className={`grow-width hand game-info`}>
+        <div className="cards-container">
+          {playerCards.map((card, index) => (
+            <Card key={index} card={card} />
+          ))}
+          {opponentCards.map((card, index) => (
+            <Card key={index} card={card} isOpponent={true} />
+          ))}
+        </div>
       </div>
-    </div>
   );
 };
+
 
 
 export const OtherPlayerHand = ({ game, playerSymbol }) => {
@@ -195,7 +210,7 @@ export const OtherPlayerHand = ({ game, playerSymbol }) => {
   return (
     <div className="grow-width hand game-info">
       <div className="count">
-        {count > 0 ? `Opponent Hand Count: ${count} Cards` : "Opponent Hand Empty"}
+        {count > 0 ? `Opponent Hand` : "Opponent Hand Empty"}
       </div>
       <div className="cards-container">
         {Array.from({ length: count }).map((_, index) => (
@@ -213,7 +228,7 @@ export const OtherPlayerDeck = ({ game, playerSymbol }) => {
   const { count = 0 } = playerDeck;
 
   return (
-    <div className="fixed-width other-deck hand game-info">
+    <div className="fixed-width-card other-deck hand game-info">
       <div className="count">Deck: {count} Cards</div>
       {count === 0 ? (
         <CardEmpty />

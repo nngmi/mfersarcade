@@ -21,7 +21,9 @@
 .opponent-area {
     background-color: #3fff00;
 }
-
+.battlefield-area {
+    background-color: #4CAF50;
+}
 .player-area-row {
     display: flex;
     width: 100%;
@@ -33,6 +35,9 @@
 
 .fixed-width {
     width: 300px; /* adjust as needed */
+}
+.fixed-width-card {
+    width: 200px; /* adjust as needed */
 }
 .header-container {
     display: flex;

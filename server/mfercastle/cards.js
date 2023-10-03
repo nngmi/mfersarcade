@@ -243,18 +243,31 @@ function wallFistEffect(game, playerSymbol) {
 
 }
 
+function turtleUpEffect(game, playerSymbol) {
+  let { player } = getPlayers(game, playerSymbol);
+
+  player.wallStrength += 4;
+  player.towerStrength += 10;
+
+}
+
+
 function abandonEffect(game, playerSymbol) {
   let { otherPlayer, player } = getPlayers(game, playerSymbol);
-
-  let n_cards_to_discard = game.hands[player.symbol].count;
-  dealDamage(game, playerSymbol, 5 * n_cards_to_discard);
   
-  // Move all cards from hand to the graveyard
+  let n_cards_to_discard = game.hands[player.symbol].count;
+  
+  // Deal 5 damage for each card to discard.
+  for (let i = 0; i < n_cards_to_discard; i++) {
+    dealDamage(game, playerSymbol, 5);
+  }
+
+  // Move all cards from hand to the graveyard.
   const discardedCards = game.hands[player.symbol].cards;
   game.graveyards[player.symbol].cards.push(...discardedCards);
   game.graveyards[player.symbol].count += discardedCards.length;
-
-  // Empty the hand
+  
+  // Empty the hand.
   game.hands[player.symbol].cards = [];
   game.hands[player.symbol].count = 0;
   return null;
@@ -302,7 +315,7 @@ const cardsData = [
   {cardid: 21, name: "Splinter", cost: 1, text: "Deal 2 damage. Gain (1) extra spending resources next turn", color: "mfer", effect: splinterEffect},
   // {cardid: 13, name: "Weaken", cost: 4, text: "Deal 5 damage. Your opponents next wall or castle card is 50% less effective", color: "mfer"},
   {cardid: 15, name: "Wall Fist", cost: 6, text: "Gain 15 wall. Deal 15 damage.", color: "mfer", effect: wallFistEffect},
-  // {cardid: 16, name: "Turtle Up", cost: 4, text: "Gain 4 height and 10 wall", color: "mfer"},   
+  {cardid: 16, name: "Turtle Up", cost: 4, text: "Gain 4 tower and 10 wall", color: "mfer", effect: turtleUpEffect},   
   {cardid: 18, name: "Abandon", cost: 7, text: "Discard your hand. Deal 5 damage for each card discarded.", color: "mfer", effect: abandonEffect},
   {cardid: 19, name: "Preparation", cost: 3, text: "Draw 2 cards next turn. Produce double resources next turn. Your attacks do 2 extra damage next turn.", color: "mfer", effect: preparationEffect},
   // {cardid: 20, name: "Split", cost: 6, text: "Combine yours and your enemies wall and castle. Divide it equally, rounding up.", color: "mfer"},

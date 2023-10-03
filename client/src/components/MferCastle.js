@@ -5,7 +5,7 @@ import './MferCastle.css';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'; 
 import { ToastContainer } from 'react-toastify';
-import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck, StateArea, PlayerBattlefield, PlayerGameState, PlayerCastleVisualization } from './PlayAreas';
+import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck, StateArea, Battlefield, PlayerGameState, PlayerCastleVisualization } from './PlayAreas';
 import { basicSound, winSound, wrongSound } from './Sounds';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
@@ -130,23 +130,24 @@ function MferCastle() {
             <PlayerGameState className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove}/>  
             <OtherPlayerHand className="grow-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
             <OtherPlayerDeck className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
-          </div>
-          <div className="player-area-row">
-            <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null}/> 
-            <PlayerBattlefield className="grow-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove}/>
             <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove} />
           </div>
+          <div className="player-area-row">
+                      </div>
+        </div>
+        <div className="player-area">       
+          <div className="player-area-row battlefield-area">
+              <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol}/>
+              <Battlefield className="grow-width" game={game} playerSymbol={playerSymbol} makeMove={makeMove}/>
+              <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null}/> 
+          </div>        
         </div>
         <div className="player-area">
-          <div className="player-area-row">
-              <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol}/>
-              <PlayerBattlefield className="grow-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
-              <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
-          </div>
           <div className="player-area-row">
               <PlayerGameState className="fixed-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
               <PlayerHand className="grow-width" game={game} playerSymbol={playerSymbol}/>
               <PlayerDeck className="fixed-width" game={game} playerSymbol={playerSymbol}/>
+              <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove}/>
           </div>
         </div>
         <ToastContainer />

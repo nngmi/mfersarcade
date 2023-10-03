@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
 import './LandingPage.css';
+import CastleVisualization from './CastleVisualization';
 
 function LandingPage() {
   const [gameLink, setGameLink] = useState("");
@@ -37,6 +38,9 @@ function LandingPage() {
   return (
     <div className="landingPageContainer">
       <h1>Mfers Arcade</h1>
+      <div>
+        <CastleVisualization/>
+      </div>
       <button onClick={createMferCastleGame}>Play Mfer Castle (Multiplayer)</button>
 
     </div>
