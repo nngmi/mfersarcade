@@ -3,6 +3,7 @@ import { useDrop } from 'react-dnd';
 import './PlayAreas.css'; // assuming you have a CSS file for styles
 import CastleVisualization from './CastleVisualization';
 import WallVisualization from './WallVisualization';
+import Bunker from './Bunker';
 
 export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) => {
   function getPlayer(game, playerSymbol) {
@@ -180,6 +181,26 @@ export const PlayerGraveyard = ({ game, playerSymbol, isOpponent, makeMove={make
   );
 };
 
+export const PlayerBunkers = ({ game, playerSymbol, isOpponent, makeMove }) => {
+  
+  if (!playerSymbol) return null;
+
+  const playerBunkers = game.bunkers[playerSymbol] || [];
+
+  return (
+    <div className="fixed-width-card hand game-info">
+      {playerBunkers.map((bunker, index) => (
+        <Bunker 
+          key={index}
+          bunker={bunker} 
+          index={index} 
+          isOpponent={isOpponent} 
+          makeMove={makeMove} 
+        />
+      ))}
+    </div>
+  );
+};
 
 
 export const Battlefield = ({ game, playerSymbol, makeMove = { makeMove } }) => {

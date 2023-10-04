@@ -5,11 +5,12 @@ import './MferCastle.css';
 import { toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css'; 
 import { ToastContainer } from 'react-toastify';
-import { PlayerGraveyard, PlayerDeck, PlayerHand, OtherPlayerHand, OtherPlayerDeck, StateArea, Battlefield, PlayerGameState, PlayerCastleVisualization } from './PlayAreas';
+import { PlayerGraveyard, PlayerDeck, PlayerHand, PlayerBunkers, OtherPlayerHand, OtherPlayerDeck, StateArea, Battlefield, PlayerGameState, PlayerCastleVisualization } from './PlayAreas';
 import { basicSound, winSound, wrongSound } from './Sounds';
 import { DndProvider } from 'react-dnd';
 import { TouchBackend } from 'react-dnd-touch-backend';
 import CastleVisualization from './CastleVisualization';
+
 
 function MferCastle() {
   let { gameId } = useParams();
@@ -134,14 +135,14 @@ function MferCastle() {
             <OtherPlayerDeck className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
             <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove} />
           </div>
-          <div className="player-area-row">
-                      </div>
         </div>
         <div className="player-area">       
           <div className="player-area-row battlefield-area">
+              <PlayerBunkers className="fixed-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove} />
               <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol} isFlipped={true}/>
               <Battlefield className="grow-width" game={game} playerSymbol={playerSymbol} makeMove={makeMove}/>
               <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isFlipped={false}/> 
+              <PlayerBunkers className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove} />
           </div>        
         </div>
         <div className="player-area">

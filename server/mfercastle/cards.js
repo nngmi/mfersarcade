@@ -26,13 +26,14 @@ const drawCard = (game, playerSymbol, ignoreLimits=false) => {
 };
 
 class Card {
-  constructor(cardid, name, cost, text, color, effect) {
+  constructor(cardid, name, cost, text, color, effect, type) {
     this.cardid = cardid;
     this.name = name;
     this.cost = cost;
     this.text = text;
     this.color = color;
     this.effect = effect;
+    this.type = type;
   }
 
   setID(playerID, index) {
@@ -299,25 +300,25 @@ function repurposeEffect(game, playerSymbol) {
 
 // Define Cards
 const cardsData = [
-  {cardid: 1, name: "Conjure Generator", cost: 2, text: "Add (1) generator", color: "mfer", effect: conjureGeneratorEffect},
-  {cardid: 2, name: "Conjure Resources", cost: 3, text: "Gain 7 resources next turn", color: "mfer", effect: delayEffect(2, conjureResourcesEffectBase)},
-  {cardid: 3, name: "Violent Generator", cost: 5, text: "Add (1) generator. Deal 10 damage", color: "mfer", effect: violentGeneratorEffect},
-  {cardid: 4, name: "Steal", cost: 7, text: "Steal (1) generator from your opponent and (1) of the corresponding spending resource", color: "mfer", effect: stealEffect},
-  {cardid: 5, name: "Explosion", cost: 10, text: "Add (1) generator and (3) spending resources. Deal 25 damage", color: "mfer", effect: explosionEffect},
-  {cardid: 6, name: "Bloody Bricks", cost: 6, text: "Deal damage equal to your wall", color: "mfer", effect: bloodyBricksEffect},
-  {cardid: 7, name: "Sneak", cost: 2, text: "Deal 7 damage. Ignore wall.", color: "mfer", effect: sneakEffect},
-  {cardid: 8, name: "Assassin", cost: 5, text: "Deal 20 damage. Ignore wall.", color: "mfer", effect: assassinEffect},
-  {cardid: 10, name: "Levy", cost: 5, text: "The enemy tower loses 10. Yours gains 10.", color: "mfer", effect: levyEffect},
-  {cardid: 11, name: "Brick Break", cost: 6, text: "Deal 20 damage. Deals double damage to walls.", color: "mfer", effect: brickBreakEffect},
-  {cardid: 12, name: "Bloody Ritual", cost: 0, text: "Lose 10 from your tower. Gain (5) spending resources", color: "mfer", effect: bloodyRitualEffect},
-  {cardid: 14, name: "Repurpose", cost: 2, text: "Lose 15 tower. Gain 30 wall", color: "mfer", effect: repurposeEffect},
-  {cardid: 17, name: "Massacre", cost: 8, text: "Deal 3 damage for every card in your discard pile", color: "mfer", effect: massacreEffect},
-  {cardid: 21, name: "Splinter", cost: 1, text: "Deal 2 damage. Gain (1) extra spending resources next turn", color: "mfer", effect: splinterEffect},
+  {cardid: 1, name: "Conjure Generator", type: "spell", cost: 2, text: "Add (1) generator", color: "mfer", effect: conjureGeneratorEffect},
+  {cardid: 2, name: "Conjure Resources", type: "spell", cost: 3, text: "Gain 7 resources next turn", color: "mfer", effect: delayEffect(2, conjureResourcesEffectBase)},
+  {cardid: 3, name: "Violent Generator", type: "spell", cost: 5, text: "Add (1) generator. Deal 10 damage", color: "mfer", effect: violentGeneratorEffect},
+  {cardid: 4, name: "Steal", type: "spell", cost: 7, text: "Steal (1) generator from your opponent and (1) of the corresponding spending resource", color: "mfer", effect: stealEffect},
+  {cardid: 5, name: "Explosion", type: "spell", cost: 10, text: "Add (1) generator and (3) spending resources. Deal 25 damage", color: "mfer", effect: explosionEffect},
+  {cardid: 6, name: "Bloody Bricks", type: "spell", cost: 6, text: "Deal damage equal to your wall", color: "mfer", effect: bloodyBricksEffect},
+  {cardid: 7, name: "Sneak", type: "spell", cost: 2, text: "Deal 7 damage. Ignore wall.", color: "mfer", effect: sneakEffect},
+  {cardid: 8, name: "Assassin", type: "spell", cost: 5, text: "Deal 20 damage. Ignore wall.", color: "mfer", effect: assassinEffect},
+  {cardid: 10, name: "Levy", type: "spell", cost: 5, text: "The enemy tower loses 10. Yours gains 10.", color: "mfer", effect: levyEffect},
+  {cardid: 11, name: "Brick Break", type: "spell", cost: 6, text: "Deal 20 damage. Deals double damage to walls.", color: "mfer", effect: brickBreakEffect},
+  {cardid: 12, name: "Bloody Ritual", type: "spell", cost: 0, text: "Lose 10 from your tower. Gain (5) spending resources", color: "mfer", effect: bloodyRitualEffect},
+  {cardid: 14, name: "Repurpose", type: "spell", cost: 2, text: "Lose 15 tower. Gain 30 wall", color: "mfer", effect: repurposeEffect},
+  {cardid: 17, name: "Massacre", type: "spell", cost: 8, text: "Deal 3 damage for every card in your discard pile", color: "mfer", effect: massacreEffect},
+  {cardid: 21, name: "Splinter", type: "spell", cost: 1, text: "Deal 2 damage. Gain (1) extra spending resources next turn", color: "mfer", effect: splinterEffect},
   // {cardid: 13, name: "Weaken", cost: 4, text: "Deal 5 damage. Your opponents next wall or castle card is 50% less effective", color: "mfer"},
-  {cardid: 15, name: "Wall Fist", cost: 6, text: "Gain 15 wall. Deal 15 damage.", color: "mfer", effect: wallFistEffect},
-  {cardid: 16, name: "Turtle Up", cost: 4, text: "Gain 4 tower and 10 wall", color: "mfer", effect: turtleUpEffect},   
-  {cardid: 18, name: "Abandon", cost: 7, text: "Discard your hand. Deal 5 damage for each card discarded.", color: "mfer", effect: abandonEffect},
-  {cardid: 19, name: "Preparation", cost: 3, text: "Draw 2 cards next turn. Produce double resources next turn. Your attacks do 2 extra damage next turn.", color: "mfer", effect: preparationEffect},
+  {cardid: 15, name: "Wall Fist", type: "spell", cost: 6, text: "Gain 15 wall. Deal 15 damage.", color: "mfer", effect: wallFistEffect},
+  {cardid: 16, name: "Turtle Up", type: "spell", cost: 4, text: "Gain 4 tower and 10 wall", color: "mfer", effect: turtleUpEffect},   
+  {cardid: 18, name: "Abandon", type: "spell", cost: 7, text: "Discard your hand. Deal 5 damage for each card discarded.", color: "mfer", effect: abandonEffect},
+  {cardid: 19, name: "Preparation", type: "spell", cost: 3, text: "Draw 2 cards next turn. Produce double resources next turn. Your attacks do 2 extra damage next turn.", color: "mfer", effect: preparationEffect},
   // {cardid: 20, name: "Split", cost: 6, text: "Combine yours and your enemies wall and castle. Divide it equally, rounding up.", color: "mfer"},
   // {cardid: 22, name: "Mirror", cost: 4, text: "Copy your opponents next card", color: "mfer"},
   // {cardid: 23, name: "Bunker Down", cost: 5, text: "Add a bunker", color: "mfer"},
@@ -326,12 +327,12 @@ const cardsData = [
   // {cardid: 26, name: "Bastion", cost: 10, text: "Gain 10 wall. At the start of each of your turns, gain 10 wall.", color: "mfer"},
   // {cardid: 27, name: "Brick Thief", cost: 8, text: "When you damage a castle, your castle grows equal to 10% of damage dealt", color: "mfer"},
   // {cardid: 28, name: "Gargoyle", cost: 6, text: "Amplify damage by 10%", color: "mfer"},
-  // {cardid: 29, name: "Builder", cost: 5, text: "Adds 2 spending resources each turn", color: "mfer"},
-  // {cardid: 30, name: "Reaper", cost: 13, text: "Deal 13 damage each turn", color: "mfer"}
+  {cardid: 29, name: "Builder", type: "familiar", cost: 5, text: "Adds 2 spending resources each turn", color: "mfer"},
+  {cardid: 30, name: "Reaper", type: "familiar", cost: 13, text: "Deal 13 damage each turn", color: "mfer"},
 ];
 
 const cards = cardsData.map((data, index) => {
-  const card = new Card(data.cardid, data.name, data.cost, data.text, data.color, data.effect);
+  const card = new Card(data.cardid, data.name, data.cost, data.text, data.color, data.effect, data.type);
   return card;
 });
 
@@ -355,6 +356,7 @@ const generateRandomDeck = (n, playerID) => {
       cards[randomIndex].text,
       cards[randomIndex].color,
       cards[randomIndex].effect,
+      cards[randomIndex].type,
     );
     card.setID(playerID, i);
     deck.push(card);
@@ -374,7 +376,7 @@ const generateSetDeck = (n, playerID) => {
     [2, 'Conjure Resources'],
     [3, 'Violent Generator'],
     [3, 'Preparation'],
-    // [2, 'Reaper']
+    [2, 'Reaper']
   ];
 
   let deck = [];
@@ -401,6 +403,7 @@ const generateSetDeck = (n, playerID) => {
         cardTemplate.text,
         cardTemplate.color,
         cardTemplate.effect,
+        cardTemplate.type,
       );
       card.setID(playerID, deck.length);
       deck.push(card);

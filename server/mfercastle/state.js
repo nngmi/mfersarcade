@@ -45,6 +45,7 @@ const getInitialGameState = () => {
         decks: {},
         battlefields: {},
         hands: {},
+        bunkers: {},
         graveyards: {}, 
         currentPlayer: "X",
         state: "waiting for other player",
@@ -72,6 +73,7 @@ const initializePlayer = (n_cards, game, playerSymbol, socketid) => {
     
     game.battlefields[playerSymbol] = {"count": 0, "cards": []};
     game.graveyards[playerSymbol] = {"count": 0, "cards": []};
+    game.bunkers[playerSymbol] = [{"count": 0, "cards": []}, {"count": 0, "cards": []}];
 };
 
 const endTurn = (game, playerSymbol) => {
@@ -143,6 +145,52 @@ const discardCard = (game, cardid, playerSymbol) => {
     return null;
 };
 
+const bunkerizeCard = (game, cardid, bunkerIndex, playerSymbol) => {
+    const player = game.players.find(p => p.symbol === playerSymbol);
+
+    if (!cardid) {
+        return "Error with bunkerize because cardid does not exist";
+    }
+
+    const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
+
+    if (cardIndex === -1) {
+        return "Error with bunkerize, card not found in hand";
+    }
+
+    // Check the type of the card
+    const card = game.hands[player.symbol].cards[cardIndex];
+    if (card.type !== 'familiar') {
+        return "Error with bunkerize, card is not of type familiar";
+    }
+
+    if (card.cost > player.spendingResources) {
+        return `Card ${card.name} costs ${card.cost} and you only have ${player.spendingResources} resources`;
+    }
+
+    // Check bunker index validity
+    if (bunkerIndex < 0 || bunkerIndex >= game.bunkers[player.symbol].length) {
+        return "Error with bunkerize, provided bunker index is out of range";
+    }
+
+    // Place card into the bunker at the specified index if it's empty
+    const targetBunker = game.bunkers[player.symbol][bunkerIndex];
+    if (targetBunker.cards.length === 0) {
+        // Remove card from hand
+        game.hands[player.symbol].cards.splice(cardIndex, 1);
+        game.hands[player.symbol].count--;
+
+        // Add card to bunker
+        targetBunker.cards.push(card);
+        targetBunker.count++;
+        player.spendingResources -= card.cost;
+        return null; // Successfully placed the card into the bunker
+    } else {
+        return "Error with bunkerize, the target bunker is already occupied";
+    }
+};
+
+
 const playCard = (game, cardid, playerSymbol) => {
     const player = game.players.find(p => p.symbol === playerSymbol);
     if (!cardid) {
@@ -150,6 +198,9 @@ const playCard = (game, cardid, playerSymbol) => {
     }
     const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
     const card = game.hands[player.symbol].cards[cardIndex];
+    if (card.type !== 'spell' && card.type !== undefined) {
+        return "Error with play, card is not of type spell";
+    }
     if (card.cost > player.spendingResources) {
         return "Card " + card.name + " costs " + card.cost + " and you only have " + player.spendingResources + " resources";
     }
@@ -182,4 +233,5 @@ module.exports = {
     checkGameState,
     discardCard,
     playCard,
+    bunkerizeCard,
 };

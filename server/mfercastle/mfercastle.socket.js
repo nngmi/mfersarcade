@@ -1,6 +1,6 @@
 // mfercastle.socket.js
 const socketIo = require("socket.io");
-const { games, initializePlayer, endTurn, beginTurn, checkGameState, discardCard, playCard} = require('./state');
+const { games, initializePlayer, endTurn, bunkerizeCard, beginTurn, checkGameState, discardCard, playCard} = require('./state');
 const { cards, generateSetDeck, drawCard } = require('./cards');
 
 
@@ -50,7 +50,7 @@ module.exports = (io) => {
         });
     
         socket.on("makeMove", (gameId, moveType, moveDetails) => {
-            console.log("handling move ", moveType);
+            console.log("handling move ", moveType, moveDetails);
             const game = games[gameId];
             if (!game) return socket.emit("error", "Game does not exist");
             if (game.lock) return socket.emit("error", "Game is currently processing another move, please try again shortly");
@@ -107,6 +107,19 @@ module.exports = (io) => {
                         game.players.forEach((player) => {
                             if (player.id != socket.id) {
                                 mfercastle.to(player.id).emit("notify", "Opponent discarded card.");
+                            }
+                        });
+                    }
+                } else if (moveType === "bunkerize") {
+                    const { cardid, bunkerIndex } = moveDetails;
+                    let errMessage = bunkerizeCard(game, cardid, bunkerIndex, player.symbol);
+                    if (errMessage) {
+                        return socket.emit("error", errMessage);
+                    } else {
+                        // notify other players
+                        game.players.forEach((player) => {
+                            if (player.id != socket.id) {
+                                mfercastle.to(player.id).emit("notify", "Opponent put card into bunker.");
                             }
                         });
                     }
