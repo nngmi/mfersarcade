@@ -1,5 +1,5 @@
 const { cardMap, getPlayers } = require('../server/mfercastle/cards');
-const { initializePlayer, getInitialGameState, playCard, beginTurn, endTurn } = require('../server/mfercastle/state');
+const { initializePlayer, getInitialGameState, playCard, beginTurn, endTurn, bunkerizeCard } = require('../server/mfercastle/state');
 
 describe('repurposeEffect function', () => {
   let game;
@@ -293,5 +293,92 @@ describe('preparationEffect function', () => {
     // End the turn and assert the persistentEffects are cleared
     endTurn(game, playerSymbol);
     expect(game.persistentEffects).toHaveLength(0);
+  });
+});
+
+describe('Reaper card in bunker', () => {
+  let game;
+  const playerSymbol = "X";
+  const otherPlayerSymbol = "O";
+  let reaperCardId;
+  let reaperCard;
+
+  beforeEach(() => {
+      game = getInitialGameState();
+      initializePlayer(30, game, playerSymbol, "1234");
+      initializePlayer(30, game, otherPlayerSymbol, "3456");
+
+      reaperCard = Object.values(cardMap).find(card => card.name === "Reaper");
+      reaperCard.setID("1234", 1);
+      reaperCardId = reaperCard.id;
+
+      // Adding Reaper card to player's hand artificially
+      game.hands[playerSymbol].cards.push(reaperCard);
+      game.hands[playerSymbol].count++;
+
+      // Setting player's resources to be enough to bunkerize the card
+      game.players.find(p => p.symbol === playerSymbol).spendingResources = reaperCard.cost;
+  });
+
+  test('should decrement other player wallStrength by 13 after bunkerizing Reaper and beginning a new turn', () => {
+      const initialWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
+
+      // Bunkerize the Reaper
+      const bunkerIndex = 0; // First bunker
+      expect(bunkerizeCard(game, reaperCardId, bunkerIndex, playerSymbol)).toBe(null);
+
+      // End turn for current player
+      endTurn(game, playerSymbol);
+
+      // Start turn for the other player
+      beginTurn(game, otherPlayerSymbol);
+      endTurn(game, otherPlayerSymbol);
+      // start turn again
+      beginTurn(game, playerSymbol);
+      // Check wallStrength has been decremented by 13
+      const afterTurnWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
+      expect(afterTurnWallStrength).toBe(initialWallStrength - 13);
+  });
+});
+
+describe('Builder card in bunker', () => {
+  let game;
+  const playerSymbol = "X";
+  let builderCardId;
+  let builderCard;
+
+  beforeEach(() => {
+      game = getInitialGameState();
+      initializePlayer(30, game, playerSymbol, "1234");
+
+      builderCard = Object.values(cardMap).find(card => card.name === "Builder");
+      builderCard.setID("1234", 2); // Assuming a different ID for the sake of uniqueness
+      builderCardId = builderCard.id;
+
+      // Adding Builder card to player's hand artificially
+      game.hands[playerSymbol].cards.push(builderCard);
+      game.hands[playerSymbol].count++;
+
+      // Setting player's resources to be enough to bunkerize the card
+      game.players.find(p => p.symbol === playerSymbol).spendingResources = builderCard.cost;
+  });
+
+  test('should increment spendingResources by 2 (plus generators) after bunkerizing Builder and beginning a new turn', () => {
+      const initialSpendingResources = game.players.find(p => p.symbol === playerSymbol).spendingResources;
+      const generators = game.players.find(p => p.symbol === playerSymbol).generators;
+
+      // Bunkerize the Builder
+      const bunkerIndex = 0; // First bunker
+      expect(bunkerizeCard(game, builderCardId, bunkerIndex, playerSymbol)).toBe(null);
+
+      // End turn for current player
+      endTurn(game, playerSymbol);
+
+      // Start turn for the same player to see the Builder's effect
+      beginTurn(game, playerSymbol);
+
+      // Check spendingResources has been incremented by 2 + generators
+      const afterTurnSpendingResources = game.players.find(p => p.symbol === playerSymbol).spendingResources;
+      expect(afterTurnSpendingResources).toBe(initialSpendingResources - builderCard.cost + 2 + generators);
   });
 });

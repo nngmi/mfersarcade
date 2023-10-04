@@ -107,6 +107,14 @@ const beginTurn = (game, playerSymbol) => {
 
     game.currentPlayer = player.symbol;
 
+    // Generate the effects from the Bunkers and familiars
+    game.bunkers[player.symbol].forEach(bunker => {
+        // If there's a card in the bunker and it has an effect function, execute it
+        if (bunker.cards.length > 0 && bunker.cards[0].effect) {
+            bunker.cards[0].applyEffect(game, player.symbol);
+        }
+    });
+
     // Execute effects and remove them after they have been run
     game.delayedEffects = game.delayedEffects.filter((effect) => {
         if (game.turnNumber === effect.turnNumber) {
@@ -198,7 +206,7 @@ const playCard = (game, cardid, playerSymbol) => {
     }
     const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
     const card = game.hands[player.symbol].cards[cardIndex];
-    if (card.type !== 'spell' && card.type !== undefined) {
+    if (card.type !== 'spell') {
         return "Error with play, card is not of type spell";
     }
     if (card.cost > player.spendingResources) {

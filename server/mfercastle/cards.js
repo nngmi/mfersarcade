@@ -252,6 +252,17 @@ function turtleUpEffect(game, playerSymbol) {
 
 }
 
+function builderEffect(game, playerSymbol) {
+  let { player } = getPlayers(game, playerSymbol);
+  player.spendingResources += 2;
+  return null;
+}
+
+function reaperEffect(game, playerSymbol) {
+  dealDamage(game, playerSymbol, 13);
+  return null;
+}
+
 
 function abandonEffect(game, playerSymbol) {
   let { otherPlayer, player } = getPlayers(game, playerSymbol);
@@ -327,8 +338,8 @@ const cardsData = [
   // {cardid: 26, name: "Bastion", cost: 10, text: "Gain 10 wall. At the start of each of your turns, gain 10 wall.", color: "mfer"},
   // {cardid: 27, name: "Brick Thief", cost: 8, text: "When you damage a castle, your castle grows equal to 10% of damage dealt", color: "mfer"},
   // {cardid: 28, name: "Gargoyle", cost: 6, text: "Amplify damage by 10%", color: "mfer"},
-  {cardid: 29, name: "Builder", type: "familiar", cost: 5, text: "Adds 2 spending resources each turn", color: "mfer"},
-  {cardid: 30, name: "Reaper", type: "familiar", cost: 13, text: "Deal 13 damage each turn", color: "mfer"},
+  {cardid: 29, name: "Builder", type: "familiar", cost: 5, text: "Adds 2 spending resources each turn", color: "mfer", effect: builderEffect},
+  {cardid: 30, name: "Reaper", type: "familiar", cost: 13, text: "Deal 13 damage each turn", color: "mfer", effect: reaperEffect},
 ];
 
 const cards = cardsData.map((data, index) => {
@@ -376,7 +387,8 @@ const generateSetDeck = (n, playerID) => {
     [2, 'Conjure Resources'],
     [3, 'Violent Generator'],
     [3, 'Preparation'],
-    [2, 'Reaper']
+    [2, 'Reaper'],
+    [2, 'Builder'],
   ];
 
   let deck = [];
