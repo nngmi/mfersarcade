@@ -134,9 +134,6 @@ module.exports = (io) => {
                         return socket.emit("error", "Card not found in hand");
                     }
                     const card = game.hands[player.symbol].cards[cardIndex];
-                    if (card.cost > player.spendingResources) {
-                        return socket.emit("error", "Card " + card.name + " costs " + card.cost + " and you only have " + player.spendingResources + " resources");
-                    }
 
                     let errMessage = playCard(game, cardid, player.symbol);
                     if (errMessage) {

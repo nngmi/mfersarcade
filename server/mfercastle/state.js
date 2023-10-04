@@ -207,7 +207,7 @@ const playCard = (game, cardid, playerSymbol) => {
     const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
     const card = game.hands[player.symbol].cards[cardIndex];
     if (card.type !== 'spell') {
-        return "Error with play, card is not of type spell";
+        return "Error, card is not of type spell";
     }
     if (card.cost > player.spendingResources) {
         return "Card " + card.name + " costs " + card.cost + " and you only have " + player.spendingResources + " resources";

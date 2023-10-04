@@ -382,3 +382,58 @@ describe('Builder card in bunker', () => {
       expect(afterTurnSpendingResources).toBe(initialSpendingResources - builderCard.cost + 2 + generators);
   });
 });
+
+describe('Interaction of Preparation and Reaper in bunker', () => {
+  let game;
+  const playerSymbol = "X";
+  const otherPlayerSymbol = "O";
+  let reaperCardId;
+  let reaperCard;
+  let preparationCardId;
+  let preparationCard;
+
+  beforeEach(() => {
+      game = getInitialGameState();
+      initializePlayer(30, game, playerSymbol, "1234");
+      initializePlayer(30, game, otherPlayerSymbol, "3456");
+
+      reaperCard = Object.values(cardMap).find(card => card.name === "Reaper");
+      reaperCard.setID("1234", 1);
+      reaperCardId = reaperCard.id;
+
+      preparationCard = Object.values(cardMap).find(card => card.name === "Preparation");
+      preparationCard.setID("1234", 104); // New unique ID
+      preparationCardId = preparationCard.id;
+
+      // Adding both Reaper and Preparation cards to player's hand artificially
+      game.hands[playerSymbol].cards.push(reaperCard, preparationCard);
+      game.hands[playerSymbol].count += 2;
+
+      // Setting player's resources to be enough to play and bunkerize the cards
+      game.players.find(p => p.symbol === playerSymbol).spendingResources = reaperCard.cost + preparationCard.cost;
+  });
+
+  test('should augment Reaper damage by 2 after playing Preparation and bunkerizing Reaper', () => {
+      const initialWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
+
+      // Play the Preparation card
+      expect(playCard(game, preparationCardId, playerSymbol)).toBe(null);
+
+      // Bunkerize the Reaper
+      const bunkerIndex = 0; // First bunker
+      expect(bunkerizeCard(game, reaperCardId, bunkerIndex, playerSymbol)).toBe(null);
+
+      // End turn for current player
+      endTurn(game, playerSymbol);
+
+      // Start turn for the other player
+      beginTurn(game, otherPlayerSymbol);
+      endTurn(game, otherPlayerSymbol);
+
+      // start turn again for the player who played Reaper
+      beginTurn(game, playerSymbol);
+      // Check wallStrength has been decremented by 15 (13 from Reaper + 2 from Preparation)
+      const afterTurnWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
+      expect(afterTurnWallStrength).toBe(initialWallStrength - 15);
+  });
+});
