@@ -38,7 +38,10 @@ function LandingPage() {
   return (
     <div className="landingPageContainer">
       <h1>Mfers Arcade</h1>
-
+      <div className="header-content">
+          <img src="/images/heads/3.png" className="logo-image" />
+          <h2>Mfers Arcade</h2>
+      </div>
       <div className="games-container">
           <div className="game-item">
             <Link to="https://nngmi.github.io/mfersbeheaded">

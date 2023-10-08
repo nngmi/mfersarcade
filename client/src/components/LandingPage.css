@@ -24,7 +24,11 @@
       grid-template-columns: 1fr;
     }
   }
-  
+  .header-content {
+    display: flex;
+    align-items: center; /* Aligns items on the cross axis */
+    justify-content: center;
+  }
   .game-item {
     display: flex;
     flex-direction: column;
