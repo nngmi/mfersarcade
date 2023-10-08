@@ -73,12 +73,11 @@ function LandingPage() {
               <p>Mfers Castle</p>
             </div>
           )}
-          { showTestLevels && (
             <div className="game-item">
-              <img onClick={createConnectFour} src="/images/mfercastle.png" alt="Connect 4" />
-              <p>Connect 4</p>
+              <img onClick={createConnectFour} src="/images/connect4.png" alt="Connect 4" />
+              <p>Connect 4 Mfers</p>
             </div>
-          )}
+          
 
       </div>
     </div>

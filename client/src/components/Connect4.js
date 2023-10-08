@@ -83,7 +83,11 @@ function GameConnect4() {
       }, [gameId]);
 
       const makeMove = (col) => {
-        const newRow = board.map(r => r[col]).lastIndexOf(null);
+        console.log("trying to make move on ", col);
+        console.log(board[col]);
+        console.log(board[col].lastIndexOf(null));
+        const newRow = board[col].lastIndexOf(null);
+        console.log(newRow);
         if (newRow === -1 || gameState !== "ongoing" || currentPlayer !== playerSymbol) return;
         socket.emit("makeMove", gameId, col, playerSymbol);
     };

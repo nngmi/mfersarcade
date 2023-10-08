@@ -1,5 +1,5 @@
 const socketIo = require("socket.io");
-let games = require('./state');
+let connect4games = require('./state');
 
 function checkGameState(board) {
     // Check for horizontal wins
@@ -60,6 +60,7 @@ function checkGameState(board) {
 }
 
 function makeMove(board, col, symbol) {
+    console.log(board, col, symbol);
     for (let row = 5; row >= 0; row--) {
         if (board[col][row] === null) {
             board[col][row] = symbol;
@@ -76,7 +77,7 @@ module.exports = (io) => {
         console.log("New client connected", socket.id);
     
         socket.on("joinGame", (gameId) => {
-            const game = games[gameId];
+            const game = connect4games[gameId];
             if (!game) return socket.emit("error", "Game does not exist");
             if (game.players.length >= 2) return socket.emit("error", "Game is full");
 
@@ -92,7 +93,8 @@ module.exports = (io) => {
         });
     
         socket.on("makeMove", (gameId, col) => {
-            const game = games[gameId];
+            console.log("beginning of makeMove");
+            const game = connect4games[gameId];
             if (!game) return socket.emit("error", "Game does not exist");
 
             const player = game.players.find(p => p.id === socket.id);
@@ -100,7 +102,7 @@ module.exports = (io) => {
             
             if (game.currentPlayer !== player.symbol) return socket.emit("error", "Not your turn");
             if (game.state !== "ongoing") return socket.emit("error", "Game is not ongoing");
-            
+            console.log("about to call make move on ", col);
             if (!makeMove(game.board, col, game.currentPlayer)) {
                 return socket.emit("error", "Column is full");
             }
