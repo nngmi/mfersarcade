@@ -83,19 +83,15 @@ function GameConnect4() {
       }, [gameId]);
 
       const makeMove = (col) => {
-        console.log("trying to make move on ", col);
-        console.log(board[col]);
-        console.log(board[col].lastIndexOf(null));
         const newRow = board[col].lastIndexOf(null);
-        console.log(newRow);
         if (newRow === -1 || gameState !== "ongoing" || currentPlayer !== playerSymbol) return;
         socket.emit("makeMove", gameId, col, playerSymbol);
     };
     return (
         <div className="game-container">
 
-    <h1 className="title">Connect 4 Mfers</h1>
-            <p className="game-info">Your Team: {playerSymbol === 'X' ? 'Team Zombie' : playerSymbol === 'O' ? 'Team Ape' : playerSymbol}</p>
+    <h1 className="title">Connect 4 - Hoodies vs Top Hats</h1>
+            <p className="game-info">Your Team: {playerSymbol === 'X' ? 'Team Top Hat' : playerSymbol === 'O' ? 'Team Hoodie' : playerSymbol}</p>
 
             {gameState === "waiting for other player" && (
                 <p>Game State: {gameState} 
@@ -134,8 +130,8 @@ function GameConnect4() {
                                 key={`${rowIndex}-${colIndex}`}
                                 className="cell"
                             >
-                                {cell === 'X' && <img src="/images/heads/3.png" alt="Zombie" className="cell-img" />}
-                                {cell === 'O' && <img src="/images/heads/7146.png" alt="Ape" className="cell-img" />}
+                                {cell === 'X' && <img src="/images/heads/7235.png" alt="Top Hat" className="cell-img" />}
+                                {cell === 'O' && <img src="/images/heads/1704.png" alt="Hoodie" className="cell-img" />}
                             </div>
                         ))}
                     </div>

@@ -75,11 +75,9 @@ function LandingPage() {
           )}
             <div className="game-item">
               <img onClick={createConnectFour} src="/images/connect4.png" alt="Connect 4" />
-              <p>Connect 4 Mfers</p>
+              <p>Connect 4 - Hoodies vs Top Hats</p>
             </div>
-          
-
-      </div>
+        </div>
     </div>
   );
 }
