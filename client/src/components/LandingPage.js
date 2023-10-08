@@ -50,13 +50,13 @@ function LandingPage() {
             </Link>
             <p>Mfers Beheaded</p>
           </div>
-          <div className="game-item" onClick={createTicTacToeGame}>
-            <img src="/images/mfermfertoe.png" alt="Mfer Mfer Toe" />
+          <div className="game-item">
+            <img onClick={createTicTacToeGame} src="/images/mfermfertoe.png" alt="Mfer Mfer Toe" />
             <p>Mfer Mfer Toe</p>
           </div>
           { showTestLevels && (
-            <div className="game-item" onClick={createMferCastleGame}>
-              <img src="/images/mfercastle.png" alt="Mfers Castle" />
+            <div className="game-item">
+              <img onClick={createMferCastleGame} src="/images/mfercastle.png" alt="Mfers Castle" />
               <p>Mfers Castle</p>
             </div>
           )}
