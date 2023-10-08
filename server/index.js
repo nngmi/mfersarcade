@@ -16,6 +16,10 @@ app.use("/api/tictactoe", require("./tictactoe/tictactoe.routes"));
 require('./mfercastle/mfercastle.socket')(io);
 app.use("/api/mfercastle", require("./mfercastle/mfercastle.routes"));
 
+// connect 4
+require('./connect4/connect4.socket')(io);
+app.use("/api/connect4", require("./connect4/connect4.routes"));
+
 app.use(express.static(path.resolve(__dirname, '../client/build')));
 // Handle any requests that don't match the ones above
 app.get('*', (req, res) => {

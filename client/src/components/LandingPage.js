@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from 'react-router-dom';
 import './LandingPage.css';
-import CastleVisualization from './CastleVisualization';
 
 function LandingPage() {
   const [gameLink, setGameLink] = useState("");
@@ -37,6 +36,20 @@ function LandingPage() {
     }
   };
 
+  const createConnectFour = async () => {
+    try {
+      const response = await fetch("/api/connect4/game", { method: "POST" });
+      console.log(response);
+      if (!response.ok) throw new Error("Failed to create game");
+      const game = await response.json();
+      const gameLink = `/connect4/${game.gameId}`;
+      setGameLink(gameLink); // if you need to set the state
+      navigate(gameLink); // to redirect
+    } catch (error) {
+      console.error("Error creating game:", error);
+    }
+  };
+
   return (
     <div className="landingPageContainer">
       <div className="header-content">
@@ -58,6 +71,12 @@ function LandingPage() {
             <div className="game-item">
               <img onClick={createMferCastleGame} src="/images/mfercastle.png" alt="Mfers Castle" />
               <p>Mfers Castle</p>
+            </div>
+          )}
+          { showTestLevels && (
+            <div className="game-item">
+              <img onClick={createConnectFour} src="/images/mfercastle.png" alt="Connect 4" />
+              <p>Connect 4</p>
             </div>
           )}
 
