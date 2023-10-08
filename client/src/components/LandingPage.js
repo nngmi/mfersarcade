@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import './LandingPage.css';
 import CastleVisualization from './CastleVisualization';
 
@@ -38,11 +38,19 @@ function LandingPage() {
   return (
     <div className="landingPageContainer">
       <h1>Mfers Arcade</h1>
-      <div>
-        <CastleVisualization/>
-      </div>
-      <button onClick={createMferCastleGame}>Play Mfer Castle (Multiplayer)</button>
 
+      <div className="games-container">
+          <div className="game-item">
+            <Link to="https://nngmi.github.io/mfersbeheaded">
+              <img src="/images/mfersbeheaded.png" alt="Mfers Beheaded" />
+            </Link>
+            <p>Mfers Beheaded</p>
+          </div>
+          <div className="game-item" onClick={createMferCastleGame}>
+            <img src="/images/mfercastle.png" alt="Mfers Castle" />
+            <p>Mfers Castle</p>
+          </div>
+      </div>
     </div>
   );
 }

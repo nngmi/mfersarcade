@@ -5,3 +5,44 @@
 .landingPageContainer button {
     font-size: 40px; /* or whatever size you prefer */
 }
+
+
+.games-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* This creates three equally sized columns */
+    gap: 1rem; /* Spacing between grid items */
+  }
+  /* Mobile view: 1 column grid */
+  @media (max-width: 1200px) {
+    .games-container {
+      grid-template-columns: repeat(2, 1fr); /* This creates three equally sized columns */
+    }
+  }
+  /* Mobile view: 1 column grid */
+  @media (max-width: 768px) {
+    .games-container {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  .game-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    cursor: pointer;
+  }
+  
+  .game-item img {
+    width: 300px;  /* Fixed width */
+    height: 150px; /* Fixed height */
+    object-fit: cover; /* This will ensure that the image covers the entire size without distortion */
+    border-radius: 8px; /* Optional: Round the edges for a better visual */
+    overflow: hidden; /* This will hide any overflowing part of the image */
+    border: 1px solid black;
+  }
+  
+  .game-item p {
+    margin-top: 0.5rem; /* Some spacing between the image and the text */
+  }
+  
