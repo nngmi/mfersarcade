@@ -9,13 +9,13 @@
 
 .games-container {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* This creates three equally sized columns */
+    grid-template-columns: 1fr;
     gap: 1rem; /* Spacing between grid items */
 }
 /* Mobile view: 1 column grid */
 @media (max-width: 1200px) {
 .games-container {
-    grid-template-columns: repeat(2, 1fr); /* This creates three equally sized columns */
+    grid-template-columns: 1fr;
 }
 }
 /* Mobile view: 1 column grid */
@@ -34,7 +34,6 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    cursor: pointer;
 }
 .logo-image {
     height: 60px; /* You can set it as per your need */
@@ -48,6 +47,7 @@
     border-radius: 8px; /* Optional: Round the edges for a better visual */
     overflow: hidden; /* This will hide any overflowing part of the image */
     border: 1px solid black;
+    cursor: pointer;
 }
 
 .game-item p {
