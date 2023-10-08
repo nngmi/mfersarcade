@@ -6,6 +6,8 @@ import CastleVisualization from './CastleVisualization';
 function LandingPage() {
   const [gameLink, setGameLink] = useState("");
   const navigate = useNavigate();
+  const urlParams = new URLSearchParams(window.location.search);
+  const showTestLevels = urlParams.get('showTestLevels') === 'true';
 
   const createTicTacToeGame = async () => {
     try {
@@ -48,10 +50,13 @@ function LandingPage() {
             </Link>
             <p>Mfers Beheaded</p>
           </div>
-          <div className="game-item" onClick={createMferCastleGame}>
-            <img src="/images/mfercastle.png" alt="Mfers Castle" />
-            <p>Mfers Castle</p>
-          </div>
+          { showTestLevels && (
+            <div className="game-item" onClick={createMferCastleGame}>
+              <img src="/images/mfercastle.png" alt="Mfers Castle" />
+              <p>Mfers Castle</p>
+            </div>
+          )}
+
       </div>
     </div>
   );
