@@ -128,22 +128,19 @@ function MferCastle() {
       <div className="game-board">
         <DndProvider backend={TouchBackend} options={{ enableMouseEvents: true }}>
 
-        <div className="player-area opponent-area">
-          <div className="player-area-row">        
-            <PlayerGameState className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove}/>  
-            <OtherPlayerHand className="grow-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
-            <OtherPlayerDeck className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} />
-            <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove} />
-          </div>
-        </div>
+          
         <div className="player-area">       
           <div className="player-area-row battlefield-area">
               <PlayerBunkers className="fixed-width" game={game} playerSymbol={playerSymbol} isOpponent={false} makeMove={makeMove} />
-              <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol} isFlipped={true}/>
+              <PlayerCastleVisualization className="fixed-width" game={game} isOpponent={false} playerSymbol={playerSymbol} isFlipped={true}/>
               <Battlefield className="grow-width" game={game} playerSymbol={playerSymbol} makeMove={makeMove}/>
-              <PlayerCastleVisualization className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isFlipped={false}/> 
+              <PlayerCastleVisualization className="fixed-width" game={game} isOpponent={true} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isFlipped={false}/> 
               <PlayerBunkers className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove} />
-          </div>        
+              <div class="fixed-width-card hand game-info">
+                <PlayerGraveyard className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove} />
+                <PlayerGameState className="fixed-width" game={game} playerSymbol={playerSymbol ? (playerSymbol === 'X' ? 'O' : 'X') : null} isOpponent={true} makeMove={makeMove}/>
+              </div>
+          </div>
         </div>
         <div className="player-area">
           <div className="player-area-row">

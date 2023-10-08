@@ -14,10 +14,12 @@ export const Bunker = ({ bunker, index, isOpponent, makeMove }) => {
         }
       }
     }));
-  
+
+    const bunkerName = isOpponent ? `Enemy Bunker ${index + 1}` : `Bunker ${index + 1}`;
+
     return (
       <div ref={dropRef} className={`${count === 0 ? 'white-outline' : ''}`}>
-        <div className="count">Bunker {index+1}</div>
+        <div className="count">{bunkerName}</div>
         {topCard ? (
           <Card key={topCard.id} card={topCard} />
         ) : (

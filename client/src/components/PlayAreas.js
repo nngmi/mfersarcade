@@ -19,12 +19,16 @@ export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) =>
     discardsLeft = null,
   } = getPlayer(game, playerSymbol);
 
+  // Set the resource label based on isOpponent
+  const resourceLabel = isOpponent ? 'Enemy Resources:' : 'Your Resources:';
+
   return (
-    <div className="playState">
-      <div className="marginSpan">Tower Height: {towerStrength}</div>
-      <div className="marginSpan">Wall Height: {wallStrength}</div>
+    <div className="playState fixed-width-card hand game-info">
+      <div className="resourceLabel">{resourceLabel}</div> {/* This line was added */}
       <div className="marginSpan">Generators: {generators}</div>
-      <div className="marginSpan">Spending Resource: {spendingResources}</div>
+      <div className="marginSpan">Spending Resources: {spendingResources}</div>
+      {isOpponent && (<div className="marginSpan">Cards in Hand: {game.hands[playerSymbol].count}</div>)}
+      {isOpponent && (<div className="marginSpan">Cards in Deck: {game.decks[playerSymbol].count}</div>)}
       <div className="marginSpan">Draws Left: {drawsLeft}</div>
       <div className="marginSpan">Discards Left: {discardsLeft}</div>
 
@@ -49,7 +53,7 @@ export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) =>
   );
 }
 
-export const PlayerCastleVisualization = ({ game, playerSymbol, isFlipped }) => {
+export const PlayerCastleVisualization = ({ game, playerSymbol, isOpponent, isFlipped }) => {
   function getPlayer(game, playerSymbol) {
     return game.players.find(player => player.symbol === playerSymbol) || {};
   }
@@ -69,11 +73,15 @@ export const PlayerCastleVisualization = ({ game, playerSymbol, isFlipped }) => 
         <>
           <CastleVisualization towerHeight={towerHeight} scaleFactor={3} isFlipped={isFlipped} />
           <WallVisualization wallHeight={wallHeight} scaleFactor={3} isFlipped={isFlipped} />
+          <div className="marginSpan">Tower Height: {towerStrength}</div>
+          <div className="marginSpan">Wall Height: {wallStrength}</div>
         </>
       ) : (
         <>
           <WallVisualization wallHeight={wallHeight} scaleFactor={3} isFlipped={isFlipped} />
           <CastleVisualization towerHeight={towerHeight} scaleFactor={3} isFlipped={isFlipped} />
+          <div className="marginSpan">Tower Height: {towerStrength}</div>
+          <div className="marginSpan">Wall Height: {wallStrength}</div>
         </>
       )}
     </div>
