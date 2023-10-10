@@ -48,6 +48,14 @@ function LandingPage() {
                 </Link>
                 <p>Hoodies vs Top Hats</p>
             </div>
+            { showTestLevels && (
+            <div className="game-item">
+                <Link to="/mferchess/">
+                  <img src="/images/mferchess.png" alt="Chess" />
+                </Link>
+                <p>Mfer Chess</p>
+            </div>
+            )}
         </div>
     </div>
   );

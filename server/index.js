@@ -8,13 +8,13 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// tic tac toe
-require('./tictactoe/tictactoe.socket')(io);
-app.use("/api/tictactoe", require("./tictactoe/tictactoe.routes"));
-
 // mfer castle
 require('./mfercastle/mfercastle.socket')(io);
 app.use("/api/mfercastle", require("./mfercastle/mfercastle.routes"));
+
+// mfer chess
+require('./chess/chess.socket')(io);
+app.use("/api/chess", require("./chess/chess.routes"));
 
 // connect 4
 require('./connect4/connect4.socket')(io);

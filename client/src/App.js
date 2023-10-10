@@ -6,13 +6,17 @@ import GameConnect4 from "./components/Connect4";
 import Connect4LandingPage from "./components/Connect4LandingPage";
 import MferCastle from "./components/MferCastle";
 import './App.css';
+import ChessLandingPage from "./components/ChessLandingPage";
+import { Chess } from "chess.js";
 function App() {
   return (
     <Router>
       <Routes>
         <Route path="/connect4/:gameId" element={<GameConnect4 />} />
         <Route path="/connect4/" element={<Connect4LandingPage />} />
+        <Route path="/mferchess/" element={<ChessLandingPage />} />
         <Route path="/mfercastle/:gameId" element={<MferCastle />} />
+        <Route path="/mferchess/:gameId" element={<Chess />} />
         <Route path="/" element={<LandingPage />} />
       </Routes>
     </Router>
