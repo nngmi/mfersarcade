@@ -48,4 +48,8 @@ router.get("/game/:gameId", (req, res) => {
     res.json(game);
 });
 
+router.get("/games", (req, res) => {
+    res.json(connect4games);
+});
+
 module.exports = router;
