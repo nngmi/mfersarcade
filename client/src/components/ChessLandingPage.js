@@ -34,7 +34,7 @@ function ChessLandingPage() {
 
     return (
         <div className="game-container">
-            <h1 className="title">Chess - Challenge Your Mind</h1>
+            <h1 className="title">Mfer Chess</h1>
             <p>Games in Progress:</p>
 
             <ul className="games-list">
