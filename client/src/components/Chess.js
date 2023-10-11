@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import io from "socket.io-client";
 import { useParams } from 'react-router-dom';
-import './Chess.css'; // You should have a similar CSS for Chess
 import { Howl } from 'howler';
+import './Chess.css';
 
 function GameChess() {
     let { gameId } = useParams();
@@ -12,6 +12,42 @@ function GameChess() {
     const [currentPlayer, setCurrentPlayer] = useState("white");
     const [playerColor, setPlayerColor] = useState(null);
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
+    const [selectedSquare, setSelectedSquare] = useState(null);
+
+    const makeMove = (fromSquare, toSquare) => {
+        if (gameState !== "ongoing" || currentPlayer !== playerColor) return;
+        const from = toAlgebraicNotation(fromSquare.row, fromSquare.col);
+        const to = toAlgebraicNotation(toSquare.row, toSquare.col);
+        socket.emit("makeMove", gameId, { from, to });
+    };
+
+
+    const toAlgebraicNotation = (row, col) => {
+        const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        return playerColor === 'white' ? 
+               `${columns[col]}${8 - row}` : 
+               `${columns[col]}${row + 1}`;
+    };
+    
+    const handleSquareClick = (rowIndex, cellIndex) => {
+        const actualRow = playerColor === 'black' ? 7 - rowIndex : rowIndex;
+        const selectedPiece = board[actualRow][cellIndex];
+        console.log("clicking on ", actualRow, cellIndex, selectedPiece);
+    
+        // If a piece is already selected
+        if (selectedSquare) {
+            // Execute the move if it's valid (You can add more validation checks here)
+            makeMove(selectedSquare, { row: rowIndex, col: cellIndex });
+            setSelectedSquare(null);
+        } else if (selectedPiece && ((selectedPiece === selectedPiece.toUpperCase() && playerColor === 'white') || (selectedPiece !== selectedPiece.toUpperCase() && playerColor === 'black'))) {
+            console.log("setting selected piece to ", rowIndex, cellIndex);
+            setSelectedSquare({ row: rowIndex, col: cellIndex });
+            
+            // Compute valid moves for the selected piece (Placeholder for now)
+            // setValidMoves(computeValidMoves(selectedPiece, actualRow, cellIndex));
+        }
+    };
+    
 
     const basicSound = new Howl({
         src: ["/audio/correct.mp3"], // Replace with your sound file path
@@ -71,6 +107,7 @@ function GameChess() {
             .then((response) => {console.log(response); response.json();})
             .then((game) => {
                 console.log("at beginning of game");
+                console.log(game);
                 if (game.message && game.message === "Game does not exist") {
                     setGameState("error");
                 } else {
@@ -83,15 +120,12 @@ function GameChess() {
             .catch((error) => console.error('Error fetching the game:', error));
     }, [gameId]);
     
-    const makeMove = (fromSquare, toSquare) => { // For chess, we'll be dealing with two squares: the source and destination
-        if (gameState !== "ongoing" || currentPlayer !== playerColor) return;
-        socket.emit("makeMove", gameId, fromSquare, toSquare, playerColor);
-    };    
+
 
     return (
         <div className="game-container">
 
-            <h1 className="title">Chess - Challenge Your Mind</h1>
+            <h1 className="title">Mfer Chess</h1>
             <p className="game-info">You play as: {playerColor}</p>
 
             {gameState === "waiting for other player" && (
@@ -101,7 +135,7 @@ function GameChess() {
                     className="depress-button" 
                     onClick={() => { 
                         const el = document.createElement('textarea');
-                        el.value = `${window.location.origin}/chess/${gameId}`;
+                        el.value = `${window.location.origin}/mferchess/${gameId}`;
                         document.body.appendChild(el);
                         el.select();
                         document.execCommand('copy');
@@ -117,18 +151,38 @@ function GameChess() {
             {gameState === "ongoing" && (
                 <p>Game State: {currentPlayer === playerColor ? 'Your Turn' : "Opponent's Turn"}</p>
             )}
-            
-            <div className="chessboard">
-                {board.map((row, rowIndex) => (
-                    row.map((cell, cellIndex) => (
-                        <div
-                            key={`${rowIndex}-${cellIndex}`}
-                            className="square"
-                        >
-                            {cell && <img src={`/images/chess/${cell}.png`} alt={cell} className="piece-img" />}
-                        </div>
-                    ))
-                ))}
+            <div className="chess-container">
+                <div className="row-labels">
+                    {(playerColor === 'black' ? [' ', '1', '2', '3', '4', '5', '6', '7', '8'] : [' ', '8', '7', '6', '5', '4', '3', '2', '1']).map(label => (
+                        <div key={label} className="row-label">{label}</div>
+                    ))}
+                </div>
+                <div className="chessboard-wrapper">
+                    <div className="column-labels">
+                        {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(label => (
+                            <div key={label} className="column-label">{label}</div>
+                        ))}
+                    </div>
+                    <div className="chessboard">
+                        {(playerColor === 'black' ? board.slice().reverse() : board).map((row, reversedRowIndex) => (
+                            row.map((cell, cellIndex) => (
+                                <div
+                                    key={`${reversedRowIndex}-${cellIndex}`}
+                                    className={`square ${selectedSquare && selectedSquare.row === reversedRowIndex && selectedSquare.col === cellIndex ? 'selected' : ''}`}
+                                    onClick={() => handleSquareClick(reversedRowIndex, cellIndex)}
+                                >
+                                    {cell && (
+                                        <img
+                                            src={`/images/chess/${cell.toLowerCase()}-${cell === cell.toUpperCase() ? 'white' : 'black'}.png`}
+                                            alt={cell}
+                                            className="piece-img"
+                                        />
+                                    )}
+                                </div>
+                            ))
+                        ))}
+                    </div>
+                </div>
             </div>
             
             <p>

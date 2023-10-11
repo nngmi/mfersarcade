@@ -2,20 +2,23 @@ const socketIo = require("socket.io");
 let chessGames = require('./state');
 const Chess = require('chess.js').Chess;
 
-function isValidMove(board, move) {
+function isValidMove(board, move, playerColor) {
     // Create a new Chess instance with the current board state
-    const chess = new Chess(boardToFEN(board));
+    try {
+        const turn = playerColor === 'white' ? 'w' : 'b';
+        const chess = new Chess(boardToFEN(board, turn));
 
-    // Try the move
-    const result = chess.move(move);
+        const result = chess.move(move);
+        return result !== null;
 
-    // If the move is invalid, result will be null
-    return result !== null;
+    } catch (error) {
+        console.log("Error during move:", error);
+        return false;
+    }
 }
 
-function boardToFEN(board) {
-    // Convert your board representation to FEN format
-    // For simplicity, assume board is an 8x8 array representing the chess board
+
+function boardToFEN(board, turn = 'w') {
     let fen = "";
     let empty = 0;
 
@@ -41,8 +44,7 @@ function boardToFEN(board) {
         }
     }
 
-    // Add space and additional details (assuming it's white's turn and both sides can castle and no en passant target)
-    fen += ' w KQkq - 0 1';
+    fen += ` ${turn} KQkq - 0 1`;
 
     return fen;
 }
@@ -70,9 +72,9 @@ function FENToBoard(fen) {
 }
 
 module.exports = (io) => {
-    const chess = io.of('/chess');
+    const chessSocket = io.of('/chess');
 
-    chess.on("connection", (socket) => {
+    chessSocket.on("connection", (socket) => {
         console.log("New client connected", socket.id);
     
         socket.on("joinGame", (gameId) => {
@@ -87,7 +89,7 @@ module.exports = (io) => {
             }
             game.lastActivity = Date.now();
             socket.join(gameId);
-            chess.to(gameId).emit("gameUpdated", game);
+            chessSocket.to(gameId).emit("gameUpdated", game);
             socket.emit("playerColor", playerColor);
         });
     
@@ -102,26 +104,28 @@ module.exports = (io) => {
             if (game.state !== "ongoing") return socket.emit("error", "Game is not ongoing");
             
             // Validate the move using chess.js
-            if (!isValidMove(game.board, move)) {
+            if (!isValidMove(game.board, move, player.color)) {
                 return socket.emit("error", "Invalid move");
             }
             
             // Update the board state. We assume move contains {from: 'e2', to: 'e4'}
             // TODO: Convert game.board to the right format and back after moving
-            const chess = new Chess(boardToFEN(game.board));
+
+            const turn = player.color === 'white' ? 'w' : 'b';
+            const chess = new Chess(boardToFEN(game.board, turn));
             chess.move(move);
             game.board = FENToBoard(chess.fen());
         
             game.lastActivity = Date.now();
         
             // Check for game end conditions like checkmate
-            if (chess.in_checkmate()) {
+            if (chess.isCheckmate()) {
                 game.state = `${game.currentPlayer}-wins`;
             } else {
                 game.currentPlayer = game.currentPlayer === "white" ? "black" : "white";
             }
         
-            chess.to(gameId).emit("gameUpdated", game);
+            chessSocket.to(gameId).emit("gameUpdated", game);
         });
         
     });
