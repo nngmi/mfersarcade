@@ -148,9 +148,31 @@ function GameChess() {
 
                 </p>
             )}
-            {gameState === "ongoing" && (
-                <p>Game State: {currentPlayer === playerColor ? 'Your Turn' : "Opponent's Turn"}</p>
-            )}
+            {
+                gameState === "ongoing" && (
+                    <p>Game State: {currentPlayer === playerColor ? 'Your Turn' : "Opponent's Turn"}</p>
+                )
+            }
+            {
+                (gameState === "white-wins" && playerColor === "white") && (
+                    <p>You Win!</p>
+                )
+            }
+            {
+                (gameState === "black-wins" && playerColor === "black") && (
+                    <p>You Win!</p>
+                )
+            }
+            {
+                (gameState === "white-wins" && playerColor === "black") && (
+                    <p>You Lose!</p>
+                )
+            }
+            {
+                (gameState === "black-wins" && playerColor === "white") && (
+                    <p>You Lose!</p>
+                )
+            }
             <div className="chess-container">
                 <div className="row-labels">
                     {(playerColor === 'black' ? [' ', '1', '2', '3', '4', '5', '6', '7', '8'] : [' ', '8', '7', '6', '5', '4', '3', '2', '1']).map(label => (
