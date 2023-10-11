@@ -186,24 +186,38 @@ function GameChess() {
                         ))}
                     </div>
                     <div className="chessboard">
-                        {(playerColor === 'black' ? board.slice().reverse() : board).map((row, reversedRowIndex) => (
-                            row.map((cell, cellIndex) => (
-                                <div
-                                    key={`${reversedRowIndex}-${cellIndex}`}
-                                    className={`square ${selectedSquare && selectedSquare.row === reversedRowIndex && selectedSquare.col === cellIndex ? 'selected' : ''}`}
-                                    onClick={() => handleSquareClick(reversedRowIndex, cellIndex)}
-                                >
-                                    {cell && (
-                                        <img
-                                            src={`/images/chess/${cell.toLowerCase()}-${cell === cell.toUpperCase() ? 'white' : 'black'}.png`}
-                                            alt={cell}
-                                            className="piece-img"
-                                        />
-                                    )}
-                                </div>
-                            ))
+                        {(playerColor === 'black' ? board.slice().reverse() : board).map((row, rowIndex) => (
+                            row.map((cell, cellIndex) => {
+                                // If player is white, then the normal board orientation is used
+                                // If player is black, then reverse the board orientation
+                                const isDarkSquare = playerColor === 'white'
+                                    ? (rowIndex + cellIndex) % 2 !== 0
+                                    : (rowIndex + cellIndex) % 2 === 0;
+
+                                return (
+                                    <div
+                                        key={`${rowIndex}-${cellIndex}`}
+                                        className={`
+                                            square 
+                                            ${isDarkSquare ? 'black-square' : 'white-square'}
+                                            ${selectedSquare && selectedSquare.row === rowIndex && selectedSquare.col === cellIndex ? 'selected' : ''}
+                                        `}
+                                        onClick={() => handleSquareClick(rowIndex, cellIndex)}
+                                    >
+                                        {cell && (
+                                            <img
+                                                src={`/images/chess/${cell.toLowerCase()}-${cell === cell.toUpperCase() ? 'white' : 'black'}.png`}
+                                                alt={cell}
+                                                className="piece-img"
+                                            />
+                                        )}
+                                    </div>
+                                );
+                            })
                         ))}
                     </div>
+
+
                 </div>
             </div>
             
