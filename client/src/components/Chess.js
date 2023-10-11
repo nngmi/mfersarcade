@@ -21,6 +21,14 @@ function GameChess() {
         socket.emit("makeMove", gameId, { from, to });
     };
 
+    const pieceLegend = [
+        { name: 'Pawn', notation: 'p' },
+        { name: 'Knight', notation: 'n' },
+        { name: 'Bishop', notation: 'b' },
+        { name: 'Rook', notation: 'r' },
+        { name: 'Queen', notation: 'q' },
+        { name: 'King', notation: 'k' },
+    ];
 
     const toAlgebraicNotation = (row, col) => {
         const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -220,7 +228,35 @@ function GameChess() {
 
                 </div>
             </div>
-            
+            <div className="legend-section">
+                <h2 className="legend-title">Legend</h2>
+                <table className="legend-table">
+                    <thead>
+                        <tr>
+                            {pieceLegend.map(piece => (
+                                <th key={piece.name}>{piece.name}</th>
+                            ))}
+                        </tr>
+                        <tr>
+                            {pieceLegend.map(piece => (
+                                <th key={piece.name + '-white'}>
+                                    <img src={`/images/chess/${piece.notation}-white.png`} alt={`${piece.name} White`} />
+                                </th>
+                            ))}
+                        </tr>
+                        <tr>
+                            {pieceLegend.map(piece => (
+                                <th key={piece.name + '-black'}>
+                                    <img src={`/images/chess/${piece.notation}-black.png`} alt={`${piece.name} Black`} />
+                                </th>
+                            ))}
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+
+
             <p>
                 <a href="/" className="back-button">
                     Back to Home

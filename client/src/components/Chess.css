@@ -26,6 +26,29 @@
     background-color: #f0d9b5;  /* Adjust color as needed */
 }
 
+.legend-table img {
+    width: 30px;
+    height: 30px;
+}
+.legend-section {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.legend-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+}
+
+.legend-table {
+    width: 400px;
+    table-layout: fixed; /* This ensures the table takes up the full width and divides the space among columns equally */
+}
+
+.legend-table th {
+    width: calc(400px / 6); /* Assuming you have 6 pieces */
+}
+
 .black-square {
     background-color: #b58863;  /* Adjust color as needed */
 }
