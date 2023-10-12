@@ -3,7 +3,6 @@
     flex-direction: column; /* To stack children vertically */
     justify-content: center; /* Centers children vertically */
     align-items: center; /* Centers children horizontally */
-    height: 100vh; /* This makes sure the container takes the full height of the viewport */
     text-align: center; /* To center the text content */
 }
 

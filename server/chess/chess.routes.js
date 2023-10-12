@@ -35,7 +35,7 @@ router.post("/game", (req, res) => {
             ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
         ],
         currentPlayer: "white", // Players are 'white' and 'black' in chess
-        state: "waiting for other player",
+        state: "waiting for players",
         lastActivity: Date.now(),
     };
     res.status(201).json({ gameId });
@@ -45,6 +45,7 @@ router.get("/game/:gameId", (req, res) => {
     const gameId = req.params.gameId;
     const game = chessGames[gameId];
     if (!game) return res.status(404).json({ message: "Game does not exist" });
+    console.log(game, gameId);
     res.json(game);
 });
 

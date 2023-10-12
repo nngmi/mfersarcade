@@ -8,11 +8,14 @@ function GameChess() {
     let { gameId } = useParams();
     const [socket, setSocket] = useState(null);
     const [board, setBoard] = useState(() => Array(8).fill(0).map(row => Array(8).fill(null)));
-    const [gameState, setGameState] = useState("waiting for other player");
+    const [gameState, setGameState] = useState("viewing");
     const [currentPlayer, setCurrentPlayer] = useState("white");
     const [playerColor, setPlayerColor] = useState(null);
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
     const [selectedSquare, setSelectedSquare] = useState(null);
+    const [ableToJoin, setAbleToJoin] = useState(false);
+    const [joined, setJoined] = useState(false);
+    const [players, setPlayers] = useState([]);
 
     const makeMove = (fromSquare, toSquare) => {
         if (gameState !== "ongoing" || currentPlayer !== playerColor) return;
@@ -75,7 +78,6 @@ function GameChess() {
         loop: false, // Do not loop the sound
         volume: 0.5, // Set the volume to 50%
       });
-
       useEffect(() => {
         if (!gameId) return;
         let playerColorLocal = null;
@@ -84,19 +86,27 @@ function GameChess() {
         const newSocket = io.connect(SERVER_URL + '/chess'); // Updated the namespace to 'chess'
         setSocket(newSocket);
     
-        newSocket.emit("joinGame", gameId);
-        console.log("emit joinGame");
+        newSocket.emit("viewGame", gameId);
+
         newSocket.on("gameUpdated", (game) => {
             console.log("got game", game);
             setBoard(game.board);
             setCurrentPlayer(game.currentPlayer);
             setGameState(game.state);
+            console.log(game.players);
+            setPlayers(game.players);
             if (game.state === `${playerColorLocal}-wins`) {
                 winSound.play();
             } else if (game.state.includes("-wins") && game.state !== `${playerColorLocal}-wins`) {
                 wrongSound.play();
             } else {
                 basicSound.play();
+            }
+            if (!joined && game.players.length < 2) {
+                // User can join the game
+                setAbleToJoin(true);
+            } else {
+                setAbleToJoin(false);
             }
         });
     
@@ -112,7 +122,7 @@ function GameChess() {
         console.log("at beginning of useefect");
         if (!gameId) return;
         fetch(`/api/chess/game/${gameId}`) // Updated the endpoint to 'chess'
-            .then((response) => {console.log(response); response.json();})
+            .then((response) => {console.log(response); return response.json();})
             .then((game) => {
                 console.log("at beginning of game");
                 console.log(game);
@@ -123,64 +133,79 @@ function GameChess() {
                     setBoard(game.board);
                     setCurrentPlayer(game.currentPlayer);
                     setGameState(game.state);
+                    setPlayers(game.players);
+                    if (game.players.length < 2) {
+                        setAbleToJoin(true);
+                    }
                 }
             })
             .catch((error) => console.error('Error fetching the game:', error));
     }, [gameId]);
     
-
+    function displayGameStatus(gameState, currentPlayer, playerColor, joined) {
+        if (gameState === "ongoing") {
+            if (joined) {  // Explicitly checks if the user has joined
+                return (
+                    <>
+                        <p>Turn: {currentPlayer === playerColor ? `Your (${playerColor}) Turn` : `Opponent's (${currentPlayer}) Turn`}</p>
+                        <p className="game-info">You play as: {playerColor}</p>
+                    </>
+                );
+            } else {
+                return <p>Turn: {currentPlayer} Turn</p>;
+            }
+        } else if (gameState.includes("-wins")) {
+            if (joined) {
+                if (gameState === `${playerColor}-wins`) {
+                    return <p>You Win!</p>;
+                } else {
+                    return <p>You Lose!</p>;
+                }
+            }
+        }
+        return null; // Default return for all other cases
+    }
 
     return (
         <div className="game-container">
-
-            <h1 className="title">Mfer Chess</h1>
-            <p className="game-info">You play as: {playerColor}</p>
-
-            {gameState === "waiting for other player" && (
-                <p>Game State: {gameState} 
-                
-                <button 
-                    className="depress-button" 
-                    onClick={() => { 
-                        const el = document.createElement('textarea');
-                        el.value = `${window.location.origin}/mferchess/${gameId}`;
-                        document.body.appendChild(el);
-                        el.select();
-                        document.execCommand('copy');
-                        document.body.removeChild(el);
-                        alert('Game Link saved! Now share it with friends.');
-                    }}
-                >
-                    Copy Game Link to Share
-                </button>
-
+                <div>
+                <h2>Mfer Chess</h2>
+                <p>
+                    <span>Game State: {gameState}</span>
                 </p>
-            )}
-            {
-                gameState === "ongoing" && (
-                    <p>Game State: {currentPlayer === playerColor ? 'Your Turn' : "Opponent's Turn"}</p>
-                )
-            }
-            {
-                (gameState === "white-wins" && playerColor === "white") && (
-                    <p>You Win!</p>
-                )
-            }
-            {
-                (gameState === "black-wins" && playerColor === "black") && (
-                    <p>You Win!</p>
-                )
-            }
-            {
-                (gameState === "white-wins" && playerColor === "black") && (
-                    <p>You Lose!</p>
-                )
-            }
-            {
-                (gameState === "black-wins" && playerColor === "white") && (
-                    <p>You Lose!</p>
-                )
-            }
+                <p>
+                    <span>Players in Game: {players.length} </span>
+                </p>
+                {joined === false && ableToJoin === true && (
+                    <button onClick={() => {
+                        socket.emit("joinGame", gameId);
+                        setJoined(true);
+                    }}>
+                        Join Game
+                    </button>
+                )}
+
+                {gameState === "waiting for players" && joined === true && (
+                    <p>You have joined but waiting for other player.
+                    
+                    <button 
+                        className="depress-button" 
+                        onClick={() => { 
+                            const el = document.createElement('textarea');
+                            el.value = `${window.location.origin}/mferchess/${gameId}`;
+                            document.body.appendChild(el);
+                            el.select();
+                            document.execCommand('copy');
+                            document.body.removeChild(el);
+                            alert('Game Link saved! Now share it with friends.');
+                        }}
+                    >
+                        Copy Game Link to Share
+                    </button>
+                    </p>
+                )}
+                {displayGameStatus(gameState, currentPlayer, playerColor, joined)}
+             </div>
             <div className="chess-container">
                 <div className="row-labels">
                     {(playerColor === 'black' ? [' ', '1', '2', '3', '4', '5', '6', '7', '8'] : [' ', '8', '7', '6', '5', '4', '3', '2', '1']).map(label => (

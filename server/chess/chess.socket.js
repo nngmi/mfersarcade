@@ -77,6 +77,12 @@ module.exports = (io) => {
     chessSocket.on("connection", (socket) => {
         console.log("New client connected", socket.id);
     
+        socket.on("viewGame", (gameId) => {
+            const game = chessGames[gameId];
+            if (!game) return socket.emit("error", "Game does not exist");
+            socket.join(gameId);
+        });
+
         socket.on("joinGame", (gameId) => {
             const game = chessGames[gameId];
             if (!game) return socket.emit("error", "Game does not exist");
