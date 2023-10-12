@@ -3,6 +3,8 @@ import io from "socket.io-client";
 import { useParams } from 'react-router-dom';
 import { Howl } from 'howler';
 import './Chess.css';
+import { ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 
 function GameChess() {
     let { gameId } = useParams();
@@ -130,6 +132,10 @@ function GameChess() {
             setPlayerColor(color);   // Updated to set the player's color
             playerColorLocal = color;
         });
+
+        newSocket.on("notify", (text) => {  // Replaced 'playerSymbol' with 'playerColor'
+            toast.success(text);
+        });
     
         return () => newSocket.disconnect();
     }, [gameId]);
@@ -190,128 +196,142 @@ function GameChess() {
         }
         return null; // Default return for all other cases
     }
-
     return (
         <div className="game-container">
-                <div>
-                <h2>Mfer Chess: {game.gameName}</h2>
-                <p>
-                    <span>Game State: {gameState} ({players.length} in game)</span>
-                </p>
-                {joined === false && ableToJoin === true && (
-                    <button onClick={() => {
-                        socket.emit("joinGame", gameId);
-                        setJoined(true);
-                    }}>
-                        Join Game
-                    </button>
-                )}
-
-                {gameState === "waiting for players" && joined === true && (
-                    <p>You have joined but waiting for other player.
-                    
-                    <button 
-                        className="depress-button" 
-                        onClick={() => { 
-                            const el = document.createElement('textarea');
-                            el.value = `${window.location.origin}/mferchess/${gameId}`;
-                            document.body.appendChild(el);
-                            el.select();
-                            document.execCommand('copy');
-                            document.body.removeChild(el);
-                            alert('Game Link saved! Now share it with friends.');
-                        }}
-                    >
-                        Copy Game Link to Share
-                    </button>
+            {gameState === "error" ? (
+                // Render only when there's an error
+                <>
+                    <h2>Mfer Chess {game.gameName}</h2>
+                    <p>
+                        <span>Game Not Found!</span>
                     </p>
-                )}
-                {displayGameStatus(gameState, currentPlayer, playerColor, joined)}
-             </div>
-            <div className="chess-container">
-                <div className="row-labels">
-                    {(playerColor === 'black' ? [' ', '1', '2', '3', '4', '5', '6', '7', '8'] : [' ', '8', '7', '6', '5', '4', '3', '2', '1']).map(label => (
-                        <div key={label} className="row-label">{label}</div>
-                    ))}
-                </div>
-                <div className="chessboard-wrapper">
-                    <div className="column-labels">
-                        {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(label => (
-                            <div key={label} className="column-label">{label}</div>
-                        ))}
+                    <ToastContainer />
+                    <p>
+                        <a href="/" className="back-button">
+                            Back to Home
+                        </a>
+                    </p>
+                </>
+            ) : (
+                // Render when there's no error
+                <>
+                    <div>
+                        <h2>Mfer Chess: {game.gameName}</h2>
+                        <p>
+                            <span>Game State: {gameState} ({players.length} in game)</span>
+                        </p>
+                        {joined === false && ableToJoin === true && (
+                            <button onClick={() => {
+                                socket.emit("joinGame", gameId);
+                                setJoined(true);
+                            }}>
+                                Join Game
+                            </button>
+                        )}
+    
+                        {gameState === "waiting for players" && joined === true && (
+                            <p>You have joined but waiting for other player.
+                            
+                            <button 
+                                className="depress-button" 
+                                onClick={() => { 
+                                    const el = document.createElement('textarea');
+                                    el.value = `${window.location.origin}/mferchess/${gameId}`;
+                                    document.body.appendChild(el);
+                                    el.select();
+                                    document.execCommand('copy');
+                                    document.body.removeChild(el);
+                                    alert('Game Link saved! Now share it with friends.');
+                                }}
+                            >
+                                Copy Game Link to Share
+                            </button>
+                            </p>
+                        )}
+                        {displayGameStatus(gameState, currentPlayer, playerColor, joined)}
                     </div>
-                    <div className="chessboard">
-                        {(playerColor === 'black' ? board.slice().reverse() : board).map((row, rowIndex) => (
-                            row.map((cell, cellIndex) => {
-                                // If player is white, then the normal board orientation is used
-                                // If player is black, then reverse the board orientation
-                                const isDarkSquare = playerColor === 'white'
-                                    ? (rowIndex + cellIndex) % 2 !== 0
-                                    : (rowIndex + cellIndex) % 2 === 0;
-
-                                return (
-                                    <div
-                                        key={`${rowIndex}-${cellIndex}`}
-                                        className={`
-                                            square 
-                                            ${isDarkSquare ? 'black-square' : 'white-square'}
-                                            ${selectedSquare && selectedSquare.row === rowIndex && selectedSquare.col === cellIndex ? 'selected' : ''}
-                                        `}
-                                        onClick={() => handleSquareClick(rowIndex, cellIndex)}
-                                    >
-                                        {cell && (
-                                            <img
-                                                src={graphics[`${cell.toLowerCase()}-${cell === cell.toUpperCase() ? 'white' : 'black'}`]}
-                                                alt={cell}
-                                                className="piece-img"
-                                            />
-                                        )}
-                                    </div>
-                                );
-                            })
-                        ))}
+                    <div className="chess-container">
+                        {/* ... Chessboard and related components ... */}
+                        <div className="row-labels">
+                            {(playerColor === 'black' ? [' ', '1', '2', '3', '4', '5', '6', '7', '8'] : [' ', '8', '7', '6', '5', '4', '3', '2', '1']).map(label => (
+                                <div key={label} className="row-label">{label}</div>
+                            ))}
+                        </div>
+                        <div className="chessboard-wrapper">
+                            <div className="column-labels">
+                                {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(label => (
+                                    <div key={label} className="column-label">{label}</div>
+                                ))}
+                            </div>
+                            <div className="chessboard">
+                                {(playerColor === 'black' ? board.slice().reverse() : board).map((row, rowIndex) => (
+                                    row.map((cell, cellIndex) => {
+                                        const isDarkSquare = playerColor === 'white'
+                                            ? (rowIndex + cellIndex) % 2 !== 0
+                                            : (rowIndex + cellIndex) % 2 === 0;
+    
+                                        return (
+                                            <div
+                                                key={`${rowIndex}-${cellIndex}`}
+                                                className={`
+                                                    square 
+                                                    ${isDarkSquare ? 'black-square' : 'white-square'}
+                                                    ${selectedSquare && selectedSquare.row === rowIndex && selectedSquare.col === cellIndex ? 'selected' : ''}
+                                                `}
+                                                onClick={() => handleSquareClick(rowIndex, cellIndex)}
+                                            >
+                                                {cell && (
+                                                    <img
+                                                        src={graphics[`${cell.toLowerCase()}-${cell === cell.toUpperCase() ? 'white' : 'black'}`]}
+                                                        alt={cell}
+                                                        className="piece-img"
+                                                    />
+                                                )}
+                                            </div>
+                                        );
+                                    })
+                                ))}
+                            </div>
+                        </div>
                     </div>
-
-
-                </div>
-            </div>
-            <div className="legend-section">
-                <h2 className="legend-title">Legend</h2>
-                <table className="legend-table">
-                    <thead>
-                        <tr>
-                            {pieceLegend.map(piece => (
-                                <th key={piece.name}>{piece.name}</th>
-                            ))}
-                        </tr>
-                        <tr>
-                            {pieceLegend.map(piece => (
-                                <th key={piece.name + '-white'}>
-                                    <img src={graphics[`${piece.notation}-white`]} alt={`${piece.name} White`} />
-                                </th>
-                            ))}
-                        </tr>
-                        <tr>
-                            {pieceLegend.map(piece => (
-                                <th key={piece.name + '-black'}>
-                                    <img src={graphics[`${piece.notation}-black`]} alt={`${piece.name} Black`} />
-                                </th>
-                            ))}
-                        </tr>
-                    </thead>
-                </table>
-            </div>
-
-
-
-
-            <p>
-                <a href="/" className="back-button">
-                    Back to Home
-                </a>
-            </p>
+                    <div className="legend-section">
+                        {/* ... Legend section ... */}
+                        <h2 className="legend-title">Legend</h2>
+                        <table className="legend-table">
+                            <thead>
+                                <tr>
+                                    {pieceLegend.map(piece => (
+                                        <th key={piece.name}>{piece.name}</th>
+                                    ))}
+                                </tr>
+                                <tr>
+                                    {pieceLegend.map(piece => (
+                                        <th key={piece.name + '-white'}>
+                                            <img src={graphics[`${piece.notation}-white`]} alt={`${piece.name} White`} />
+                                        </th>
+                                    ))}
+                                </tr>
+                                <tr>
+                                    {pieceLegend.map(piece => (
+                                        <th key={piece.name + '-black'}>
+                                            <img src={graphics[`${piece.notation}-black`]} alt={`${piece.name} Black`} />
+                                        </th>
+                                    ))}
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                    <ToastContainer />
+                    <p>
+                        <a href="/" className="back-button">
+                            Back to Home
+                        </a>
+                    </p>
+                </>
+            )}
         </div>
     );
+    
 }
 
 export default GameChess;

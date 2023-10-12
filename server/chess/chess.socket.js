@@ -83,6 +83,30 @@ module.exports = (io) => {
             socket.join(gameId);
         });
 
+        socket.on("disconnect", (reason) => {
+            console.log("Client disconnected", socket.id, "Reason:", reason);
+        
+            // Loop through all games
+            for (const gameId in chessGames) {
+                const game = chessGames[gameId];
+        
+                // Check if the disconnecting socket is part of the game
+                const disconnectingPlayer = game.players.find(p => p.id === socket.id);
+        
+                if (disconnectingPlayer && game.state === "ongoing") {
+                    const opponentColor = disconnectingPlayer.color === "white" ? "black" : "white";
+        
+                    game.state = `${opponentColor}-wins`; // set the win for the other player
+                    game.lastActivity = Date.now();
+                    
+                    // Notify other players in the game room about the game update
+                    chessSocket.to(gameId).emit("gameUpdated", game);
+                    chessSocket.to(gameId).emit("notify", disconnectingPlayer.color + " disconnected, " + opponentColor + " wins!");
+                    break; // exit the loop as we've found the game the disconnecting player was part of
+                }
+            }
+        });
+
         socket.on("joinGame", (gameId) => {
             const game = chessGames[gameId];
             if (!game) return socket.emit("error", "Game does not exist");
@@ -102,7 +126,7 @@ module.exports = (io) => {
         socket.on("makeMove", (gameId, move) => {
             const game = chessGames[gameId];
             if (!game) return socket.emit("error", "Game does not exist");
-        
+            
             const player = game.players.find(p => p.id === socket.id);
             if (!player) return socket.emit("error", "Not a player in this game");
             
@@ -113,26 +137,27 @@ module.exports = (io) => {
             if (!isValidMove(game.board, move, player.color)) {
                 return socket.emit("error", "Invalid move");
             }
-            
-            // Update the board state. We assume move contains {from: 'e2', to: 'e4'}
-            // TODO: Convert game.board to the right format and back after moving
-
+        
             const turn = player.color === 'white' ? 'w' : 'b';
             const chess = new Chess(boardToFEN(game.board, turn));
             chess.move(move);
             game.board = FENToBoard(chess.fen());
         
             game.lastActivity = Date.now();
-        
+            chessSocket.to(gameId).emit("notify", player.color + " made move from " + move["from"] + " to " + move["to"]);
             // Check for game end conditions like checkmate
             if (chess.isCheckmate()) {
                 game.state = `${game.currentPlayer}-wins`;
+                chessSocket.to(gameId).emit("notify", game.currentPlayer + " wins via checkmate!");
             } else {
                 game.currentPlayer = game.currentPlayer === "white" ? "black" : "white";
             }
         
+
+            
             chessSocket.to(gameId).emit("gameUpdated", game);
         });
+        
 
         socket.on("resign", (gameId) => {
             const game = chessGames[gameId];
@@ -148,7 +173,7 @@ module.exports = (io) => {
 
             game.state = `${otherPlayer}-wins`;
             game.lastActivity = Date.now();
-        
+            chessSocket.to(gameId).emit("notify", game.currentPlayer + " resigned, " + otherPlayer + " wins!");
             chessSocket.to(gameId).emit("gameUpdated", game);
         });
 

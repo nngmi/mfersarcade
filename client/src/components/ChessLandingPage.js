@@ -86,7 +86,6 @@ function ChessLandingPage() {
                             placeholder="Enter a Name for New Game" 
                             value={gameName} 
                             onChange={(e) => setGameName(e.target.value)} 
-                            style={{ fontFamily: 'Satoshi' }} // Set the font to 'Satoshi'
                         />
                     </label>
                 </p>
