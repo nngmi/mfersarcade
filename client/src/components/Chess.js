@@ -7,6 +7,7 @@ import './Chess.css';
 function GameChess() {
     let { gameId } = useParams();
     const [socket, setSocket] = useState(null);
+    const [game, setGame] = useState('');
     const [board, setBoard] = useState(() => Array(8).fill(0).map(row => Array(8).fill(null)));
     const [gameState, setGameState] = useState("viewing");
     const [currentPlayer, setCurrentPlayer] = useState("white");
@@ -36,13 +37,13 @@ function GameChess() {
     const graphics = {
         'p-white': '/images/chess/5666.png',
         'n-white': '/images/chess/3432.png',
-        'b-white': '/images/chess/2151.png',
+        'b-white': '/images/chess/1951.png',
         'r-white': '/images/chess/2132.png',
         'q-white': '/images/chess/2670.png',
         'k-white': '/images/chess/3787.png',
         'p-black': '/images/chess/4770.png',
         'n-black': '/images/chess/8161.png',
-        'b-black': '/images/chess/4031.png',
+        'b-black': '/images/chess/2116.png',
         'r-black': '/images/chess/1046.png',
         'q-black': '/images/chess/7791.png',
         'k-black': '/images/chess/931.png',
@@ -108,7 +109,7 @@ function GameChess() {
             setBoard(game.board);
             setCurrentPlayer(game.currentPlayer);
             setGameState(game.state);
-            console.log(game.players);
+            setGame(game);
             setPlayers(game.players);
             if (game.state === `${playerColorLocal}-wins`) {
                 winSound.play();
@@ -148,6 +149,7 @@ function GameChess() {
                     setBoard(game.board);
                     setCurrentPlayer(game.currentPlayer);
                     setGameState(game.state);
+                    setGame(game);
                     setPlayers(game.players);
                     if (game.players.length < 2) {
                         setAbleToJoin(true);
@@ -192,7 +194,7 @@ function GameChess() {
     return (
         <div className="game-container">
                 <div>
-                <h2>Mfer Chess</h2>
+                <h2>Mfer Chess: {game.gameName}</h2>
                 <p>
                     <span>Game State: {gameState} ({players.length} in game)</span>
                 </p>

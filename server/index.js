@@ -7,7 +7,8 @@ const { v4: uuidv4 } = require('uuid');
 const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
-
+const bodyParser = require('body-parser');
+app.use(bodyParser.json()); 
 // mfer castle
 require('./mfercastle/mfercastle.socket')(io);
 app.use("/api/mfercastle", require("./mfercastle/mfercastle.routes"));

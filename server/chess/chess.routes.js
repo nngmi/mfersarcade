@@ -3,6 +3,8 @@ const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
 let chessGames = require('./state');
 
+
+
 const cleanupGames = () => {
     const now = Date.now();
     const timeout = 10 * 60 * 1000; // 10 minutes in milliseconds
@@ -20,7 +22,11 @@ const cleanupGames = () => {
 router.post("/game", (req, res) => {
     const gameId = uuidv4();
     if (chessGames[gameId]) return res.status(400).json({ message: "Game already exists" });
-
+    console.log(req.body);
+    const gameName = req.body.gameName;
+    if (!gameName) {
+        return res.status(400).json({ message: "Game name is required." });
+    }
     // Initialize a chess board
     chessGames[gameId] = {
         players: [],
@@ -37,6 +43,7 @@ router.post("/game", (req, res) => {
         currentPlayer: "white", // Players are 'white' and 'black' in chess
         state: "waiting for players",
         lastActivity: Date.now(),
+        gameName: gameName,
     };
     res.status(201).json({ gameId });
 });

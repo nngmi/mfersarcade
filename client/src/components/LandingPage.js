@@ -43,16 +43,16 @@ function LandingPage() {
             </div>
           )}
             <div className="game-item">
-                <Link to="/connect4/">
-                  <img src="/images/connect4.png" alt="Connect 4" />
-                </Link>
-                <p>Hoodies vs Top Hats</p>
-            </div>
-            <div className="game-item">
                 <Link to="/mferchess/">
                   <img src="/images/mferchess.png" alt="Chess" />
                 </Link>
                 <p>Mfer Chess</p>
+            </div>
+            <div className="game-item">
+                <Link to="/connect4/">
+                  <img src="/images/connect4.png" alt="Connect 4" />
+                </Link>
+                <p>Hoodies vs Top Hats</p>
             </div>
         </div>
     </div>
