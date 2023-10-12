@@ -25,13 +25,28 @@ function GameChess() {
     };
 
     const pieceLegend = [
-        { name: 'Pawn', notation: 'p' },
+        { name: 'Pawn', notation: 'p',  },
         { name: 'Knight', notation: 'n' },
         { name: 'Bishop', notation: 'b' },
         { name: 'Rook', notation: 'r' },
         { name: 'Queen', notation: 'q' },
         { name: 'King', notation: 'k' },
     ];
+
+    const graphics = {
+        'p-white': '/images/chess/5666.png',
+        'n-white': '/images/chess/3432.png',
+        'b-white': '/images/chess/2151.png',
+        'r-white': '/images/chess/2132.png',
+        'q-white': '/images/chess/2670.png',
+        'k-white': '/images/chess/3787.png',
+        'p-black': '/images/chess/4770.png',
+        'n-black': '/images/chess/8161.png',
+        'b-black': '/images/chess/4031.png',
+        'r-black': '/images/chess/1046.png',
+        'q-black': '/images/chess/7791.png',
+        'k-black': '/images/chess/931.png',
+    }
 
     const toAlgebraicNotation = (row, col) => {
         const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -147,13 +162,21 @@ function GameChess() {
             if (joined) {  // Explicitly checks if the user has joined
                 return (
                     <>
-                        <p>Turn: {currentPlayer === playerColor ? `Your (${playerColor}) Turn` : `Opponent's (${currentPlayer}) Turn`}</p>
-                        <p className="game-info">You play as: {playerColor}</p>
+                        <p>Turn: {currentPlayer === playerColor ? `Your (${playerColor}) Turn` : `Opponent's (${currentPlayer}) Turn`}
+                            <button 
+                                onClick={() => {
+                                    socket.emit("resign", gameId);
+                                }}
+                                disabled={currentPlayer !== playerColor}  // Button is disabled if it's not the player's turn
+                            >
+                                Resign
+                            </button>
+                        </p>
                     </>
                 );
             } else {
                 return <p>Turn: {currentPlayer} Turn</p>;
-            }
+            }            
         } else if (gameState.includes("-wins")) {
             if (joined) {
                 if (gameState === `${playerColor}-wins`) {
@@ -171,10 +194,7 @@ function GameChess() {
                 <div>
                 <h2>Mfer Chess</h2>
                 <p>
-                    <span>Game State: {gameState}</span>
-                </p>
-                <p>
-                    <span>Players in Game: {players.length} </span>
+                    <span>Game State: {gameState} ({players.length} in game)</span>
                 </p>
                 {joined === false && ableToJoin === true && (
                     <button onClick={() => {
@@ -239,7 +259,7 @@ function GameChess() {
                                     >
                                         {cell && (
                                             <img
-                                                src={`/images/chess/${cell.toLowerCase()}-${cell === cell.toUpperCase() ? 'white' : 'black'}.png`}
+                                                src={graphics[`${cell.toLowerCase()}-${cell === cell.toUpperCase() ? 'white' : 'black'}`]}
                                                 alt={cell}
                                                 className="piece-img"
                                             />
@@ -265,20 +285,21 @@ function GameChess() {
                         <tr>
                             {pieceLegend.map(piece => (
                                 <th key={piece.name + '-white'}>
-                                    <img src={`/images/chess/${piece.notation}-white.png`} alt={`${piece.name} White`} />
+                                    <img src={graphics[`${piece.notation}-white`]} alt={`${piece.name} White`} />
                                 </th>
                             ))}
                         </tr>
                         <tr>
                             {pieceLegend.map(piece => (
                                 <th key={piece.name + '-black'}>
-                                    <img src={`/images/chess/${piece.notation}-black.png`} alt={`${piece.name} Black`} />
+                                    <img src={graphics[`${piece.notation}-black`]} alt={`${piece.name} Black`} />
                                 </th>
                             ))}
                         </tr>
                     </thead>
                 </table>
             </div>
+
 
 
 

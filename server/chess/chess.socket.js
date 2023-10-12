@@ -133,6 +133,25 @@ module.exports = (io) => {
         
             chessSocket.to(gameId).emit("gameUpdated", game);
         });
+
+        socket.on("resign", (gameId) => {
+            const game = chessGames[gameId];
+            if (!game) return socket.emit("error", "Game does not exist");
         
+            const player = game.players.find(p => p.id === socket.id);
+            if (!player) return socket.emit("error", "Not a player in this game");
+            
+            if (game.currentPlayer !== player.color) return socket.emit("error", "Not your turn");
+            if (game.state !== "ongoing") return socket.emit("error", "Game is not ongoing");
+            
+            const otherPlayer = game.currentPlayer === "white" ? "black" : "white";
+
+            game.state = `${otherPlayer}-wins`;
+            game.lastActivity = Date.now();
+        
+            chessSocket.to(gameId).emit("gameUpdated", game);
+        });
+
+
     });
 };

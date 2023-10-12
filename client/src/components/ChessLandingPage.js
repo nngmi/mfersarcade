@@ -39,18 +39,18 @@ function ChessLandingPage() {
 
             <ul className="games-list">
             {Object.entries(games)
-            .filter(([, game]) => game.state === "waiting for other player" || game.state === "ongoing")
+            .filter(([, game]) => game.state === "waiting for players" || game.state === "ongoing")
             .sort(([, gameA], [, gameB]) => {
-                if (gameA.state === "waiting for other player" && gameB.state !== "waiting for other player") return -1;
-                if (gameB.state === "waiting for other player" && gameA.state !== "waiting for other player") return 1;
+                if (gameA.state === "waiting for players" && gameB.state !== "waiting for players") return -1;
+                if (gameB.state === "waiting for players" && gameA.state !== "waiting for players") return 1;
                 return gameB.lastActivity - gameA.lastActivity; // Assuming lastActivity is a timestamp. Adjust accordingly.
             })
             .map(([uuid, game]) => (
                 <li key={uuid}>
                     Game ({game.state})
-                    {game.players && game.players.length === 1 ? (
+                    {game.players && game.players.length < 2 ? (
                         <button onClick={() => joinGame(uuid)}>Join</button>
-                    ) : null}
+                    ) : <button onClick={() => joinGame(uuid)}>View Game</button>}
                 </li>
             ))}
 
