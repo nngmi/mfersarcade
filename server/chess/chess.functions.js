@@ -133,6 +133,7 @@ function joinExistingGame(game, playerId) {
     
     // Initialize the player with a timeLeft property
     const player = { id: playerId, color: playerColor, timeLeft: 900000 }; // 15 minutes in milliseconds
+    //const player = { id: playerId, color: playerColor, timeLeft: 18000 }; // 15 minutes in milliseconds
     game.players.push(player);
 
     if (game.players.length === 2) {

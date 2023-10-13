@@ -28,23 +28,22 @@ module.exports = (io) => {
         socket.on("checkTime", (gameId) => {
             const game = chessGames[gameId];
             if (!game) return socket.emit("error", "Game does not exist");
-            console.log("checkign time");
+            console.log("checking time");
             
-            // Check if any player's time has run out and update the game state accordingly
+            const currentPlayer = game.players.find(player => player.color === game.currentPlayer);
+            if (!currentPlayer) return; // Ensure a current player is found
+        
+            // Check if the current player's time has run out and update the game state accordingly
             const currentTime = Date.now();
-            game.players.forEach(player => {
-                const timeElapsed = currentTime - game.lastActivity;
-                player.timeLeft -= timeElapsed;
-                if (player.timeLeft <= 0) {
-                    player.timeLeft = 0;
-                    game.state = `${player.color === "white" ? "black" : "white"}-wins`;
-                    socket.emit("gameUpdated", game); // Notify about the updated game state
-                    game.lastActivity = currentTime;
-                }
-            });
+            const timeElapsed = currentTime - game.lastActivity;
+            if (currentPlayer.timeLeft <= timeElapsed) {
+                currentPlayer.timeLeft = 0;
+                game.state = `${currentPlayer.color === "white" ? "black" : "white"}-wins`;
+                socket.emit("gameUpdated", game); // Notify about the updated game state
+                game.lastActivity = currentTime;
+            }
         });
-
-
+        
 
         socket.on("joinGame", (gameId) => {
             const game = chessGames[gameId];

@@ -148,9 +148,23 @@ function GameChess() {
             toast.error(text);
         });
     
-        return () => newSocket.disconnect();
+        return () => {
+            newSocket.disconnect();
+        };
     }, [gameId]);
+
+    useEffect(() => {
+        if (!gameId || !game || game.state !== "ongoing") return;
     
+        const timeCheckInterval = setInterval(() => {
+            socket.emit("checkTime", gameId);
+        }, 1000);  // for example, every 1 second.
+    
+        return () => {
+            clearInterval(timeCheckInterval);
+        };
+    }, [gameId, game]);
+
     useEffect(() => {
         console.log("at beginning of useefect");
         if (!gameId) return;
