@@ -43,7 +43,6 @@ router.get("/game/:gameId", (req, res) => {
     const gameId = req.params.gameId;
     const game = chessGames[gameId];
     if (!game) return res.status(404).json({ message: "Game does not exist" });
-    console.log(game, gameId);
     res.json(game);
 });
 

@@ -101,7 +101,14 @@ function GameChess() {
         let playerColorLocal = null;
         console.log("starting socket");
     
-        const newSocket = io.connect(SERVER_URL + '/chess'); // Updated the namespace to 'chess'
+        const newSocket = io.connect(SERVER_URL + '/chess', {
+            reconnection: true,
+            reconnectionDelay: 2000,           // Start with 2 seconds
+            reconnectionDelayMax: 10000,       // Max out at 10 seconds
+            reconnectionAttempts: 10,          // Try to reconnect 10 times
+            randomizationFactor: 0.5           // Apply variance between reconnects
+        });
+        
         setSocket(newSocket);
     
         newSocket.emit("viewGame", gameId);
