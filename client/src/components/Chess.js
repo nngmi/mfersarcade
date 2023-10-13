@@ -5,6 +5,7 @@ import { Howl } from 'howler';
 import './Chess.css';
 import { ToastContainer } from 'react-toastify';
 import { toast } from 'react-toastify';
+import PlayerTimer from './PlayerTimer';
 
 function GameChess() {
     let { gameId } = useParams();
@@ -175,7 +176,10 @@ function GameChess() {
             .catch((error) => console.error('Error fetching the game:', error));
     }, [gameId]);
     
-    function displayGameStatus(gameState, currentPlayer, playerColor, joined) {
+    function displayGameStatus(gameState, currentPlayer, playerColor, joined, players) {
+        console.log(players);
+        const whitePlayer = players.find(p => p.color === 'white');
+        const blackPlayer = players.find(p => p.color === 'black');
         if (gameState === "ongoing") {
             if (joined) {  // Explicitly checks if the user has joined
                 return (
@@ -190,6 +194,10 @@ function GameChess() {
                                 Resign
                             </button>
                         </p>
+                        <div>
+                            <PlayerTimer player={whitePlayer} isPlayerTurn={currentPlayer === 'white'} />
+                            <PlayerTimer player={blackPlayer} isPlayerTurn={currentPlayer === 'black'} />
+                        </div>
                     </>
                 );
             } else {
@@ -257,7 +265,7 @@ function GameChess() {
                             </button>
                             </p>
                         )}
-                        {displayGameStatus(gameState, currentPlayer, playerColor, joined)}
+                        {displayGameStatus(gameState, currentPlayer, playerColor, joined, players)}
                     </div>
                     <div className="chess-container">
                         {/* ... Chessboard and related components ... */}

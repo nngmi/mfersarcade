@@ -139,12 +139,13 @@ describe("Pawn Promotion", () => {
         expect(game.state).toBe("ongoing");
 
         // Move sequence to promote the pawn
-        const move = { player: player1, move: { from: "a7", to: "a8", promotion: 'q' } }; 
+        const move = { player: player1, move: { from: "a7", to: "a8" } }; 
         const moveResult = processMove(game, move.move, move.player);
         expect(moveResult.success).toBe(true);
 
         // Verify that the pawn has been promoted to a queen
         const { board } = FENToBoard("Q6k/8/8/8/8/8/8/7K b - - 0 2");
         expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
+
     });
 });

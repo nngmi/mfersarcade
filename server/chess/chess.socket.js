@@ -24,7 +24,27 @@ module.exports = (io) => {
                 chessSocket.to(result.gameId).emit("notify", result.disconnectedColor + " disconnected, " + result.winningColor + " wins!");
             }
         });
-        
+
+        socket.on("checkTime", (gameId) => {
+            const game = chessGames[gameId];
+            if (!game) return socket.emit("error", "Game does not exist");
+            console.log("checkign time");
+            
+            // Check if any player's time has run out and update the game state accordingly
+            const currentTime = Date.now();
+            game.players.forEach(player => {
+                const timeElapsed = currentTime - game.lastActivity;
+                player.timeLeft -= timeElapsed;
+                if (player.timeLeft <= 0) {
+                    player.timeLeft = 0;
+                    game.state = `${player.color === "white" ? "black" : "white"}-wins`;
+                    socket.emit("gameUpdated", game); // Notify about the updated game state
+                    game.lastActivity = currentTime;
+                }
+            });
+        });
+
+
 
         socket.on("joinGame", (gameId) => {
             const game = chessGames[gameId];

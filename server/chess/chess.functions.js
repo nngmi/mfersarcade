@@ -5,6 +5,20 @@ function processMove(game, move, playerId) {
     const player = game.players.find(p => p.id === playerId);
     if (game.currentPlayer !== player.color) return { error: "Not your turn" };
     if (game.state !== "ongoing") return { error: "Game is not ongoing" };
+
+    const fromCol = move.from.charCodeAt(0) - 'a'.charCodeAt(0);
+    const fromRow = 8 - parseInt(move.from[1]);
+    const toRow = 8 - parseInt(move.to[1]);
+
+    const promotingPiece = game.board[fromRow][fromCol];
+    if (promotingPiece && promotingPiece.toLowerCase() === 'p') {
+        if (player.color === 'white' && toRow === 0) {
+            move.promotion = 'q';
+        } else if (player.color === 'black' && toRow === 7) {
+            move.promotion = 'q';
+        }
+    }
+
     // Validate the move using chess.js
     if (!isValidMove(game.board, move, player.color, game.castling, game.moveNumber)) {
         return { error: "Invalid move", success: false };
@@ -19,12 +33,21 @@ function processMove(game, move, playerId) {
     game.turn = newturn;
     game.castling = castling;
 
-    game.lastActivity = Date.now();
     if (chess.isCheckmate()) {
         game.state = `${game.currentPlayer}-wins`;
     } else {
         game.currentPlayer = game.currentPlayer === "white" ? "black" : "white";
     }
+
+    const currentTime = Date.now();
+    const timeElapsed = currentTime - game.lastActivity;
+    player.timeLeft -= timeElapsed;
+    if (player.timeLeft < 0) {
+        player.timeLeft = 0;
+        game.state = `${player.color === "white" ? "black" : "white"}-wins`;
+    }
+
+    game.lastActivity = Date.now();
 
     return { success: true };
 }
@@ -39,7 +62,6 @@ function isValidMove(board, move, playerColor, castling, moveCount) {
         return result !== null;
 
     } catch (error) {
-        //console.log("Error during move:", move);
         return false;
     }
 }
@@ -108,7 +130,10 @@ function joinExistingGame(game, playerId) {
     if (game.players.length >= 2) return { error: "Game is full" };
 
     const playerColor = game.players.length === 0 ? "white" : "black";
-    game.players.push({ id: playerId, color: playerColor });
+    
+    // Initialize the player with a timeLeft property
+    const player = { id: playerId, color: playerColor, timeLeft: 900000 }; // 15 minutes in milliseconds
+    game.players.push(player);
 
     if (game.players.length === 2) {
         game.state = "ongoing";
