@@ -1,9 +1,9 @@
 const express = require("express");
 const router = express.Router();
-const { v4: uuidv4 } = require('uuid');
+
 let chessGames = require('./state');
 
-
+const { createChessGame} = require('./chess.functions');
 
 const cleanupGames = () => {
     const now = Date.now();
@@ -20,32 +20,23 @@ const cleanupGames = () => {
 };
 
 router.post("/game", (req, res) => {
-    const gameId = uuidv4();
-    if (chessGames[gameId]) return res.status(400).json({ message: "Game already exists" });
-    console.log(req.body);
-    const gameName = req.body.gameName;
-    if (!gameName) {
-        return res.status(400).json({ message: "Game name is required." });
+    try {
+        const { gameName } = req.body;
+
+        const { gameId, game } = createChessGame(gameName);
+
+        if (chessGames[gameId]) {
+            return res.status(400).json({ message: "Game already exists" });
+        }
+
+        chessGames[gameId] = game;
+
+        res.status(201).json({ gameId });
+
+    } catch (error) {
+        console.log(error.message);
+        res.status(400).json({ message: error.message });
     }
-    // Initialize a chess board
-    chessGames[gameId] = {
-        players: [],
-        board: [
-            ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
-            ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            [null, null, null, null, null, null, null, null],
-            ['P', 'P', 'P', 'P', 'P', 'P', 'P', 'P'],
-            ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
-        ],
-        currentPlayer: "white", // Players are 'white' and 'black' in chess
-        state: "waiting for players",
-        lastActivity: Date.now(),
-        gameName: gameName,
-    };
-    res.status(201).json({ gameId });
 });
 
 router.get("/game/:gameId", (req, res) => {

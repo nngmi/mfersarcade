@@ -117,8 +117,6 @@ function GameChess() {
                 winSound.play();
             } else if (game.state.includes("-wins") && game.state !== `${playerColorLocal}-wins`) {
                 wrongSound.play();
-            } else {
-                basicSound.play();
             }
             if (!joined && game.players.length < 2) {
                 // User can join the game
@@ -134,7 +132,12 @@ function GameChess() {
         });
 
         newSocket.on("notify", (text) => {  // Replaced 'playerSymbol' with 'playerColor'
+            basicSound.play();
             toast.success(text);
+        });
+        newSocket.on("error", (text) => {  // Replaced 'playerSymbol' with 'playerColor'
+            wrongSound.play();
+            toast.error(text);
         });
     
         return () => newSocket.disconnect();
@@ -218,7 +221,7 @@ function GameChess() {
                     <div>
                         <h2>Mfer Chess: {game.gameName}</h2>
                         <p>
-                            <span>Game State: {gameState} ({players.length} in game)</span>
+                            <span>{gameState} ({players.length} players in game)</span>
                         </p>
                         {joined === false && ableToJoin === true && (
                             <button onClick={() => {
@@ -229,9 +232,8 @@ function GameChess() {
                             </button>
                         )}
     
-                        {gameState === "waiting for players" && joined === true && (
-                            <p>You have joined but waiting for other player.
-                            
+                        {gameState === "waiting for players" && (
+                            <p>
                             <button 
                                 className="depress-button" 
                                 onClick={() => { 
