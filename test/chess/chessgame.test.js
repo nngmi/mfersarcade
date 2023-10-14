@@ -76,13 +76,11 @@ describe("Chess Game", () => {
         // Player 1 joins
         let joinResult = joinExistingGame(game, player1);
         expect(joinResult.success).toBe(true);
-        expect(joinResult.playerColor).toBe("white");
         expect(game.state).toBe("waiting for players");
 
         // Player 2 joins
         joinResult = joinExistingGame(game, player2);
         expect(joinResult.success).toBe(true);
-        expect(joinResult.playerColor).toBe("black");
         expect(game.state).toBe("ongoing");
 
         // Four-move checkmate sequence: Scholar's Mate
@@ -102,7 +100,7 @@ describe("Chess Game", () => {
         }
 
         // Checkmate validation
-        expect(game.state).toBe("white-wins");
+        expect(game.state).toBe("player0-wins");
         const { board } = FENToBoard("r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4");
         expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
 
@@ -131,13 +129,11 @@ describe("Pawn Promotion", () => {
         // Player 1 joins
         let joinResult = joinExistingGame(game, player1);
         expect(joinResult.success).toBe(true);
-        expect(joinResult.playerColor).toBe("white");
         expect(game.state).toBe("waiting for players");
 
         // Player 2 joins
         joinResult = joinExistingGame(game, player2);
         expect(joinResult.success).toBe(true);
-        expect(joinResult.playerColor).toBe("black");
         expect(game.state).toBe("ongoing");
 
         // Move sequence to promote the pawn
@@ -178,13 +174,13 @@ describe('Chess game flow 1', () => {
         // Player 1 joins
         const join1 = joinExistingGame(chessGames[gameId], player1Id);
         expect(join1.success).toBe(true);
-        expect(join1.playerColor).toBe("white");
+        expect(join1.joinedPlayer).toBe(player1Id);
         player1JoinKey = chessGames[gameId].players.find(p => p.id === player1Id).joinKey;
 
         // Player 2 joins
         const join2 = joinExistingGame(chessGames[gameId], player2Id);
         expect(join2.success).toBe(true);
-        expect(join2.playerColor).toBe("black");
+        expect(join2.joinedPlayer).toBe(player2Id);
         player2JoinKey = chessGames[gameId].players.find(p => p.id === player2Id).joinKey;
 
         // Player 1 makes a move
@@ -195,7 +191,7 @@ describe('Chess game flow 1', () => {
         const disconnectResult1 = handleDisconnect(chessGames, player1Id);
         expect(disconnectResult1.gameUpdated).toBe(true);
         expect(disconnectResult1.gameId).toBe(gameId);
-        expect(disconnectResult1.disconnectedColor).toBe("white");
+        expect(disconnectResult1.disconnectingPlayer).toBe(player1Id);
 
         // Player 1 tries to rejoin with incorrect joinKey
         const failedRejoin = joinExistingGame(chessGames[gameId], player1Id, "incorrectKey");
@@ -204,13 +200,11 @@ describe('Chess game flow 1', () => {
         // Player 1 rejoins with correct joinKey
         const rejoin = joinExistingGame(chessGames[gameId], player1Id, player1JoinKey);
         expect(rejoin.success).toBe(true);
-        expect(rejoin.playerColor).toBe("white");
-
+        expect(rejoin.joinedPlayer).toBe(player1Id);
+        
         // Player 2 resigns
         const resign = playerResign(chessGames[gameId], player2Id);
         expect(resign.success).toBe(true);
-        expect(resign.resignedPlayer).toBe("black");
-        expect(resign.winningPlayer).toBe("white");
     });
 
 });
@@ -242,13 +236,13 @@ describe('Chess game flow', () => {
         // Player 1 joins
         const join1 = joinExistingGame(chessGames[gameId], player1Id);
         expect(join1.success).toBe(true);
-        expect(join1.playerColor).toBe("white");
+        expect(join1.joinedPlayer).toBe(player1Id);
         player1JoinKey = chessGames[gameId].players.find(p => p.id === player1Id).joinKey;
 
         // Player 2 joins
         const join2 = joinExistingGame(chessGames[gameId], player2Id);
         expect(join2.success).toBe(true);
-        expect(join2.playerColor).toBe("black");
+        expect(join2.joinedPlayer).toBe(player2Id);
         player2JoinKey = chessGames[gameId].players.find(p => p.id === player2Id).joinKey;
 
         // Player 1 makes a move
@@ -267,7 +261,6 @@ describe('Chess game flow', () => {
         const disconnectResult1 = handleDisconnect(chessGames, player1Id);
         expect(disconnectResult1.gameUpdated).toBe(true);
         expect(disconnectResult1.gameId).toBe(gameId);
-        expect(disconnectResult1.disconnectedColor).toBe("white");
 
         // Player 1 tries to rejoin with incorrect joinKey
         const failedRejoin = joinExistingGame(chessGames[gameId], player1Id, "incorrectKey");
@@ -285,13 +278,11 @@ describe('Chess game flow', () => {
         // Player 1 rejoins with correct joinKey
         const rejoin = joinExistingGame(chessGames[gameId], player1Id, player1JoinKey);
         expect(rejoin.success).toBe(true);
-        expect(rejoin.playerColor).toBe("white");
+        expect(rejoin.joinedPlayer).toBe(player1Id);
 
         // Player 2 resigns
         const resign = playerResign(chessGames[gameId], player2Id);
         expect(resign.success).toBe(true);
-        expect(resign.resignedPlayer).toBe("black");
-        expect(resign.winningPlayer).toBe("white");
     });
 
 });

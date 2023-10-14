@@ -20,43 +20,60 @@ module.exports = (io) => {
             const result = handleDisconnect(chessGames, socket.id);
         
             if (result.gameUpdated) {
-                chessSocket.to(result.gameId).emit("gameUpdated", chessGames[result.gameId]);
-                chessSocket.to(result.gameId).emit("notify", result.disconnectedColor + " disconnected, waiting for reconnect.");
+                const game = chessGames[result.gameId];
+                const disconnectedPlayer = game.players.find(p => p.id === socket.id);
+        
+                if (disconnectedPlayer) {
+                    const playerColor = disconnectedPlayer.color;
+                    chessSocket.to(result.gameId).emit("gameUpdated", game);
+                    chessSocket.to(result.gameId).emit("notify", playerColor + " disconnected, waiting for reconnect.");
+                }
             }
-        });
+        });        
 
         socket.on("checkTime", (gameId) => {
             const game = chessGames[gameId];
             if (!game) return;
             console.log("checking time");
             
-            const currentPlayer = game.players.find(player => player.color === game.currentPlayer);
-            if (!currentPlayer) return; // Ensure a current player is found
+            const currentPlayerIndex = game.players.findIndex(player => player.id === game.currentPlayer);
+            if (currentPlayerIndex === -1) return; // Ensure a current player is found
+        
+            const currentPlayer = game.players[currentPlayerIndex];
         
             // Check if the current player's time has run out and update the game state accordingly
             const currentTime = Date.now();
             const timeElapsed = currentTime - game.lastActivity;
             if (currentPlayer.timeLeft <= timeElapsed) {
                 currentPlayer.timeLeft = 0;
-                game.state = `${currentPlayer.color === "white" ? "black" : "white"}-wins`;
-                socket.emit("gameUpdated", game); // Notify about the updated game state
+        
+                // Determine the winner based on currentPlayer's index
+                game.state = currentPlayerIndex === 0 ? "player1-wins" : "player0-wins";
+        
+                // Notify which player ran out of time
+                const playerColor = currentPlayer.color;
+                chessSocket.to(gameId).emit("notify", playerColor + " ran out of time.");
+                chessSocket.to(gameId).emit("gameUpdated", game);
                 game.lastActivity = currentTime;
             }
         });
         
-
         socket.on("joinGame", (gameId, joinKey) => {
             const game = chessGames[gameId];
             const result = joinExistingGame(game, socket.id, joinKey);
-            
+        
             if (result.error) {
                 socket.emit("error", result.error);
             } else {
                 socket.join(gameId);
-                chessSocket.to(gameId).emit("gameUpdated", game);
-                socket.emit("playerColor", result.playerColor);
+                socket.emit("joined", result.joinedPlayer);
+                const joinedPlayer = game.players.find(p => p.id === result.joinedPlayer);
+                setTimeout(() => {
+                    chessSocket.to(gameId).emit("notify", joinedPlayer.color + " joined the game.");
+                    chessSocket.to(gameId).emit("gameUpdated", game);
+                }, 100);  // Add a 100ms delay before emitting gameUpdated event
             }
-        });
+        });        
     
         socket.on("makeMove", (gameId, move) => {
             const game = chessGames[gameId];
@@ -80,10 +97,13 @@ module.exports = (io) => {
             if (result.error) {
                 socket.emit("error", result.error);
             } else {
-                chessSocket.to(gameId).emit("notify", result.resignedPlayer + " resigned, " + result.winningPlayer + " wins!");
+                const resignedPlayerColor = game.players.find(p => p.id === result.resignedPlayer).color;
+                const winningPlayerColor = game.players.find(p => p.id === result.winningPlayer).color;
+        
+                chessSocket.to(gameId).emit("notify", resignedPlayerColor + " resigned, " + winningPlayerColor + " wins!");
                 chessSocket.to(gameId).emit("gameUpdated", game);
             }
-        });        
+        });
 
 
     });

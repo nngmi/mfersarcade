@@ -13,10 +13,12 @@ function GameInfoComponent({gameState, players}) {
     const disconnectedPlayersCount = players.filter(player => player.disconnected).length;
     const connectedPlayersCount = players.length - disconnectedPlayersCount;
 
+    // Convert the gameState if it ends with '-wins'
     if (gameState.endsWith('-wins')) {
+        const winnerColor = gameState === "player0-wins" ? "white" : "black";
         return (
             <p>
-                <span>{gameState}</span>
+                <span>{winnerColor} wins</span>
             </p>
         );
     }
@@ -31,29 +33,30 @@ function GameInfoComponent({gameState, players}) {
     );
 }
 
-
 function GameChess() {
     let { gameId } = useParams();
     const [socket, setSocket] = useState(null);
     const [game, setGame] = useState('');
-    const [board, setBoard] = useState(() => Array(8).fill(0).map(row => Array(8).fill(null)));
+    //const [board, setBoard] = useState(() => Array(8).fill(0).map(row => Array(8).fill(null)));
     const [gameState, setGameState] = useState("viewing");
-    const [currentPlayer, setCurrentPlayer] = useState("white");
-    const [playerColor, setPlayerColor] = useState(null);
+    const [playerId, setPlayerId] = useState(null);
     const [joinKey, setJoinKey] = useState(null);
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
     const [selectedSquare, setSelectedSquare] = useState(null);
     const [ableToJoin, setAbleToJoin] = useState(false);
     const [joined, setJoined] = useState(false);
-    const [players, setPlayers] = useState([]);
 
     const makeMove = (fromSquare, toSquare) => {
-        if (gameState !== "ongoing" || currentPlayer !== playerColor) return;
+        if (gameState !== "ongoing" || game.currentPlayer !== playerId) return;
         const from = toAlgebraicNotation(fromSquare.row, fromSquare.col);
         const to = toAlgebraicNotation(toSquare.row, toSquare.col);
         socket.emit("makeMove", gameId, { from, to });
     };
-
+    const getPlayerColor = (game, playerId) => {
+        const player = game.players.find(p => p.id === playerId);
+        return player ? player.color : null; // Returns null if the player isn't found.
+    };
+    
     const pieceLegend = [
         { name: 'Pawn', notation: 'p',  },
         { name: 'Knight', notation: 'n' },
@@ -80,14 +83,16 @@ function GameChess() {
 
     const toAlgebraicNotation = (row, col) => {
         const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
+        const playerColor = getPlayerColor(game, playerId); // Assuming you have access to game and playerId in this context.
+        
         return playerColor === 'white' ? 
                `${columns[col]}${8 - row}` : 
                `${columns[col]}${row + 1}`;
-    };
+    };    
     
     const handleSquareClick = (rowIndex, cellIndex) => {
-        const actualRow = playerColor === 'black' ? 7 - rowIndex : rowIndex;
-        const selectedPiece = board[actualRow][cellIndex];
+        const actualRow = getPlayerColor(game, playerId) === 'black' ? 7 - rowIndex : rowIndex;
+        const selectedPiece = game.board[actualRow][cellIndex];
         console.log("clicking on ", actualRow, cellIndex, selectedPiece);
     
         // If a piece is already selected
@@ -95,7 +100,7 @@ function GameChess() {
             // Execute the move if it's valid (You can add more validation checks here)
             makeMove(selectedSquare, { row: rowIndex, col: cellIndex });
             setSelectedSquare(null);
-        } else if (selectedPiece && ((selectedPiece === selectedPiece.toUpperCase() && playerColor === 'white') || (selectedPiece !== selectedPiece.toUpperCase() && playerColor === 'black'))) {
+        } else if (selectedPiece && ((selectedPiece === selectedPiece.toUpperCase() && getPlayerColor(game, playerId) === 'white') || (selectedPiece !== selectedPiece.toUpperCase() && getPlayerColor(game, playerId) === 'black'))) {
             console.log("setting selected piece to ", rowIndex, cellIndex);
             setSelectedSquare({ row: rowIndex, col: cellIndex });
 
@@ -121,75 +126,89 @@ function GameChess() {
         loop: false, // Do not loop the sound
         volume: 0.5, // Set the volume to 50%
       });
+
       useEffect(() => {
         if (!gameId) return;
-        let playerColorLocal = null;
         console.log("starting socket");
     
         const newSocket = io.connect(SERVER_URL + '/chess', {
             reconnection: true,
-            reconnectionDelay: 2000,           // Start with 2 seconds
-            reconnectionDelayMax: 10000,       // Max out at 10 seconds
-            reconnectionAttempts: 10,          // Try to reconnect 10 times
-            randomizationFactor: 0.5           // Apply variance between reconnects
+            reconnectionDelay: 2000,
+            reconnectionDelayMax: 10000,
+            reconnectionAttempts: 10,
+            randomizationFactor: 0.5
         });
-        
+    
         setSocket(newSocket);
     
         newSocket.emit("viewGame", gameId);
-
-        newSocket.on("gameUpdated", (game) => {
-            console.log("got game", game);
-            setBoard(game.board);
-            setCurrentPlayer(game.currentPlayer);
-            setGameState(game.state);
-            setGame(game);
-            setPlayers(game.players);
-            if (game.state === `${playerColorLocal}-wins`) {
-                winSound.play();
-            } else if (game.state.includes("-wins") && game.state !== `${playerColorLocal}-wins`) {
-                wrongSound.play();
-            }
-            if (!joined && game.players.length < 2) {
-                // User can join the game
-                setAbleToJoin(true);
-            } else {
-                setAbleToJoin(false);
-            }
-
-            let currentPlayerDetails = game.players.find(p => p.color === playerColorLocal);
-
-            if (currentPlayerDetails) {
-                const cookieKey = `JoinKey-${gameId}`;
-                const cookieValue = {
-                    joinKey: currentPlayerDetails.joinKey,
-                    color: currentPlayerDetails.color
-                };
-            
-                console.log("Stored the joinKey and color", cookieKey, cookieValue);
-                Cookies.set(cookieKey, JSON.stringify(cookieValue));
-            }     
-
-        });
     
-        newSocket.on("playerColor", (color) => {  // Replaced 'playerSymbol' with 'playerColor'
-            setPlayerColor(color);   // Updated to set the player's color
-            playerColorLocal = color;
-        });
-
-        newSocket.on("notify", (text) => {  // Replaced 'playerSymbol' with 'playerColor'
+        const joinedListener = (receivedPlayerId) => {
+            console.log("successfully joined game as ", receivedPlayerId);
             basicSound.play();
-            toast.success(text);
-        });
-        newSocket.on("error", (text) => {  // Replaced 'playerSymbol' with 'playerColor'
-            wrongSound.play();
-            toast.error(text);
-        });
+            setPlayerId(receivedPlayerId);
+    
+            const gameUpdatedListener = (game) => {
+                console.log("game updated");
+                setGameState(game.state);
+                setGame(game);
+    
+                if (game.state === `${receivedPlayerId}-wins`) {
+                    winSound.play();
+                } else if (game.state.includes("-wins") && game.state !== `${receivedPlayerId}-wins`) {
+                    wrongSound.play();
+                }
+    
+                if (!joined && game.players.length < 2) {
+                    setAbleToJoin(true);
+                } else {
+                    setAbleToJoin(false);
+                }
+    
+                let currentPlayerDetails = game.players.find(p => p.id === receivedPlayerId);
+                console.log(currentPlayerDetails);
+    
+                if (currentPlayerDetails) {
+                    const cookieKey = `JoinKey-${gameId}`;
+                    const cookieValue = {
+                        joinKey: currentPlayerDetails.joinKey,
+                        color: currentPlayerDetails.color
+                    };
+    
+                    console.log("Stored the joinKey and color", cookieKey, cookieValue);
+                    Cookies.set(cookieKey, JSON.stringify(cookieValue));
+                }
+            };
+    
+            const notifyListener = (text) => {
+                basicSound.play();
+                toast.success(text);
+            };
+    
+            const errorListener = (text) => {
+                wrongSound.play();
+                toast.error(text);
+            };
+    
+            newSocket.on("gameUpdated", gameUpdatedListener);
+            newSocket.on("notify", notifyListener);
+            newSocket.on("error", errorListener);
+    
+            return () => {
+                newSocket.off("gameUpdated", gameUpdatedListener);
+                newSocket.off("notify", notifyListener);
+                newSocket.off("error", errorListener);
+            };
+        };
+    
+        newSocket.on("joined", joinedListener);
     
         return () => {
+            newSocket.off("joined", joinedListener);
             newSocket.disconnect();
         };
     }, [gameId]);
+    
 
     useEffect(() => {
         if (!gameId || !game || game.state !== "ongoing") return;
@@ -225,11 +244,10 @@ function GameChess() {
                 if (game.message && game.message === "Game does not exist") {
                     setGameState("error");
                 } else {
-                    setBoard(game.board);
-                    setCurrentPlayer(game.currentPlayer);
+                    // setBoard(game.board);
+                    // setCurrentPlayer(game.currentPlayer);
                     setGameState(game.state);
                     setGame(game);
-                    setPlayers(game.players);
     
                     if (game.players.length < 2) {
                         setAbleToJoin(true);
@@ -253,42 +271,46 @@ function GameChess() {
     
     
     
-    function displayGameStatus(gameState, currentPlayer, playerColor, joined, players) {
-        console.log(players);
-        const whitePlayer = players.find(p => p.color === 'white');
-        const blackPlayer = players.find(p => p.color === 'black');
+    function displayGameStatus(gameState, currentPlayer, playerId, joined) {
         if (gameState === "ongoing") {
-            if (joined) {  // Explicitly checks if the user has joined
+            const whitePlayer = game.players.find(p => p.color === 'white');
+            const blackPlayer = game.players.find(p => p.color === 'black');
+    
+            if (joined) {
                 return (
                     <>
-                        <p>Turn: {currentPlayer === playerColor ? `Your (${playerColor}) Turn` : `Opponent's (${currentPlayer}) Turn`}
+                        <p>Turn: {currentPlayer === playerId ? `Your (${getPlayerColor(game, playerId)}) Turn` : `Opponent's Turn`}
                             <button 
                                 onClick={() => {
                                     socket.emit("resign", gameId);
                                 }}
-                                disabled={currentPlayer !== playerColor}  // Button is disabled if it's not the player's turn
+                                disabled={currentPlayer !== playerId}  // Button is disabled if it's not the player's turn
                             >
                                 Resign
                             </button>
                         </p>
                         <div>
-                            <PlayerTimer player={whitePlayer} isPlayerTurn={currentPlayer === 'white'} />
-                            <PlayerTimer player={blackPlayer} isPlayerTurn={currentPlayer === 'black'} />
+                            <PlayerTimer player={whitePlayer} isPlayerTurn={getPlayerColor(game, game.currentPlayer) === 'white'} />
+                            <PlayerTimer player={blackPlayer} isPlayerTurn={getPlayerColor(game, game.currentPlayer) === 'black'} />
                         </div>
                     </>
                 );
             } else {
-                return <p>Turn: {currentPlayer} Turn</p>;
+                return <p>Turn: {getPlayerColor(game, game.currentPlayer)} Turn</p>;
             }            
         } else if (gameState.includes("-wins")) {
             if (joined) {
-                if (gameState === `${playerColor}-wins`) {
+                const winningPlayerIndex = gameState === "player0-wins" ? 0 : 1;
+                const currentPlayerIndex = game.players.findIndex(player => player.id === playerId);
+        
+                if (winningPlayerIndex === currentPlayerIndex) {
                     return <p>You Win!</p>;
                 } else {
                     return <p>You Lose!</p>;
                 }
             }
         }
+        
         return null; // Default return for all other cases
     }
     return (
@@ -307,12 +329,17 @@ function GameChess() {
                         </a>
                     </p>
                 </>
+            ) : !game ? (
+                // Render "Loading" modal if game is null or undefined
+                <div className="loading-modal">
+                    Loading...
+                </div>
             ) : (
                 // Render when there's no error
                 <>
                     <div>
                         <h2>Mfer Chess: {game.gameName}</h2>
-                        <GameInfoComponent gameState={gameState} players={players}/>
+                        <GameInfoComponent gameState={gameState} players={game.players}/>
                         {joined === false && ableToJoin === true && (
                             <button onClick={() => {
                                 socket.emit("joinGame", gameId, joinKey);
@@ -340,12 +367,11 @@ function GameChess() {
                             </button>
                             </p>
                         )}
-                        {displayGameStatus(gameState, currentPlayer, playerColor, joined, players)}
+                        {displayGameStatus(gameState, game.currentPlayer, playerId, joined)}
                     </div>
                     <div className="chess-container">
-                        {/* ... Chessboard and related components ... */}
                         <div className="row-labels">
-                            {(playerColor === 'black' ? [' ', '1', '2', '3', '4', '5', '6', '7', '8'] : [' ', '8', '7', '6', '5', '4', '3', '2', '1']).map(label => (
+                            {(getPlayerColor(game, playerId) === 'black' ? [' ', '1', '2', '3', '4', '5', '6', '7', '8'] : [' ', '8', '7', '6', '5', '4', '3', '2', '1']).map(label => (
                                 <div key={label} className="row-label">{label}</div>
                             ))}
                         </div>
@@ -356,9 +382,9 @@ function GameChess() {
                                 ))}
                             </div>
                             <div className="chessboard">
-                                {(playerColor === 'black' ? board.slice().reverse() : board).map((row, rowIndex) => (
+                                {(getPlayerColor(game, playerId) === 'black' ? game.board.slice().reverse() : game.board).map((row, rowIndex) => (
                                     row.map((cell, cellIndex) => {
-                                        const isDarkSquare = playerColor === 'white'
+                                        const isDarkSquare = getPlayerColor(game, playerId) === 'white'
                                             ? (rowIndex + cellIndex) % 2 !== 0
                                             : (rowIndex + cellIndex) % 2 === 0;
     
@@ -387,7 +413,6 @@ function GameChess() {
                         </div>
                     </div>
                     <div className="legend-section">
-                        {/* ... Legend section ... */}
                         <h2 className="legend-title">Legend</h2>
                         <table className="legend-table">
                             <thead>

@@ -1,10 +1,39 @@
 const Chess = require('chess.js').Chess;
 const { v4: uuidv4 } = require('uuid');
 
+const { 
+    joinExistingGame: commonJoinExistingGame, 
+    playerResign: commonPlayerResign, 
+    handleDisconnect: commonHandleDisconnect,
+    createGame,
+} = require('../common/playerconnect.functions');
+
+function joinExistingGame(game, playerId, joinKey) {
+
+    function newPlayerFunction(newplayer, game) {
+        const newPlayerColor = game.players.length === 0 ? "white" : "black";
+        // newplayer will be created by library function, augment it with game specific logic
+        newplayer.color = newPlayerColor;
+        newplayer.timeLeft = 900000;
+        //newplayer.timeLeft = 9000;
+    }
+
+    return commonJoinExistingGame(game, playerId, joinKey, newPlayerFunction);
+}
+
+
+function playerResign(game, playerId) {
+    return commonPlayerResign(game, playerId);
+}
+
+function handleDisconnect(games, playerId) {
+    return commonHandleDisconnect(games, playerId);
+}
+
 function processMove(game, move, playerId) {
     const player = game.players.find(p => p.id === playerId);
     if (!player) return { error: "Not a valid player" };
-    if (game.currentPlayer !== player.color) return { error: "Not your turn" };
+    if (game.currentPlayer !== playerId) return { error: "Not your turn" };
     if (game.state !== "ongoing") return { error: "Game is not ongoing" };
 
     const fromCol = move.from.charCodeAt(0) - 'a'.charCodeAt(0);
@@ -35,23 +64,26 @@ function processMove(game, move, playerId) {
     game.castling = castling;
 
     if (chess.isCheckmate()) {
-        game.state = `${game.currentPlayer}-wins`;
+        const winningPlayerIndex = game.players.findIndex(p => p.id === playerId); 
+        game.state = winningPlayerIndex === 0 ? "player0-wins" : "player1-wins";
     } else {
-        game.currentPlayer = game.currentPlayer === "white" ? "black" : "white";
-    }
+        const otherPlayer = game.players.find(p => p.id !== playerId); // Find the other player
+        game.currentPlayer = otherPlayer.id; // Set the currentPlayer to the other player's id
+    }    
 
     const currentTime = Date.now();
     const timeElapsed = currentTime - game.lastActivity;
     player.timeLeft -= timeElapsed;
     if (player.timeLeft < 0) {
         player.timeLeft = 0;
-        game.state = `${player.color === "white" ? "black" : "white"}-wins`;
+        game.state = `${player.color === "white" ? "black" : "white"}-wins`; // Using player.color for the outcome
     }
 
     game.lastActivity = Date.now();
 
     return { success: true };
 }
+
 
 function isValidMove(board, move, playerColor, castling, moveCount) {
     // Create a new Chess instance with the current board state
@@ -125,80 +157,6 @@ function FENToBoard(fen) {
     return { board, turn, castling, moveNumber };
 }
 
-
-function joinExistingGame(game, playerId, joinKey) {
-    if (!game) return { error: "Game does not exist" };
-
-    // Check if a player with the provided joinKey exists
-    const existingPlayer = game.players.find(player => player.joinKey === joinKey);
-
-    if (existingPlayer) {
-        existingPlayer.id = playerId;
-        existingPlayer.disconnected = false;
-        return { success: true, playerColor: existingPlayer.color };
-    }
-
-    if (game.players.length >= 2) return { error: "Game is full" };
-
-    const playerColor = game.players.length === 0 ? "white" : "black";
-    
-    // Initialize the player with a timeLeft property and joinKey
-    const player = { 
-        id: playerId, 
-        color: playerColor, 
-        disconnected: false,
-        timeLeft: 900000, // 15 minutes in milliseconds
-        joinKey: uuidv4() // Save the joinKey with the player
-    };
-    
-    game.players.push(player);
-
-    if (game.players.length === 2) {
-        game.state = "ongoing";
-    }
-    
-    game.lastActivity = Date.now();
-
-    return { success: true, playerColor };
-}
-
-
-function playerResign(game, playerId) {
-    if (!game) return { error: "Game does not exist" };
-
-    const player = game.players.find(p => p.id === playerId);
-    if (!player) return { error: "Not a player in this game" };
-    
-    if (game.currentPlayer !== player.color) return { error: "Not your turn" };
-    if (game.state !== "ongoing") return { error: "Game is not ongoing" };
-    
-    const otherPlayer = game.currentPlayer === "white" ? "black" : "white";
-    game.state = `${otherPlayer}-wins`;
-    game.lastActivity = Date.now();
-
-    return { success: true, resignedPlayer: game.currentPlayer, winningPlayer: otherPlayer };
-}
-
-function handleDisconnect(chessGames, playerId) {
-    for (const gameId in chessGames) {
-        const game = chessGames[gameId];
-
-        const disconnectingPlayer = game.players.find(p => p.id === playerId);
-
-        if (disconnectingPlayer) {
-            disconnectingPlayer.disconnected = true;
-
-            return {
-                gameUpdated: true,
-                gameId: gameId,
-                disconnectedColor: disconnectingPlayer.color,
-            };
-    
-        }        
-    }
-    return { gameUpdated: false };
-}
-
 function createChessGame(gameName, fenPosition = null) {
     if (!gameName) {
         throw new Error("Game name is required.");
@@ -219,16 +177,10 @@ function createChessGame(gameName, fenPosition = null) {
 
     const initialData = fenPosition ? FENToBoard(fenPosition) : { board: initialBoard, turn: "white", castling: "KQkq", moveNumber: 0 };
 
-    const game = {
-        players: [],
-        board: initialData.board,
-        currentPlayer: initialData.turn, // Using the turn value extracted from FEN
-        castling: initialData.castling, // Add castling availability to the game
-        state: "waiting for players",
-        lastActivity: Date.now(),
-        gameName: gameName,
-        moveNumber: initialData.moveNumber,
-    };
+    let game = createGame(gameName);
+    game.board = initialData.board;
+    game.castling = initialData.castling; // Add castling availability to the game
+    game.moveNumer = initialData.moveNumber;
 
     return { gameId, game };
 }
