@@ -142,7 +142,14 @@ function GameChess() {
         setSocket(newSocket);
     
         newSocket.emit("viewGame", gameId);
-    
+
+        const disconnectListener = () => {
+            console.log("Socket disconnected, refresh page");
+            window.location.reload();
+        };
+        
+        newSocket.on("disconnect", disconnectListener);
+
         const joinedListener = (receivedPlayerId) => {
             console.log("successfully joined game as ", receivedPlayerId);
             basicSound.play();
@@ -205,6 +212,7 @@ function GameChess() {
     
         return () => {
             newSocket.off("joined", joinedListener);
+            newSocket.off("disconnect", disconnectListener);
             newSocket.disconnect();
         };
     }, [gameId]);
@@ -351,7 +359,8 @@ function GameChess() {
     
                         {gameState === "waiting for players" && (
                             <p>
-                            <button 
+                                Tell your friend the game name and to join from mfersarcade chess lobby.
+                            {/* <button 
                                 className="depress-button" 
                                 onClick={() => { 
                                     const el = document.createElement('textarea');
@@ -363,8 +372,8 @@ function GameChess() {
                                     alert('Game Link saved! Now share it with friends.');
                                 }}
                             >
-                                Copy Game Link to Share
-                            </button>
+                                Copy Link to Mfers Arcade
+                            </button> */}
                             </p>
                         )}
                         {displayGameStatus(gameState, game.currentPlayer, playerId, joined)}
