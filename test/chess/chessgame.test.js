@@ -6,7 +6,7 @@ const {
     boardToFEN,
     playerResign,
     handleDisconnect,
-} = require('../server/chess/chess.functions'); // Adjust the path to your module
+} = require('../../server/chess/chess.functions'); // Adjust the path to your module
 
 
 describe('FEN and Board conversion', () => {

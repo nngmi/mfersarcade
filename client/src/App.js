@@ -1,13 +1,13 @@
 import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import LandingPage from "./components/LandingPage";
-import GameTicTacToe from "./components/GameTicTacToe";
-import GameConnect4 from "./components/Connect4";
-import Connect4LandingPage from "./components/Connect4LandingPage";
-import MferCastle from "./components/MferCastle";
+import GameConnect4 from "./components/connect4/Connect4";
+import Connect4LandingPage from "./components/connect4/Connect4LandingPage";
+import MferCastle from "./components/mfercastle/MferCastle";
+import ChessLandingPage from "./components/chess/ChessLandingPage";
+import GameChess from "./components/chess/Chess";
 import './App.css';
-import ChessLandingPage from "./components/ChessLandingPage";
-import GameChess from "./components/Chess";
+
 function App() {
   return (
     <Router>

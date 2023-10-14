@@ -1,6 +1,6 @@
-const { dealDamage } = require('../server/mfercastle/cards');
+const { dealDamage } = require('../../server/mfercastle/cards');
 
-const { getInitialGameState, initializePlayer } = require('../server/mfercastle/state');
+const { getInitialGameState, initializePlayer } = require('../../server/mfercastle/state');
 
 
 describe('dealDamage', () => {

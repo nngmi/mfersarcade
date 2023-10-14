@@ -1,5 +1,5 @@
-const { cardMap, getPlayers, drawCard } = require('../server/mfercastle/cards');
-const { initializePlayer, getInitialGameState, beginTurn, endTurn, discardCard, bunkerizeCard, playCard} = require('../server/mfercastle/state');
+const { cardMap, getPlayers, drawCard } = require('../../server/mfercastle/cards');
+const { initializePlayer, getInitialGameState, beginTurn, endTurn, discardCard, bunkerizeCard, playCard} = require('../../server/mfercastle/state');
 
 describe('basicTest function', () => {
   let game;

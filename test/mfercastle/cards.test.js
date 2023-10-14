@@ -1,5 +1,5 @@
-const { cardMap, getPlayers } = require('../server/mfercastle/cards');
-const { initializePlayer, getInitialGameState, playCard, beginTurn, endTurn, bunkerizeCard } = require('../server/mfercastle/state');
+const { cardMap, getPlayers } = require('../../server/mfercastle/cards');
+const { initializePlayer, getInitialGameState, playCard, beginTurn, endTurn, bunkerizeCard } = require('../../server/mfercastle/state');
 
 describe('repurposeEffect function', () => {
   let game;

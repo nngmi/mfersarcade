@@ -1,4 +1,4 @@
-const { checkGameState } = require('../server/mfercastle/state');
+const { checkGameState } = require('../../server/mfercastle/state');
 
 describe('checkGameState', () => {
 
