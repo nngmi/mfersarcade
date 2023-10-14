@@ -20,7 +20,7 @@ function joinExistingGame(game, playerId, joinKey, newPlayerFunction) {
 
     if (existingPlayer) {
         // if the player is active override them
-        if (game.currentPlayer === playerId) {
+        if (game.currentPlayer === existingPlayer.id) {
             game.currentPlayer = playerId;
         }
         existingPlayer.id = playerId;
