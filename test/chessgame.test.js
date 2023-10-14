@@ -4,6 +4,8 @@ const {
     processMove,
     FENToBoard,
     boardToFEN,
+    playerResign,
+    handleDisconnect,
 } = require('../server/chess/chess.functions'); // Adjust the path to your module
 
 
@@ -148,4 +150,148 @@ describe("Pawn Promotion", () => {
         expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
 
     });
+});
+
+describe('Chess game flow 1', () => {
+
+    let chessGames = {};
+    let gameId;
+    let player1Id = "player1SocketId";
+    let player2Id = "player2SocketId";
+    let player1JoinKey;
+    let player2JoinKey;
+
+    beforeEach(() => {
+        const gameCreation = createChessGame("Test Game");
+        gameId = gameCreation.gameId;
+        chessGames[gameId] = gameCreation.game;
+    });
+
+    afterEach(() => {
+        gameId = null;
+        player1JoinKey = null;
+        player2JoinKey = null;
+        chessGames = {};
+    });
+
+    test('join, disconnect and rejoin game', () => {
+        // Player 1 joins
+        const join1 = joinExistingGame(chessGames[gameId], player1Id);
+        expect(join1.success).toBe(true);
+        expect(join1.playerColor).toBe("white");
+        player1JoinKey = chessGames[gameId].players.find(p => p.id === player1Id).joinKey;
+
+        // Player 2 joins
+        const join2 = joinExistingGame(chessGames[gameId], player2Id);
+        expect(join2.success).toBe(true);
+        expect(join2.playerColor).toBe("black");
+        player2JoinKey = chessGames[gameId].players.find(p => p.id === player2Id).joinKey;
+
+        // Player 1 makes a move
+        let moveResult = processMove(chessGames[gameId], { from: "e2", to: "e4" }, player1Id);
+        expect(moveResult.success).toBe(true);
+
+        // Player 1 disconnects
+        const disconnectResult1 = handleDisconnect(chessGames, player1Id);
+        expect(disconnectResult1.gameUpdated).toBe(true);
+        expect(disconnectResult1.gameId).toBe(gameId);
+        expect(disconnectResult1.disconnectedColor).toBe("white");
+
+        // Player 1 tries to rejoin with incorrect joinKey
+        const failedRejoin = joinExistingGame(chessGames[gameId], player1Id, "incorrectKey");
+        expect(failedRejoin.error).toBeDefined();
+
+        // Player 1 rejoins with correct joinKey
+        const rejoin = joinExistingGame(chessGames[gameId], player1Id, player1JoinKey);
+        expect(rejoin.success).toBe(true);
+        expect(rejoin.playerColor).toBe("white");
+
+        // Player 2 resigns
+        const resign = playerResign(chessGames[gameId], player2Id);
+        expect(resign.success).toBe(true);
+        expect(resign.resignedPlayer).toBe("black");
+        expect(resign.winningPlayer).toBe("white");
+    });
+
+});
+
+describe('Chess game flow', () => {
+
+    let chessGames = {};
+    let gameId;
+    let player1Id = "player1SocketId";
+    let player2Id = "player2SocketId";
+    let player3Id = "player3SocketId"; // Introducing a third player
+    let player1JoinKey;
+    let player2JoinKey;
+
+    beforeEach(() => {
+        const gameCreation = createChessGame("Test Game");
+        gameId = gameCreation.gameId;
+        chessGames[gameId] = gameCreation.game;
+    });
+
+    afterEach(() => {
+        gameId = null;
+        player1JoinKey = null;
+        player2JoinKey = null;
+        chessGames = {};
+    });
+
+    test('join, disconnect, rejoin game and third player scenarios', () => {
+        // Player 1 joins
+        const join1 = joinExistingGame(chessGames[gameId], player1Id);
+        expect(join1.success).toBe(true);
+        expect(join1.playerColor).toBe("white");
+        player1JoinKey = chessGames[gameId].players.find(p => p.id === player1Id).joinKey;
+
+        // Player 2 joins
+        const join2 = joinExistingGame(chessGames[gameId], player2Id);
+        expect(join2.success).toBe(true);
+        expect(join2.playerColor).toBe("black");
+        player2JoinKey = chessGames[gameId].players.find(p => p.id === player2Id).joinKey;
+
+        // Player 1 makes a move
+        let moveResult = processMove(chessGames[gameId], { from: "e2", to: "e4" }, player1Id);
+        expect(moveResult.success).toBe(true);
+
+        // Player 3 tries to join (game is full)
+        const join3 = joinExistingGame(chessGames[gameId], player3Id);
+        expect(join3.error).toBe("Game is full");
+
+        // Player 3 tries to make a move without joining
+        let moveResult3 = processMove(chessGames[gameId], { from: "e7", to: "e5" }, player3Id);
+        expect(moveResult3.error).toBe("Not a valid player");
+
+        // Player 1 disconnects
+        const disconnectResult1 = handleDisconnect(chessGames, player1Id);
+        expect(disconnectResult1.gameUpdated).toBe(true);
+        expect(disconnectResult1.gameId).toBe(gameId);
+        expect(disconnectResult1.disconnectedColor).toBe("white");
+
+        // Player 1 tries to rejoin with incorrect joinKey
+        const failedRejoin = joinExistingGame(chessGames[gameId], player1Id, "incorrectKey");
+        expect(failedRejoin.error).toBeDefined();
+
+        // Player 3 tries to join with an incorrect key
+        const failedJoin3 = joinExistingGame(chessGames[gameId], player3Id, "someWrongKey");
+        expect(failedJoin3.error).toBe("Game is full");
+
+
+        // Player 3 hacks player 1 id and tries to join
+        const failedJoin3Again = joinExistingGame(chessGames[gameId], player1Id, "someWrongKey");
+        expect(failedJoin3Again.error).toBe("Game is full");
+
+        // Player 1 rejoins with correct joinKey
+        const rejoin = joinExistingGame(chessGames[gameId], player1Id, player1JoinKey);
+        expect(rejoin.success).toBe(true);
+        expect(rejoin.playerColor).toBe("white");
+
+        // Player 2 resigns
+        const resign = playerResign(chessGames[gameId], player2Id);
+        expect(resign.success).toBe(true);
+        expect(resign.resignedPlayer).toBe("black");
+        expect(resign.winningPlayer).toBe("white");
+    });
+
 });

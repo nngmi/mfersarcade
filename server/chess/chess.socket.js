@@ -21,13 +21,13 @@ module.exports = (io) => {
         
             if (result.gameUpdated) {
                 chessSocket.to(result.gameId).emit("gameUpdated", chessGames[result.gameId]);
-                chessSocket.to(result.gameId).emit("notify", result.disconnectedColor + " disconnected, " + result.winningColor + " wins!");
+                chessSocket.to(result.gameId).emit("notify", result.disconnectedColor + " disconnected, waiting for reconnect.");
             }
         });
 
         socket.on("checkTime", (gameId) => {
             const game = chessGames[gameId];
-            if (!game) return socket.emit("error", "Game does not exist");
+            if (!game) return;
             console.log("checking time");
             
             const currentPlayer = game.players.find(player => player.color === game.currentPlayer);
@@ -45,10 +45,10 @@ module.exports = (io) => {
         });
         
 
-        socket.on("joinGame", (gameId) => {
+        socket.on("joinGame", (gameId, joinKey) => {
             const game = chessGames[gameId];
-            const result = joinExistingGame(game, socket.id);
-        
+            const result = joinExistingGame(game, socket.id, joinKey);
+            
             if (result.error) {
                 socket.emit("error", result.error);
             } else {
@@ -57,7 +57,6 @@ module.exports = (io) => {
                 socket.emit("playerColor", result.playerColor);
             }
         });
-        
     
         socket.on("makeMove", (gameId, move) => {
             const game = chessGames[gameId];

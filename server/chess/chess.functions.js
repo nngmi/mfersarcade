@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 
 function processMove(game, move, playerId) {
     const player = game.players.find(p => p.id === playerId);
+    if (!player) return { error: "Not a valid player" };
     if (game.currentPlayer !== player.color) return { error: "Not your turn" };
     if (game.state !== "ongoing") return { error: "Game is not ongoing" };
 
@@ -125,15 +126,31 @@ function FENToBoard(fen) {
 }
 
 
-function joinExistingGame(game, playerId) {
+function joinExistingGame(game, playerId, joinKey) {
     if (!game) return { error: "Game does not exist" };
+
+    // Check if a player with the provided joinKey exists
+    const existingPlayer = game.players.find(player => player.joinKey === joinKey);
+
+    if (existingPlayer) {
+        existingPlayer.id = playerId;
+        existingPlayer.disconnected = false;
+        return { success: true, playerColor: existingPlayer.color };
+    }
+
     if (game.players.length >= 2) return { error: "Game is full" };
 
     const playerColor = game.players.length === 0 ? "white" : "black";
     
-    // Initialize the player with a timeLeft property
-    const player = { id: playerId, color: playerColor, timeLeft: 900000 }; // 15 minutes in milliseconds
-    //const player = { id: playerId, color: playerColor, timeLeft: 18000 }; // 15 minutes in milliseconds
+    // Initialize the player with a timeLeft property and joinKey
+    const player = { 
+        id: playerId, 
+        color: playerColor, 
+        disconnected: false,
+        timeLeft: 900000, // 15 minutes in milliseconds
+        joinKey: uuidv4() // Save the joinKey with the player
+    };
+    
     game.players.push(player);
 
     if (game.players.length === 2) {
@@ -144,6 +161,7 @@ function joinExistingGame(game, playerId) {
 
     return { success: true, playerColor };
 }
+
 
 function playerResign(game, playerId) {
     if (!game) return { error: "Game does not exist" };
@@ -166,19 +184,17 @@ function handleDisconnect(chessGames, playerId) {
         const game = chessGames[gameId];
 
         const disconnectingPlayer = game.players.find(p => p.id === playerId);
-        
-        if (disconnectingPlayer && game.state === "ongoing") {
-            const opponentColor = disconnectingPlayer.color === "white" ? "black" : "white";
-            game.state = `${opponentColor}-wins`; 
-            game.lastActivity = Date.now();
+
+        if (disconnectingPlayer) {
+            disconnectingPlayer.disconnected = true;
 
             return {
                 gameUpdated: true,
                 gameId: gameId,
                 disconnectedColor: disconnectingPlayer.color,
-                winningColor: opponentColor
             };
-        }
+    
+        }        
     }
     return { gameUpdated: false };
 }

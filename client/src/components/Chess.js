@@ -6,6 +6,31 @@ import './Chess.css';
 import { ToastContainer } from 'react-toastify';
 import { toast } from 'react-toastify';
 import PlayerTimer from './PlayerTimer';
+import Cookies from 'js-cookie';
+
+function GameInfoComponent({gameState, players}) {
+    // Calculate the number of disconnected players
+    const disconnectedPlayersCount = players.filter(player => player.disconnected).length;
+    const connectedPlayersCount = players.length - disconnectedPlayersCount;
+
+    if (gameState.endsWith('-wins')) {
+        return (
+            <p>
+                <span>{gameState}</span>
+            </p>
+        );
+    }
+
+    return (
+        <p>
+            <span>
+                {gameState} ({connectedPlayersCount} players connected
+                {disconnectedPlayersCount > 0 ? `, ${disconnectedPlayersCount} players disconnected` : ""})
+            </span>
+        </p>
+    );
+}
+
 
 function GameChess() {
     let { gameId } = useParams();
@@ -15,6 +40,7 @@ function GameChess() {
     const [gameState, setGameState] = useState("viewing");
     const [currentPlayer, setCurrentPlayer] = useState("white");
     const [playerColor, setPlayerColor] = useState(null);
+    const [joinKey, setJoinKey] = useState(null);
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
     const [selectedSquare, setSelectedSquare] = useState(null);
     const [ableToJoin, setAbleToJoin] = useState(false);
@@ -72,9 +98,7 @@ function GameChess() {
         } else if (selectedPiece && ((selectedPiece === selectedPiece.toUpperCase() && playerColor === 'white') || (selectedPiece !== selectedPiece.toUpperCase() && playerColor === 'black'))) {
             console.log("setting selected piece to ", rowIndex, cellIndex);
             setSelectedSquare({ row: rowIndex, col: cellIndex });
-            
-            // Compute valid moves for the selected piece (Placeholder for now)
-            // setValidMoves(computeValidMoves(selectedPiece, actualRow, cellIndex));
+
         }
     };
     
@@ -132,6 +156,20 @@ function GameChess() {
             } else {
                 setAbleToJoin(false);
             }
+
+            let currentPlayerDetails = game.players.find(p => p.color === playerColorLocal);
+
+            if (currentPlayerDetails) {
+                const cookieKey = `JoinKey-${gameId}`;
+                const cookieValue = {
+                    joinKey: currentPlayerDetails.joinKey,
+                    color: currentPlayerDetails.color
+                };
+            
+                console.log("Stored the joinKey and color", cookieKey, cookieValue);
+                Cookies.set(cookieKey, JSON.stringify(cookieValue));
+            }     
+
         });
     
         newSocket.on("playerColor", (color) => {  // Replaced 'playerSymbol' with 'playerColor'
@@ -166,29 +204,54 @@ function GameChess() {
     }, [gameId, game]);
 
     useEffect(() => {
-        console.log("at beginning of useefect");
         if (!gameId) return;
-        fetch(`/api/chess/game/${gameId}`) // Updated the endpoint to 'chess'
-            .then((response) => {console.log(response); return response.json();})
-            .then((game) => {
-                console.log("at beginning of game");
-                console.log(game);
+
+        
+        const storedDetails = Cookies.get(`JoinKey-${gameId}`);
+    
+        let storedJoinKey, storedColor;
+        console.log("storedDetails", storedDetails);
+        if (storedDetails) {
+            const { joinKey, color } = JSON.parse(storedDetails);
+            storedJoinKey = joinKey;
+            storedColor = color;
+            setJoinKey(joinKey);
+        } 
+        console.log("Read key", storedJoinKey, storedColor);
+    
+        fetch(`/api/chess/game/${gameId}`)
+            .then(response => response.json())
+            .then(game => {
                 if (game.message && game.message === "Game does not exist") {
                     setGameState("error");
                 } else {
-                    console.log(game);
                     setBoard(game.board);
                     setCurrentPlayer(game.currentPlayer);
                     setGameState(game.state);
                     setGame(game);
                     setPlayers(game.players);
+    
                     if (game.players.length < 2) {
                         setAbleToJoin(true);
+                    } else if (storedJoinKey) {
+                        const matchingPlayer = game.players.find(player => 
+                            player.joinKey === storedJoinKey && 
+                            player.color === storedColor &&
+                            player.disconnected === true  // check if the player is disconnected
+                        );
+    
+                        if (matchingPlayer) {
+                            setAbleToJoin(true);
+                        } else {
+                            setAbleToJoin(false);
+                        }
                     }
                 }
             })
-            .catch((error) => console.error('Error fetching the game:', error));
+            .catch(error => console.error('Error fetching the game:', error));
     }, [gameId]);
+    
+    
     
     function displayGameStatus(gameState, currentPlayer, playerColor, joined, players) {
         console.log(players);
@@ -249,15 +312,13 @@ function GameChess() {
                 <>
                     <div>
                         <h2>Mfer Chess: {game.gameName}</h2>
-                        <p>
-                            <span>{gameState} ({players.length} players in game)</span>
-                        </p>
+                        <GameInfoComponent gameState={gameState} players={players}/>
                         {joined === false && ableToJoin === true && (
                             <button onClick={() => {
-                                socket.emit("joinGame", gameId);
+                                socket.emit("joinGame", gameId, joinKey);
                                 setJoined(true);
                             }}>
-                                Join Game
+                                {joinKey ? "Rejoin" : "Join Game"}
                             </button>
                         )}
     
