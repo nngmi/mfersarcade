@@ -16,6 +16,8 @@ Common code:
 Prerequisites:
 - github set up
 - node.js, npm installed
+- Run `npm install` in root
+- `cd client && npm install`
 
 Quick commands:
 

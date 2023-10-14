@@ -36,12 +36,6 @@ function LandingPage() {
             </Link>
             <p>Mfers Beheaded</p>
           </div>
-          { showTestLevels && (
-            <div className="game-item">
-              <img onClick={createMferCastleGame} src="/images/mfercastle.png" alt="Mfers Castle" />
-              <p>Mfers Castle</p>
-            </div>
-          )}
             <div className="game-item">
                 <Link to="/mferchess/">
                   <img src="/images/mferchess.png" alt="Chess" />
@@ -52,7 +46,11 @@ function LandingPage() {
                 <Link to="/connect4/">
                   <img src="/images/connect4.png" alt="Connect 4" />
                 </Link>
-                <p>Hoodies vs Top Hats</p>
+                <p>Hoodies vs Top Hats (Connect 4)</p>
+            </div>
+            <div className="game-item">
+              <img onClick={createMferCastleGame} src="/images/mfercastle.png" alt="Mfers Castle" />
+              <p>🚧 Mfers Castle 🚧</p>
             </div>
         </div>
     </div>
