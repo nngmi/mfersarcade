@@ -79,7 +79,7 @@ module.exports = (io) => {
             const game = chessGames[gameId];
             if (!game) return socket.emit("error", "Game does not exist");
             const player = game.players.find(p => p.id === socket.id);
-            if (!player) return socket.emit("error", "Not a player in this game");
+            if (!player) return socket.emit("error", "Not a player in this game, if you think error, try refreshing page to rejoin.");
         
             const result = processMove(game, move, socket.id);
             if (result.error) {
