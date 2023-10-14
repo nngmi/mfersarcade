@@ -166,7 +166,6 @@ function GameChess() {
                 }
     
                 let currentPlayerDetails = game.players.find(p => p.id === receivedPlayerId);
-                console.log(currentPlayerDetails);
     
                 if (currentPlayerDetails) {
                     const cookieKey = `JoinKey-${gameId}`;
@@ -177,6 +176,7 @@ function GameChess() {
     
                     console.log("Stored the joinKey and color", cookieKey, cookieValue);
                     Cookies.set(cookieKey, JSON.stringify(cookieValue));
+                    setJoinKey(currentPlayerDetails.joinKey);
                 }
             };
     
@@ -205,6 +205,7 @@ function GameChess() {
     
         return () => {
             newSocket.off("joined", joinedListener);
+            setJoined(false);
             newSocket.disconnect();
         };
     }, [gameId]);
@@ -229,7 +230,6 @@ function GameChess() {
         const storedDetails = Cookies.get(`JoinKey-${gameId}`);
     
         let storedJoinKey, storedColor;
-        console.log("storedDetails", storedDetails);
         if (storedDetails) {
             const { joinKey, color } = JSON.parse(storedDetails);
             storedJoinKey = joinKey;
@@ -251,11 +251,9 @@ function GameChess() {
     
                     if (game.players.length < 2) {
                         setAbleToJoin(true);
-                    } else if (storedJoinKey) {
+                    } else if (joinKey) {
                         const matchingPlayer = game.players.find(player => 
-                            player.joinKey === storedJoinKey && 
-                            player.color === storedColor &&
-                            player.disconnected === true  // check if the player is disconnected
+                            player.joinKey === joinKey
                         );
     
                         if (matchingPlayer) {
