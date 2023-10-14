@@ -17,12 +17,12 @@ function ChessLandingPage() {
     }, []);
     const validateGameName = (name) => {
         const trimmedName = name.trim();
-        return trimmedName.length > 0 && trimmedName.length <= 30;
+        return trimmedName.length > 0 && trimmedName.length <= 50;
     };
     
     const createChessGame = async () => {
         if (!validateGameName(gameName)) {
-            alert('Please enter a valid game name (1-30 characters).');
+            alert('Please enter a valid game name (1-50 characters).');
             return;
         }
         try {
