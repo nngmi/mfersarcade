@@ -19,6 +19,10 @@ function joinExistingGame(game, playerId, joinKey, newPlayerFunction) {
     const existingPlayer = game.players.find(player => player.joinKey === joinKey);
 
     if (existingPlayer) {
+        // if the player is active override them
+        if (game.currentPlayer === playerId) {
+            game.currentPlayer = playerId;
+        }
         existingPlayer.id = playerId;
         existingPlayer.disconnected = false;
         return { success: true, joinedPlayer: existingPlayer.id };
