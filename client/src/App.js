@@ -12,12 +12,12 @@ function App() {
   return (
     <Router>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/connect4/:gameId" element={<GameConnect4 />} />
         <Route path="/connect4/" element={<Connect4LandingPage />} />
         <Route path="/mferchess/" element={<ChessLandingPage />} />
-        <Route path="/mfercastle/:gameId" element={<MferCastle />} />
         <Route path="/mferchess/:gameId" element={<GameChess />} />
-        <Route path="/" element={<LandingPage />} />
+        <Route path="/mfercastle/:gameId" element={<MferCastle />} />
       </Routes>
     </Router>
   );

@@ -9,11 +9,11 @@
 
 .games-container {
     display: grid;
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, 1fr); /* Makes a 2 column grid */
     gap: 1rem; /* Spacing between grid items */
 }
 /* Mobile view: 1 column grid */
-@media (max-width: 1200px) {
+@media (max-width: 768px) {
 .games-container {
     grid-template-columns: 1fr;
 }
