@@ -1,6 +1,6 @@
 const socketIo = require("socket.io");
 let chessGames = require('./state');
-const { processMove, joinExistingGame, playerResign, handleDisconnect, createChessGame} = require('./chess.functions');
+const { processMove, suggestMove, joinExistingGame, playerResign, handleDisconnect, createChessGame} = require('./chess.functions');
 
 module.exports = (io) => {
     const chessSocket = io.of('/chess');
@@ -71,6 +71,13 @@ module.exports = (io) => {
                 setTimeout(() => {
                     chessSocket.to(gameId).emit("notify", joinedPlayer.color + " joined the game.");
                     chessSocket.to(gameId).emit("gameUpdated", game);
+                    console.log("game autoplay ", game.autoplay, game.players.length);
+                    if (game.autoplay && game.players.length === 1) {
+                        console.log("auto play joining");
+                        const result = joinExistingGame(game, "AI" + gameId, null);
+                        chessSocket.to(gameId).emit("notify", "black (AI) joined the game.");
+                        chessSocket.to(gameId).emit("gameUpdated", game);
+                    }
                 }, 100);  // Add a 100ms delay before emitting gameUpdated event
             }
         });        
@@ -86,6 +93,14 @@ module.exports = (io) => {
                 socket.emit("error", result.error);
             } else {
                 chessSocket.to(gameId).emit("notify", player.color + " made a move from " + move["from"] + " to " + move["to"]);
+                chessSocket.to(gameId).emit("gameUpdated", game);
+            }
+            if (game.autoplay) { 
+                let suggestedMove = suggestMove(game, 'black');
+            
+                // Validate the move
+                processMove(game, suggestedMove, game.players[1].id);
+                chessSocket.to(gameId).emit("notify", game.players[1].color + " made a move from " + suggestedMove["from"] + " to " + suggestedMove["to"]);
                 chessSocket.to(gameId).emit("gameUpdated", game);
             }
         });

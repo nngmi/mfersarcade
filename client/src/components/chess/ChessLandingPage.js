@@ -4,6 +4,7 @@ import './ChessLandingPage.css';
 
 function ChessLandingPage() {
     const [games, setGames] = useState([]);
+    const [autoplay, setAutoplay] = useState(false);
     const [gameName, setGameName] = useState(''); // New state for game name
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
     const navigate = useNavigate();
@@ -29,7 +30,7 @@ function ChessLandingPage() {
             const response = await fetch("/api/chess/game", { 
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ gameName }) // Pass game name and player name in POST request
+                body: JSON.stringify({ gameName, autoplay }) // Pass game name and player name in POST request
             });
             console.log(response);
             if (!response.ok) throw new Error("Failed to create game");
@@ -89,6 +90,18 @@ function ChessLandingPage() {
                         />
                     </label>
                 </p>
+
+                <p>
+                    <label>
+                        Autoplay: 
+                        <input 
+                            type="checkbox" 
+                            checked={autoplay}
+                            onChange={(e) => setAutoplay(e.target.checked)} 
+                        />
+                    </label>
+                </p>
+
                 <button className="create-game-button" onClick={createChessGame}>
                     Create New Game
                 </button>

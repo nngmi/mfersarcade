@@ -21,9 +21,10 @@ const cleanupGames = () => {
 
 router.post("/game", (req, res) => {
     try {
-        const { gameName } = req.body;
+        const { gameName, autoplay } = req.body;
+        console.log(autoplay);
 
-        const { gameId, game } = createChessGame(gameName);
+        const { gameId, game } = createChessGame(gameName, null, autoplay);
 
         if (chessGames[gameId]) {
             return res.status(400).json({ message: "Game already exists" });

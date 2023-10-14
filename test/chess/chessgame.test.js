@@ -6,6 +6,7 @@ const {
     boardToFEN,
     playerResign,
     handleDisconnect,
+    suggestMove,
 } = require('../../server/chess/chess.functions'); // Adjust the path to your module
 
 
@@ -105,6 +106,32 @@ describe("Chess Game", () => {
         expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
 
     });
+
+    it("should suggest a valid move for a given game state", () => {
+        // Setup initial game state
+        const initialFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; // Starting position
+        const { board, turn, castling, moveNumber } = FENToBoard(initialFEN);
+    
+        const game = {
+            board: board,
+            turn: turn === 'w' ? 'white' : 'black',
+            castling: castling,
+            moveNumber: moveNumber,
+            state: "ongoing",
+            currentPlayer: player1, // Assuming player1 is the white player
+            players: [ { id: player1, color: "white" }, { id: player2, color: "black" } ]
+        };
+    
+        // Call suggestMove to get a move suggestion
+        const suggestedMove = suggestMove(game, 'white');
+        console.log(suggestedMove);
+    
+        // Validate the move
+        expect(suggestedMove).not.toBeNull();
+        const moveResult = processMove(game, suggestedMove, player1); // Assuming player1 is the current player
+        expect(moveResult.success).toBe(true);
+    });
+    
 });
 
 

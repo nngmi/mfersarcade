@@ -30,6 +30,37 @@ function handleDisconnect(games, playerId) {
     return commonHandleDisconnect(games, playerId);
 }
 
+function suggestMove(game, turn) {
+    // Convert the game board to FEN
+    const simpleTurn = turn === 'white' ? 'w' : 'b';
+    const fen = boardToFEN(game.board, simpleTurn, game.castling, game.moveNumber);
+
+    // Load game state using chess.js
+    const chess = new Chess(fen);
+
+    // Generate possible moves
+    const moves = chess.moves({ verbose: true });
+
+    // If no moves are available, return null
+    if (moves.length === 0) {
+        return null;
+    }
+
+    // For simplicity, pick a random move from the available moves.
+    // NOTE: You can use more sophisticated algorithms for this step.
+    const randomMove = moves[Math.floor(Math.random() * moves.length)];
+
+    let s = {
+        from: randomMove.from,
+        to: randomMove.to,
+        
+    };
+    if (randomMove.promotion) {
+        s.promotion = randomMove.promotion;
+    }
+    return s;
+}
+
 function processMove(game, move, playerId) {
     const player = game.players.find(p => p.id === playerId);
     if (!player) return { error: "Not a valid player" };
@@ -157,7 +188,7 @@ function FENToBoard(fen) {
     return { board, turn, castling, moveNumber };
 }
 
-function createChessGame(gameName, fenPosition = null) {
+function createChessGame(gameName, fenPosition = null, autoplay=false) {
     if (!gameName) {
         throw new Error("Game name is required.");
     }
@@ -181,6 +212,7 @@ function createChessGame(gameName, fenPosition = null) {
     game.board = initialData.board;
     game.castling = initialData.castling; // Add castling availability to the game
     game.moveNumer = initialData.moveNumber;
+    game.autoplay = autoplay;
 
     return { gameId, game };
 }
@@ -195,4 +227,5 @@ module.exports = {
     playerResign,
     handleDisconnect,
     createChessGame,
+    suggestMove,
 };
