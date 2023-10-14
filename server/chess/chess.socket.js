@@ -94,15 +94,16 @@ module.exports = (io) => {
             } else {
                 chessSocket.to(gameId).emit("notify", player.color + " made a move from " + move["from"] + " to " + move["to"]);
                 chessSocket.to(gameId).emit("gameUpdated", game);
+                if (game.autoplay) { 
+                    let suggestedMove = suggestMove(game, 'black');
+                
+                    // Validate the move
+                    processMove(game, suggestedMove, game.players[1].id);
+                    chessSocket.to(gameId).emit("notify", game.players[1].color + " made a move from " + suggestedMove["from"] + " to " + suggestedMove["to"]);
+                    chessSocket.to(gameId).emit("gameUpdated", game);
+                }
             }
-            if (game.autoplay) { 
-                let suggestedMove = suggestMove(game, 'black');
-            
-                // Validate the move
-                processMove(game, suggestedMove, game.players[1].id);
-                chessSocket.to(gameId).emit("notify", game.players[1].color + " made a move from " + suggestedMove["from"] + " to " + suggestedMove["to"]);
-                chessSocket.to(gameId).emit("gameUpdated", game);
-            }
+
         });
 
         socket.on("resign", (gameId) => {
