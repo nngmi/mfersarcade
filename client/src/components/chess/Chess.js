@@ -8,14 +8,22 @@ import { toast } from 'react-toastify';
 import PlayerTimer from './PlayerTimer';
 import Cookies from 'js-cookie';
 
-function GameInfoComponent({gameState, players}) {
+const getPlayerColor = (game, playerId) => {
+    const player = game.players.find(p => p.id === playerId);
+    return player ? player.color : null; // Returns null if the player isn't found.
+};
+
+function GameInfoComponent({game}) {
+    if (!game) return;
     // Calculate the number of disconnected players
-    const disconnectedPlayersCount = players.filter(player => player.disconnected).length;
-    const connectedPlayersCount = players.length - disconnectedPlayersCount;
+    const disconnectedPlayersCount = game.players.filter(player => player.disconnected).length;
+    const connectedPlayersCount = game.players.length - disconnectedPlayersCount;
+    const whitePlayer = game.players.find(p => p.color === 'white');
+    const blackPlayer = game.players.find(p => p.color === 'black');
 
     // Convert the gameState if it ends with '-wins'
-    if (gameState.endsWith('-wins')) {
-        const winnerColor = gameState === "player0-wins" ? "white" : "black";
+    if (game.state.endsWith('-wins')) {
+        const winnerColor = game.state === "player0-wins" ? "white" : "black";
         return (
             <p>
                 <span>{winnerColor} wins</span>
@@ -24,12 +32,16 @@ function GameInfoComponent({gameState, players}) {
     }
 
     return (
-        <p>
+        <div>
             <span>
-                {gameState} ({connectedPlayersCount} players connected
+                {game.state} ({connectedPlayersCount} players connected
                 {disconnectedPlayersCount > 0 ? `, ${disconnectedPlayersCount} players disconnected` : ""})
             </span>
-        </p>
+            <div>
+                {whitePlayer && blackPlayer && (<PlayerTimer player={whitePlayer} isPlayerTurn={getPlayerColor(game, game.currentPlayer) === 'white'} />)}
+                {whitePlayer && blackPlayer && (<PlayerTimer player={blackPlayer} isPlayerTurn={getPlayerColor(game, game.currentPlayer) === 'black'} />)}
+            </div>
+        </div>
     );
 }
 
@@ -52,10 +64,7 @@ function GameChess() {
         const to = toAlgebraicNotation(toSquare.row, toSquare.col);
         socket.emit("makeMove", gameId, { from, to });
     };
-    const getPlayerColor = (game, playerId) => {
-        const player = game.players.find(p => p.id === playerId);
-        return player ? player.color : null; // Returns null if the player isn't found.
-    };
+
     
     const pieceLegend = [
         { name: 'Pawn', notation: 'p',  },
@@ -150,15 +159,33 @@ function GameChess() {
         
         newSocket.on("disconnect", disconnectListener);
 
+        const gameUpdatedListenerBasic = (game) => {
+            console.log("game updated");
+            setGameState(game.state);
+            setGame(game);
+        };
+
+        const notifyListener = (text) => {
+            basicSound.play();
+            toast.success(text);
+        };
+
+        const errorListener = (text) => {
+            wrongSound.play();
+            toast.error(text);
+        };
+
+        newSocket.on("gameUpdated", gameUpdatedListenerBasic);
+        newSocket.on("notify", notifyListener);
+        newSocket.on("error", errorListener);
+    
         const joinedListener = (receivedPlayerId) => {
             console.log("successfully joined game as ", receivedPlayerId);
             basicSound.play();
             setPlayerId(receivedPlayerId);
     
             const gameUpdatedListener = (game) => {
-                console.log("game updated");
-                setGameState(game.state);
-                setGame(game);
+
     
                 if (game.state === `${receivedPlayerId}-wins`) {
                     winSound.play();
@@ -186,25 +213,12 @@ function GameChess() {
                     Cookies.set(cookieKey, JSON.stringify(cookieValue));
                 }
             };
-    
-            const notifyListener = (text) => {
-                basicSound.play();
-                toast.success(text);
-            };
-    
-            const errorListener = (text) => {
-                wrongSound.play();
-                toast.error(text);
-            };
-    
+        
             newSocket.on("gameUpdated", gameUpdatedListener);
-            newSocket.on("notify", notifyListener);
-            newSocket.on("error", errorListener);
+
     
             return () => {
                 newSocket.off("gameUpdated", gameUpdatedListener);
-                newSocket.off("notify", notifyListener);
-                newSocket.off("error", errorListener);
             };
         };
     
@@ -212,6 +226,9 @@ function GameChess() {
     
         return () => {
             newSocket.off("joined", joinedListener);
+            newSocket.off("gameUpdated", gameUpdatedListenerBasic);
+            newSocket.off("notify", notifyListener);
+            newSocket.off("error", errorListener);
             newSocket.off("disconnect", disconnectListener);
             newSocket.disconnect();
         };
@@ -223,8 +240,8 @@ function GameChess() {
     
         const timeCheckInterval = setInterval(() => {
             socket.emit("checkTime", gameId);
-        }, 1000);  // for example, every 1 second.
-    
+        }, 3000);
+
         return () => {
             clearInterval(timeCheckInterval);
         };
@@ -281,8 +298,7 @@ function GameChess() {
     
     function displayGameStatus(gameState, currentPlayer, playerId, joined) {
         if (gameState === "ongoing") {
-            const whitePlayer = game.players.find(p => p.color === 'white');
-            const blackPlayer = game.players.find(p => p.color === 'black');
+
     
             if (joined) {
                 return (
@@ -297,15 +313,12 @@ function GameChess() {
                                 Resign
                             </button>
                         </p>
-                        <div>
-                            <PlayerTimer player={whitePlayer} isPlayerTurn={getPlayerColor(game, game.currentPlayer) === 'white'} />
-                            <PlayerTimer player={blackPlayer} isPlayerTurn={getPlayerColor(game, game.currentPlayer) === 'black'} />
-                        </div>
+
                     </>
                 );
             } else {
                 return <p>Turn: {getPlayerColor(game, game.currentPlayer)} Turn</p>;
-            }            
+            }
         } else if (gameState.includes("-wins")) {
             if (joined) {
                 const winningPlayerIndex = gameState === "player0-wins" ? 0 : 1;
@@ -347,7 +360,7 @@ function GameChess() {
                 <>
                     <div>
                         <h2>Mfer Chess: {game.gameName}</h2>
-                        <GameInfoComponent gameState={gameState} players={game.players}/>
+                        <GameInfoComponent game={game}/>
                         {joined === false && ableToJoin === true && (
                             <button onClick={() => {
                                 socket.emit("joinGame", gameId, joinKey);
@@ -360,20 +373,6 @@ function GameChess() {
                         {gameState === "waiting for players" && (
                             <p>
                                 Tell your friend the game name and to join from mfersarcade chess lobby.
-                            {/* <button 
-                                className="depress-button" 
-                                onClick={() => { 
-                                    const el = document.createElement('textarea');
-                                    el.value = `${window.location.origin}/mferchess/${gameId}`;
-                                    document.body.appendChild(el);
-                                    el.select();
-                                    document.execCommand('copy');
-                                    document.body.removeChild(el);
-                                    alert('Game Link saved! Now share it with friends.');
-                                }}
-                            >
-                                Copy Link to Mfers Arcade
-                            </button> */}
                             </p>
                         )}
                         {displayGameStatus(gameState, game.currentPlayer, playerId, joined)}

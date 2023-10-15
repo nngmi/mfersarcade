@@ -29,11 +29,11 @@ module.exports = (io) => {
                     chessSocket.to(result.gameId).emit("notify", playerColor + " disconnected, waiting for reconnect.");
                 }
             }
-        });        
+        });
 
         socket.on("checkTime", (gameId) => {
             const game = chessGames[gameId];
-            if (!game) return;
+            if (!game || game.state !== 'ongoing') return;
             console.log("checking time");
             
             const currentPlayerIndex = game.players.findIndex(player => player.id === game.currentPlayer);
@@ -53,9 +53,12 @@ module.exports = (io) => {
                 // Notify which player ran out of time
                 const playerColor = currentPlayer.color;
                 chessSocket.to(gameId).emit("notify", playerColor + " ran out of time.");
-                chessSocket.to(gameId).emit("gameUpdated", game);
+                game.lastActivity = currentTime;
+            } else {
+                currentPlayer.timeLeft -= timeElapsed;
                 game.lastActivity = currentTime;
             }
+            chessSocket.to(gameId).emit("gameUpdated", game);
         });
         
         socket.on("joinGame", (gameId, joinKey) => {

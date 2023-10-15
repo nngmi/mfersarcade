@@ -14,7 +14,7 @@ function joinExistingGame(game, playerId, joinKey) {
         const newPlayerColor = game.players.length === 0 ? "white" : "black";
         // newplayer will be created by library function, augment it with game specific logic
         newplayer.color = newPlayerColor;
-        newplayer.timeLeft = 900000;
+        newplayer.timeLeft = 1200000;
         //newplayer.timeLeft = 9000;
     }
 
