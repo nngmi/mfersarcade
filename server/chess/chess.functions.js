@@ -148,6 +148,7 @@ function processMove(game, move, playerId) {
     const { board, castling } = FENToBoard(chess.fen());
     game.board = board;
     game.castling = castling;
+    game.moves.push(move);
 
     if (chess.isCheckmate()) {
         const winningPlayerIndex = game.players.findIndex(p => p.id === playerId); 
@@ -268,6 +269,7 @@ function createChessGame(gameName, fenPosition = null, autoplay=false) {
     game.castling = initialData.castling; // Add castling availability to the game
     game.moveNumer = initialData.moveNumber;
     game.autoplay = autoplay;
+    game.moves = []; // latest moves last
 
     return { gameId, game };
 }

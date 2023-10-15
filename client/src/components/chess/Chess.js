@@ -9,6 +9,7 @@ import Cookies from 'js-cookie';
 import {pieceLegend, graphics, getPlayerColor} from './ChessLib';
 import GameInfoComponent from './GameInfoComponent';
 import CapturedPieces from './CapturedPieces';
+import ChessContainer from './ChessContainer';
 
 function GameChess() {
     let { gameId } = useParams();
@@ -19,7 +20,6 @@ function GameChess() {
     const [playerId, setPlayerId] = useState(null);
     const [joinKey, setJoinKey] = useState(null);
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
-    const [selectedSquare, setSelectedSquare] = useState(null);
     const [ableToJoin, setAbleToJoin] = useState(false);
     const [joined, setJoined] = useState(false);
 
@@ -41,23 +41,7 @@ function GameChess() {
                `${columns[col]}${row + 1}`;
     };    
     
-    const handleSquareClick = (rowIndex, cellIndex) => {
-        const actualRow = getPlayerColor(game, playerId) === 'black' ? 7 - rowIndex : rowIndex;
-        const selectedPiece = game.board[actualRow][cellIndex];
-        console.log("clicking on ", actualRow, cellIndex, selectedPiece);
-    
-        // If a piece is already selected
-        if (selectedSquare) {
-            // Execute the move if it's valid (You can add more validation checks here)
-            makeMove(selectedSquare, { row: rowIndex, col: cellIndex });
-            setSelectedSquare(null);
-        } else if (selectedPiece && ((selectedPiece === selectedPiece.toUpperCase() && getPlayerColor(game, playerId) === 'white') || (selectedPiece !== selectedPiece.toUpperCase() && getPlayerColor(game, playerId) === 'black'))) {
-            console.log("setting selected piece to ", rowIndex, cellIndex);
-            setSelectedSquare({ row: rowIndex, col: cellIndex });
 
-        }
-    };
-    
 
     const basicSound = new Howl({
         src: ["/audio/correct.mp3"], // Replace with your sound file path
@@ -319,49 +303,7 @@ function GameChess() {
                         )}
                         {displayGameStatus(gameState, game.currentPlayer, playerId, joined)}
                     </div>
-                    <div className="chess-container">
-                        <div className="row-labels">
-                            {(getPlayerColor(game, playerId) === 'black' ? [' ', '1', '2', '3', '4', '5', '6', '7', '8'] : [' ', '8', '7', '6', '5', '4', '3', '2', '1']).map(label => (
-                                <div key={label} className="row-label">{label}</div>
-                            ))}
-                        </div>
-                        <div className="chessboard-wrapper">
-                            <div className="column-labels">
-                                {['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'].map(label => (
-                                    <div key={label} className="column-label">{label}</div>
-                                ))}
-                            </div>
-                            <div className="chessboard">
-                                {(getPlayerColor(game, playerId) === 'black' ? game.board.slice().reverse() : game.board).map((row, rowIndex) => (
-                                    row.map((cell, cellIndex) => {
-                                        const isDarkSquare = getPlayerColor(game, playerId) === 'white'
-                                            ? (rowIndex + cellIndex) % 2 !== 0
-                                            : (rowIndex + cellIndex) % 2 === 0;
-    
-                                        return (
-                                            <div
-                                                key={`${rowIndex}-${cellIndex}`}
-                                                className={`
-                                                    square 
-                                                    ${isDarkSquare ? 'black-square' : 'white-square'}
-                                                    ${selectedSquare && selectedSquare.row === rowIndex && selectedSquare.col === cellIndex ? 'selected' : ''}
-                                                `}
-                                                onClick={() => handleSquareClick(rowIndex, cellIndex)}
-                                            >
-                                                {cell && (
-                                                    <img
-                                                        src={graphics[`${cell.toLowerCase()}-${cell === cell.toUpperCase() ? 'white' : 'black'}`]}
-                                                        alt={cell}
-                                                        className="piece-img"
-                                                    />
-                                                )}
-                                            </div>
-                                        );
-                                    })
-                                ))}
-                            </div>
-                        </div>
-                    </div>
+                    <ChessContainer game={game} playerId={playerId} makeMove={makeMove}/>
                     <CapturedPieces game={game}/>
                     <div className="legend-section">
                         <h2 className="legend-title">Legend</h2>

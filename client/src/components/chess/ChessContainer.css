@@ -1,0 +1,15 @@
+.last-move-self {
+    background-color: rgba(0, 255, 0, 0.3);  /* Light green shade for the current player */
+}
+
+.last-move-opponent {
+    background-color: rgba(255, 0, 0, 0.3);  /* Light red shade for the opponent */
+}
+
+.second-last-move-self {
+    background-color: rgba(0, 128, 0, 0.3);  /* Darker green shade for the current player */
+}
+
+.second-last-move-opponent {
+    background-color: rgba(128, 0, 0, 0.3);  /* Darker red shade for the opponent */
+}

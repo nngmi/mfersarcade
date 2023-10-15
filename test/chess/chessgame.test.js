@@ -187,6 +187,7 @@ describe("Chess Game", () => {
             castling: castling,
             moveNumber: moveNumber,
             state: "ongoing",
+            moves: [],
             currentPlayer: player1, // Assuming player1 is the white player
             players: [ { id: player1, color: "white" }, { id: player2, color: "black" } ]
         };
