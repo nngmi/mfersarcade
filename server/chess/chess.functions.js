@@ -14,6 +14,7 @@ function joinExistingGame(game, playerId, joinKey) {
         const newPlayerColor = game.players.length === 0 ? "white" : "black";
         // newplayer will be created by library function, augment it with game specific logic
         newplayer.color = newPlayerColor;
+        newplayer.capturedPieces = [];
         newplayer.timeLeft = 1200000;
         //newplayer.timeLeft = 9000;
     }
@@ -31,35 +32,85 @@ function handleDisconnect(games, playerId) {
 }
 
 function suggestMove(game, turn) {
-    // Convert the game board to FEN
+    const pieceValues = {
+        'p': 1,
+        'n': 3,
+        'b': 3,
+        'r': 5,
+        'q': 9,
+        'k': 100
+    };
+
+    const centerSquares = ['d4', 'e4', 'd5', 'e5'];
+
     const simpleTurn = turn === 'white' ? 'w' : 'b';
     const fen = boardToFEN(game.board, simpleTurn, game.castling, game.moveNumber);
 
-    // Load game state using chess.js
     const chess = new Chess(fen);
-
-    // Generate possible moves
     const moves = chess.moves({ verbose: true });
 
-    // If no moves are available, return null
     if (moves.length === 0) {
         return null;
     }
 
-    // For simplicity, pick a random move from the available moves.
-    // NOTE: You can use more sophisticated algorithms for this step.
-    const randomMove = moves[Math.floor(Math.random() * moves.length)];
+    // Prioritize captures by the piece value
+    moves.sort((a, b) => {
+        const aValue = a.flags.includes('c') ? pieceValues[a.piece] : 0;
+        const bValue = b.flags.includes('c') ? pieceValues[b.piece] : 0;
+        return bValue - aValue;
+    });
 
-    let s = {
-        from: randomMove.from,
-        to: randomMove.to,
-        
-    };
-    if (randomMove.promotion) {
-        s.promotion = randomMove.promotion;
+    const topMove = moves[0];
+
+    if (topMove.flags.includes('c')) {
+        return {
+            from: topMove.from,
+            to: topMove.to,
+            promotion: topMove.promotion
+        };
     }
-    return s;
+
+    // Prioritize center control
+    moves.sort((a, b) => {
+        const aCenterValue = centerSquares.includes(a.to) ? 1 : 0;
+        const bCenterValue = centerSquares.includes(b.to) ? 1 : 0;
+        return bCenterValue - aCenterValue;
+    });
+
+    const topCenterMove = moves[0];
+
+    // If the top move controls the center, prefer it
+    if (centerSquares.includes(topCenterMove.to)) {
+        return {
+            from: topCenterMove.from,
+            to: topCenterMove.to,
+            promotion: topCenterMove.promotion
+        };
+    }
+
+    // Check if the piece can be captured in the next move
+    for (let move of moves) {
+        chess.move(move);
+        const opponentsMoves = chess.moves({ verbose: true });
+        if (!opponentsMoves.some(opMove => opMove.to === move.to)) {
+            return {
+                from: move.from,
+                to: move.to,
+                promotion: move.promotion
+            };
+        }
+        chess.undo();
+    }
+
+    // If all pieces are in danger, just return the top move (arbitrary).
+    return {
+        from: topMove.from,
+        to: topMove.to,
+        promotion: topMove.promotion
+    };
 }
+
+
 
 function processMove(game, move, playerId) {
     const player = game.players.find(p => p.id === playerId);
@@ -88,10 +139,14 @@ function processMove(game, move, playerId) {
     const turn = player.color === 'white' ? 'w' : 'b';
     const fen = boardToFEN(game.board, turn, game.castling, game.moveNumber);
     const chess = new Chess(fen);
-    chess.move(move);
-    const { board, newturn, castling, moveNumber } = FENToBoard(chess.fen());
+    const chessMoveResult = chess.move(move);
+
+    // Check if a piece was captured during the move
+    if (chessMoveResult && chessMoveResult.captured) {
+        player.capturedPieces.push(chessMoveResult.captured);
+    }
+    const { board, castling } = FENToBoard(chess.fen());
     game.board = board;
-    game.turn = newturn;
     game.castling = castling;
 
     if (chess.isCheckmate()) {

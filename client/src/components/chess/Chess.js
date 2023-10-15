@@ -5,45 +5,10 @@ import { Howl } from 'howler';
 import './Chess.css';
 import { ToastContainer } from 'react-toastify';
 import { toast } from 'react-toastify';
-import PlayerTimer from './PlayerTimer';
 import Cookies from 'js-cookie';
-
-const getPlayerColor = (game, playerId) => {
-    const player = game.players.find(p => p.id === playerId);
-    return player ? player.color : null; // Returns null if the player isn't found.
-};
-
-function GameInfoComponent({game}) {
-    if (!game) return;
-    // Calculate the number of disconnected players
-    const disconnectedPlayersCount = game.players.filter(player => player.disconnected).length;
-    const connectedPlayersCount = game.players.length - disconnectedPlayersCount;
-    const whitePlayer = game.players.find(p => p.color === 'white');
-    const blackPlayer = game.players.find(p => p.color === 'black');
-
-    // Convert the gameState if it ends with '-wins'
-    if (game.state.endsWith('-wins')) {
-        const winnerColor = game.state === "player0-wins" ? "white" : "black";
-        return (
-            <p>
-                <span>{winnerColor} wins</span>
-            </p>
-        );
-    }
-
-    return (
-        <div>
-            <span>
-                {game.state} ({connectedPlayersCount} players connected
-                {disconnectedPlayersCount > 0 ? `, ${disconnectedPlayersCount} players disconnected` : ""})
-            </span>
-            <div>
-                {whitePlayer && blackPlayer && (<PlayerTimer player={whitePlayer} isPlayerTurn={getPlayerColor(game, game.currentPlayer) === 'white'} />)}
-                {whitePlayer && blackPlayer && (<PlayerTimer player={blackPlayer} isPlayerTurn={getPlayerColor(game, game.currentPlayer) === 'black'} />)}
-            </div>
-        </div>
-    );
-}
+import {pieceLegend, graphics, getPlayerColor} from './ChessLib';
+import GameInfoComponent from './GameInfoComponent';
+import CapturedPieces from './CapturedPieces';
 
 function GameChess() {
     let { gameId } = useParams();
@@ -65,30 +30,7 @@ function GameChess() {
         socket.emit("makeMove", gameId, { from, to });
     };
 
-    
-    const pieceLegend = [
-        { name: 'Pawn', notation: 'p',  },
-        { name: 'Knight', notation: 'n' },
-        { name: 'Bishop', notation: 'b' },
-        { name: 'Rook', notation: 'r' },
-        { name: 'Queen', notation: 'q' },
-        { name: 'King', notation: 'k' },
-    ];
 
-    const graphics = {
-        'p-white': '/images/chess/5666.png',
-        'n-white': '/images/chess/3432.png',
-        'b-white': '/images/chess/1951.png',
-        'r-white': '/images/chess/2132.png',
-        'q-white': '/images/chess/2670.png',
-        'k-white': '/images/chess/3787.png',
-        'p-black': '/images/chess/4770.png',
-        'n-black': '/images/chess/8161.png',
-        'b-black': '/images/chess/2116.png',
-        'r-black': '/images/chess/1046.png',
-        'q-black': '/images/chess/7791.png',
-        'k-black': '/images/chess/931.png',
-    }
 
     const toAlgebraicNotation = (row, col) => {
         const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -420,6 +362,7 @@ function GameChess() {
                             </div>
                         </div>
                     </div>
+                    <CapturedPieces game={game}/>
                     <div className="legend-section">
                         <h2 className="legend-title">Legend</h2>
                         <table className="legend-table">

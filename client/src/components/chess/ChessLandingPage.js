@@ -93,7 +93,7 @@ function ChessLandingPage() {
 
                 <p>
                     <label>
-                        Autoplay: 
+                        Play Against Computer: 
                         <input 
                             type="checkbox" 
                             checked={autoplay}

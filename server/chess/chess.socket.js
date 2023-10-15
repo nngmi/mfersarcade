@@ -34,7 +34,7 @@ module.exports = (io) => {
         socket.on("checkTime", (gameId) => {
             const game = chessGames[gameId];
             if (!game || game.state !== 'ongoing') return;
-            console.log("checking time");
+            console.log("checking time on game ", gameId);
             
             const currentPlayerIndex = game.players.findIndex(player => player.id === game.currentPlayer);
             if (currentPlayerIndex === -1) return; // Ensure a current player is found
@@ -62,51 +62,64 @@ module.exports = (io) => {
         });
         
         socket.on("joinGame", (gameId, joinKey) => {
-            const game = chessGames[gameId];
-            const result = joinExistingGame(game, socket.id, joinKey);
-        
-            if (result.error) {
-                socket.emit("error", result.error);
-            } else {
-                socket.join(gameId);
-                socket.emit("joined", result.joinedPlayer);
-                const joinedPlayer = game.players.find(p => p.id === result.joinedPlayer);
-                setTimeout(() => {
-                    chessSocket.to(gameId).emit("notify", joinedPlayer.color + " joined the game.");
-                    chessSocket.to(gameId).emit("gameUpdated", game);
-                    console.log("game autoplay ", game.autoplay, game.players.length);
-                    if (game.autoplay && game.players.length === 1) {
-                        console.log("auto play joining");
-                        const result = joinExistingGame(game, "AI" + gameId, null);
-                        chessSocket.to(gameId).emit("notify", "black (AI) joined the game.");
+            try {
+                const game = chessGames[gameId];
+                const result = joinExistingGame(game, socket.id, joinKey);
+            
+                if (result.error) {
+                    socket.emit("error", result.error);
+                } else {
+                    socket.join(gameId);
+                    socket.emit("joined", result.joinedPlayer);
+                    const joinedPlayer = game.players.find(p => p.id === result.joinedPlayer);
+                    setTimeout(() => {
+                        chessSocket.to(gameId).emit("notify", joinedPlayer.color + " joined the game.");
                         chessSocket.to(gameId).emit("gameUpdated", game);
-                    }
-                }, 100);  // Add a 100ms delay before emitting gameUpdated event
+                        console.log("game autoplay ", game.autoplay, game.players.length);
+                        if (game.autoplay && game.players.length === 1) {
+                            console.log("auto play joining");
+                            const result = joinExistingGame(game, "AI" + gameId, null);
+                            chessSocket.to(gameId).emit("notify", "black (AI) joined the game.");
+                            chessSocket.to(gameId).emit("gameUpdated", game);
+                        }
+                    }, 100);  // Add a 100ms delay before emitting gameUpdated event
+                }
+            } catch (err) {
+                console.error(`Error processing move for game ${gameId}:`, err);
+                chessSocket.to(gameId).emit("error", "Unknown error, please report to dev");
             }
         });        
     
         socket.on("makeMove", (gameId, move) => {
-            const game = chessGames[gameId];
-            if (!game) return socket.emit("error", "Game does not exist");
-            const player = game.players.find(p => p.id === socket.id);
-            if (!player) return socket.emit("error", "Not a player in this game, if you think error, try refreshing page to rejoin.");
-        
-            const result = processMove(game, move, socket.id);
-            if (result.error) {
-                socket.emit("error", result.error);
-            } else {
-                chessSocket.to(gameId).emit("notify", player.color + " made a move from " + move["from"] + " to " + move["to"]);
-                chessSocket.to(gameId).emit("gameUpdated", game);
-                if (game.autoplay) { 
-                    let suggestedMove = suggestMove(game, 'black');
-                
-                    // Validate the move
-                    processMove(game, suggestedMove, game.players[1].id);
-                    chessSocket.to(gameId).emit("notify", game.players[1].color + " made a move from " + suggestedMove["from"] + " to " + suggestedMove["to"]);
+            try {
+                const game = chessGames[gameId];
+                if (!game) return socket.emit("error", "Game does not exist");
+                const player = game.players.find(p => p.id === socket.id);
+                if (!player) return socket.emit("error", "Not a player in this game, if you think error, try refreshing page to rejoin.");
+            
+                const result = processMove(game, move, socket.id);
+                if (result.error) {
+                    socket.emit("error", result.error);
+                } else {
+                    chessSocket.to(gameId).emit("notify", player.color + " made a move from " + move["from"] + " to " + move["to"]);
                     chessSocket.to(gameId).emit("gameUpdated", game);
+                    if (game.autoplay) { 
+                        let suggestedMove = suggestMove(game, 'black');
+                        if (suggestedMove !== null) {
+                            // Validate the move
+                            processMove(game, suggestedMove, game.players[1].id);
+                            chessSocket.to(gameId).emit("notify", game.players[1].color + " made a move from " + suggestedMove["from"] + " to " + suggestedMove["to"]);
+                            chessSocket.to(gameId).emit("gameUpdated", game);
+                        } else {
+                            chessSocket.to(gameId).emit("error", game.players[1].color + " has no more possible moves!");
+                        }
+                    
+                    }
                 }
+            } catch (err) {
+                console.error(`Error processing move for game ${gameId}:`, err);
+                chessSocket.to(gameId).emit("error", "Unknown error, please report to dev");
             }
-
         });
 
         socket.on("resign", (gameId) => {
