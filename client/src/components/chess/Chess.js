@@ -285,7 +285,7 @@ function GameChess() {
                     <p>
                         <span>Game Not Found!</span>
                     </p>
-                    <ToastContainer />
+                    <ToastContainer limit={3}/>
                     <p>
                         <a href="/" className="back-button">
                             Back to Home
@@ -389,7 +389,7 @@ function GameChess() {
                             </thead>
                         </table>
                     </div>
-                    <ToastContainer />
+                    <ToastContainer limit={3}/>
                     <p>
                         <a href="/" className="back-button">
                             Back to Home
