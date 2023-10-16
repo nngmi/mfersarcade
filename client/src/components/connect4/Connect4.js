@@ -11,7 +11,6 @@ function GameConnect4() {
     const [gameState, setGameState] = useState("waiting for other player");
     const [currentPlayer, setCurrentPlayer] = useState("X");
     const [playerSymbol, setPlayerSymbol] = useState(null);
-    const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
 
     const basicSound = new Howl({
         src: ["/audio/correct.mp3"], // Replace with your sound file path
@@ -35,7 +34,7 @@ function GameConnect4() {
         if (!gameId) return;
         let playerSymbolLocal = null;
     
-        const newSocket = io.connect(SERVER_URL + '/connect4');
+        const newSocket = io.connect('/connect4');
         setSocket(newSocket);
         console.log("before emit");
         newSocket.emit("joinGame", gameId);
