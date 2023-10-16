@@ -6,12 +6,11 @@ function ChessLandingPage() {
     const [games, setGames] = useState([]);
     const [autoplay, setAutoplay] = useState(false);
     const [gameName, setGameName] = useState(''); // New state for game name
-    const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
     const navigate = useNavigate();
 
     useEffect(() => {
         // Fetch the list of all games
-        fetch(`${SERVER_URL}/api/chess/games`)
+        fetch(`/api/chess/games`)
             .then((response) => response.json())
             .then((data) => { console.log(data); setGames(data)})
             .catch((error) => console.error('Error fetching the games list:', error));

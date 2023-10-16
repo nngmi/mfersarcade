@@ -19,7 +19,6 @@ function GameChess() {
     const [gameState, setGameState] = useState("viewing");
     const [playerId, setPlayerId] = useState(null);
     const [joinKey, setJoinKey] = useState(null);
-    const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
     const [ableToJoin, setAbleToJoin] = useState(false);
     const [joined, setJoined] = useState(false);
 
@@ -66,7 +65,7 @@ function GameChess() {
         if (!gameId) return;
         console.log("starting socket");
     
-        const newSocket = io.connect(SERVER_URL + '/chess', {
+        const newSocket = io.connect('/chess', {
             reconnection: true,
             reconnectionDelay: 2000,
             reconnectionDelayMax: 10000,

@@ -19,14 +19,13 @@ function MferCastle() {
   const [game, setGame] = useState(null);
   const [currentPlayer, setCurrentPlayer] = useState("X");
   const [playerSymbol, setPlayerSymbol] = useState(null);
-  const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
 
 
   useEffect(() => {
     if (!gameId) return;
     let playerSymbolLocal = null;
 
-    const newSocket = io.connect(SERVER_URL + '/mfercastle');
+    const newSocket = io.connect('/mfercastle');
     setSocket(newSocket);
     console.log("before emit");
     newSocket.emit("joinGame", gameId);

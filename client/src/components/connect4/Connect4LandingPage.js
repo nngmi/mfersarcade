@@ -3,11 +3,10 @@ import { useNavigate } from 'react-router-dom';
 
 function Connect4LandingPage() {
     const [games, setGames] = useState([]);
-    const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
     const navigate = useNavigate();
     useEffect(() => {
         // Fetch the list of all games
-        fetch(`${SERVER_URL}/api/connect4/games`)
+        fetch(`/api/connect4/games`)
             .then((response) => response.json())
             .then((data) => { console.log(data); setGames(data)})
             .catch((error) => console.error('Error fetching the games list:', error));
