@@ -1,4 +1,3 @@
-const Chess = require('chess.js').Chess;
 const { v4: uuidv4 } = require('uuid');
 
 function createGame(gameName = null) {

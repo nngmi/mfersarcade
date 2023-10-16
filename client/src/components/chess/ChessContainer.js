@@ -25,14 +25,17 @@ function ChessContainer({game, playerId, makeMove}) {
     const secondLastMove = game.moves.length > 1 ? game.moves[game.moves.length - 2] : null;
 
     const isLastMoveSquare = (row, col) => {
-        const cellName = `${String.fromCharCode(97 + col)}${8 - row}`;
+        const adjustedRow = getPlayerColor(game, playerId) === 'black' ? 7 - row : row;
+        const cellName = `${String.fromCharCode(97 + col)}${8 - adjustedRow}`;
         return lastMove && (cellName === lastMove.from || cellName === lastMove.to);
     };
-
+    
     const isSecondLastMoveSquare = (row, col) => {
-        const cellName = `${String.fromCharCode(97 + col)}${8 - row}`;
+        const adjustedRow = getPlayerColor(game, playerId) === 'black' ? 7 - row : row;
+        const cellName = `${String.fromCharCode(97 + col)}${8 - adjustedRow}`;
         return secondLastMove && (cellName === secondLastMove.from || cellName === secondLastMove.to);
     };
+    
     const lastMoveByCurrentPlayer = game.moves.length > 0 && getPlayerColor(game, playerId) === (game.moves.length % 2 === 0 ? 'black' : 'white');
 
     return (
