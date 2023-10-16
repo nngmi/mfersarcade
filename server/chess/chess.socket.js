@@ -1,6 +1,6 @@
 const socketIo = require("socket.io");
 let chessGames = require('./state');
-const { processMove, suggestMove, joinExistingGame, playerResign, handleDisconnect, createChessGame} = require('./chess.functions');
+const { processMove, suggestMove, joinExistingGame, playerResign, handleDisconnect, notifyDiscord} = require('./chess.functions');
 
 module.exports = (io) => {
     const chessSocket = io.of('/chess');
@@ -53,6 +53,7 @@ module.exports = (io) => {
                 // Notify which player ran out of time
                 const playerColor = currentPlayer.color;
                 chessSocket.to(gameId).emit("notify", playerColor + " ran out of time.");
+                notifyDiscord(gameId,  playerColor + " ran out of time in " + game.gameName);
                 game.lastActivity = currentTime;
             } else {
                 currentPlayer.timeLeft -= timeElapsed;
@@ -76,6 +77,9 @@ module.exports = (io) => {
                         chessSocket.to(gameId).emit("notify", joinedPlayer.color + " joined the game.");
                         chessSocket.to(gameId).emit("gameUpdated", game);
                         console.log("game autoplay ", game.autoplay, game.players.length);
+                        if (game.players.length == 2) {
+                            notifyDiscord(gameId,  game.gameName + " is now underway!");
+                        }
                         if (game.autoplay && game.players.length === 1) {
                             console.log("auto play joining");
                             const result = joinExistingGame(game, "AI" + gameId, null);
@@ -134,6 +138,7 @@ module.exports = (io) => {
         
                 chessSocket.to(gameId).emit("notify", resignedPlayerColor + " resigned, " + winningPlayerColor + " wins!");
                 chessSocket.to(gameId).emit("gameUpdated", game);
+                notifyDiscord(gameId, resignedPlayerColor + " resigned from game " + game.gameName);
             }
         });
 

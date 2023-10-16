@@ -1,7 +1,9 @@
 const { v4: uuidv4 } = require('uuid');
 
 function createGame(gameName = null) {
+    const gameId = uuidv4();
     let game = {
+        id: gameId,
         players: [],
         currentPlayer: null, // current player should be common
         state: "waiting for players",

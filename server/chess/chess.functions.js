@@ -1,5 +1,6 @@
 const Chess = require('chess.js').Chess;
 const { v4: uuidv4 } = require('uuid');
+const axios = require('axios');
 
 const { 
     joinExistingGame: commonJoinExistingGame, 
@@ -7,6 +8,22 @@ const {
     handleDisconnect: commonHandleDisconnect,
     createGame,
 } = require('../common/playerconnect.functions');
+
+function notifyDiscord(gameId, message) {
+    const discordWebhookURL = process.env.DISCORD_WEBHOOK_URL;
+    try {
+        if (discordWebhookURL) {
+            axios.post(discordWebhookURL, {
+                content: "mfer chess alert! " + message + " https://www.mfersarcade.lol/mferchess/" + gameId
+            }).catch(error => {
+                // Log the error if the request fails. This is just for monitoring and won't delay the route's response.
+                console.error('Error sending Discord notification:', error.message);
+            });
+        }
+    } catch (err) {
+        console.log("failed to send discord webhook ", err);
+    }
+}
 
 function joinExistingGame(game, playerId, joinKey) {
 
@@ -153,18 +170,11 @@ function processMove(game, move, playerId) {
     if (chess.isCheckmate()) {
         const winningPlayerIndex = game.players.findIndex(p => p.id === playerId); 
         game.state = winningPlayerIndex === 0 ? "player0-wins" : "player1-wins";
+        notifyDiscord(game.id, game.players[winningPlayerIndex].color + " has achieved glorious victory in game " + game.gameName);
     } else {
         const otherPlayer = game.players.find(p => p.id !== playerId); // Find the other player
         game.currentPlayer = otherPlayer.id; // Set the currentPlayer to the other player's id
     }    
-
-    const currentTime = Date.now();
-    const timeElapsed = currentTime - game.lastActivity;
-    player.timeLeft -= timeElapsed;
-    if (player.timeLeft < 0) {
-        player.timeLeft = 0;
-        game.state = `${player.color === "white" ? "black" : "white"}-wins`; // Using player.color for the outcome
-    }
 
     game.lastActivity = Date.now();
 
@@ -249,8 +259,6 @@ function createChessGame(gameName, fenPosition = null, autoplay=false) {
         throw new Error("Game name is required.");
     }
 
-    const gameId = uuidv4();
-
     const initialBoard = [
         ['r', 'n', 'b', 'q', 'k', 'b', 'n', 'r'],
         ['p', 'p', 'p', 'p', 'p', 'p', 'p', 'p'],
@@ -270,7 +278,7 @@ function createChessGame(gameName, fenPosition = null, autoplay=false) {
     game.moveNumer = initialData.moveNumber;
     game.autoplay = autoplay;
     game.moves = []; // latest moves last
-
+    const gameId = game.id;
     return { gameId, game };
 }
 
@@ -285,4 +293,5 @@ module.exports = {
     handleDisconnect,
     createChessGame,
     suggestMove,
+    notifyDiscord,
 };
