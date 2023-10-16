@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const axios = require('axios');
 
 let chessGames = require('./state');
 
@@ -31,6 +32,16 @@ router.post("/game", (req, res) => {
         }
 
         chessGames[gameId] = game;
+
+        const discordWebhookURL = process.env.DISCORD_WEBHOOK_URL;
+        if (discordWebhookURL) {
+            axios.post(discordWebhookURL, {
+                content: `A mfer chess game '${gameName}' has started! Check it out at https://www.mfersarcade.lol/mferchess/${gameId}!`
+            }).catch(error => {
+                // Log the error if the request fails. This is just for monitoring and won't delay the route's response.
+                console.error('Error sending Discord notification:', error.message);
+            });
+        }
 
         res.status(201).json({ gameId });
 
