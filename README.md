@@ -24,7 +24,7 @@ Quick commands:
 - `npm test` - run unit tests
 - `npm run build && npm start` - start up local server with your changes
 
-### Local Development Setup
+## Local Development Setup
 
 Follow these steps to run the app locally with hot reload on the client:
 
@@ -50,7 +50,9 @@ Follow these steps to run the app locally with hot reload on the client:
 
     - Make some changes, save, and you should see them automatically in the browser
 
-## Infra
+## Infra + Deploy
 
 - Hosted on heroku
+  - https://staging.mfersarcade.lol - automatic deploy anytime the `main` branch is updated
+  - https://www.mfersarcade.lol (prod) - automatic deploy anytime the `prod` branch is updated. nngmi has permission
 - Stateless - no backend db - all game data stored in memory, any deploy clears the history
