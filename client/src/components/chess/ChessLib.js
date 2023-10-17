@@ -1,3 +1,8 @@
+const ChessColor = {
+    WHITE: 'plain',
+    BLACK: 'charcoal',
+};
+
 const pieceLegend = [
     { name: 'Pawn', notation: 'p',  },
     { name: 'Knight', notation: 'n' },
@@ -6,10 +11,12 @@ const pieceLegend = [
     { name: 'Queen', notation: 'q' },
     { name: 'King', notation: 'k' },
 ];
+
 const getPlayerColor = (game, playerId) => {
     const player = game.players.find(p => p.id === playerId);
     return player ? player.color : null; // Returns null if the player isn't found.
 };
+
 const graphics = {
     'p-white': '/images/chess/5666.png',
     'n-white': '/images/chess/3432.png',
@@ -29,4 +36,5 @@ module.exports = {
     pieceLegend,
     graphics,
     getPlayerColor,
+    ChessColor,
 };

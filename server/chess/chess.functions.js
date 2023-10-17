@@ -9,6 +9,11 @@ const {
     createGame,
 } = require('../common/playerconnect.functions');
 
+const ChessColor = {
+    WHITE: 'plain',
+    BLACK: 'charcoal',
+};
+
 function notifyDiscord(gameId, message) {
     const discordWebhookURL = process.env.DISCORD_WEBHOOK_URL;
     try {
@@ -28,8 +33,7 @@ function notifyDiscord(gameId, message) {
 function joinExistingGame(game, playerId, joinKey) {
 
     function newPlayerFunction(newplayer, game) {
-        const newPlayerColor = game.players.length === 0 ? "white" : "black";
-        // newplayer will be created by library function, augment it with game specific logic
+        const newPlayerColor = game.players.length === 0 ? ChessColor.WHITE : ChessColor.BLACK;
         newplayer.color = newPlayerColor;
         newplayer.capturedPieces = [];
         newplayer.timeLeft = 1200000;
@@ -58,9 +62,7 @@ function suggestMove(game, turn) {
     };
 
     const centerSquares = ['d4', 'e4', 'd5', 'e5'];
-
-    const simpleTurn = turn === 'white' ? 'w' : 'b';
-    const fen = boardToFEN(game.board, simpleTurn, game.castling, game.moveNumber);
+    const fen = boardToFEN(game.board, (turn === ChessColor.WHITE ? 'w' : 'b'), game.castling, game.moveNumber);
 
     const chess = new Chess(fen);
     const moves = chess.moves({ verbose: true });
@@ -140,7 +142,7 @@ function processMove(game, move, playerId) {
 
     const promotingPiece = game.board[fromRow][fromCol];
     if (promotingPiece && promotingPiece.toLowerCase() === 'p') {
-        if (player.color === 'white' && toRow === 0) {
+        if (player.color === ChessColor.WHITE && toRow === 0) {
             move.promotion = 'q';
         } else if (player.color === 'black' && toRow === 7) {
             move.promotion = 'q';
@@ -152,7 +154,7 @@ function processMove(game, move, playerId) {
         return { error: "Invalid move", success: false };
     }
 
-    const turn = player.color === 'white' ? 'w' : 'b';
+    const turn = player.color === ChessColor.WHITE ? 'w' : 'b';
     const fen = boardToFEN(game.board, turn, game.castling, game.moveNumber);
     const chess = new Chess(fen);
     const chessMoveResult = chess.move(move);
@@ -184,7 +186,7 @@ function processMove(game, move, playerId) {
 function isValidMove(board, move, playerColor, castling, moveCount) {
     // Create a new Chess instance with the current board state
     try {
-        const turn = playerColor === 'white' ? 'w' : 'b';
+        const turn = playerColor === ChessColor.WHITE ? 'w' : 'b';
         const chess = new Chess(boardToFEN(board, turn, castling, moveCount));
 
         const result = chess.move(move);
@@ -230,7 +232,7 @@ function FENToBoard(fen) {
     // Extracts the board part of the FEN string and splits it into rows
     const fenParts = fen.split(' ');
     const rows = fenParts[0].split('/');
-    const turn = fenParts[1] === 'w' ? "white" : "black";
+    const turn = fenParts[1] === 'w' ? ChessColor.WHITE : ChessColor.BLACK;
     const castling = fenParts[2];
     const moveNumber = parseInt(fenParts[5]);
 

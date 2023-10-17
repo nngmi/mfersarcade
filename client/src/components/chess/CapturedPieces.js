@@ -1,10 +1,10 @@
-import {graphics} from './ChessLib';
+import {graphics, ChessColor} from './ChessLib';
 import './CapturedPieces.css';
 
 function CapturedPieces({game}) {
     if (!game) return null; // Return null for React components when nothing should be rendered
-    const whitePlayer = game.players.find(p => p.color === 'white');
-    const blackPlayer = game.players.find(p => p.color === 'black');
+    const whitePlayer = game.players.find(p => p.color === ChessColor.WHITE);
+    const blackPlayer = game.players.find(p => p.color === ChessColor.BLACK);
     if (!whitePlayer || !blackPlayer) return null;
 
     // Helper function to determine the value of the piece
@@ -28,7 +28,7 @@ function CapturedPieces({game}) {
             <table className="captured-table">
                 <thead>
                     <tr>
-                        <th>Captured by White:</th>
+                        <th>Captured by Plain:</th>
                         <th>
                             {whitePlayer.capturedPieces.map(piece => (
                                 <img src={graphics[`${piece}-black`]} alt={`${piece} black`} />
@@ -36,7 +36,7 @@ function CapturedPieces({game}) {
                         </th>
                     </tr>
                     <tr>
-                        <th>Captured by Black:</th>
+                        <th>Captured by Charcoal:</th>
                         <th>
                             {blackPlayer.capturedPieces.map(piece => (
                                 <img src={graphics[`${piece}-white`]} alt={`${piece} white`} />
