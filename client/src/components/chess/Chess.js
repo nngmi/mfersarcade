@@ -6,7 +6,7 @@ import './Chess.css';
 import { ToastContainer } from 'react-toastify';
 import { toast } from 'react-toastify';
 import Cookies from 'js-cookie';
-import {pieceLegend, graphics, getPlayerColor} from './ChessLib';
+import {pieceLegend, graphics, getPlayerColor, ChessColor} from './ChessLib';
 import GameInfoComponent from './GameInfoComponent';
 import CapturedPieces from './CapturedPieces';
 import ChessContainer from './ChessContainer';
@@ -36,7 +36,7 @@ function GameChess() {
         const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
         const playerColor = getPlayerColor(game, playerId); // Assuming you have access to game and playerId in this context.
         
-        return playerColor === 'white' ? 
+        return playerColor === ChessColor.WHITE ? 
                `${columns[col]}${8 - row}` : 
                `${columns[col]}${row + 1}`;
     };    

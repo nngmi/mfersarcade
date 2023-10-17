@@ -79,7 +79,7 @@ module.exports = (io) => {
                         if (game.autoplay && game.players.length === 1) {
                             console.log("auto play joining");
                             const result = joinExistingGame(game, "AI" + gameId, null);
-                            chessSocket.to(gameId).emit("notify", "black (AI) joined the game.");
+                            chessSocket.to(gameId).emit("notify", "charcoal (AI) joined the game.");
                             chessSocket.to(gameId).emit("gameUpdated", game);
                         }
                         if (game.players.length == 2) {
