@@ -33,7 +33,6 @@ function joinExistingGame(game, playerId, joinKey) {
         newplayer.color = newPlayerColor;
         newplayer.capturedPieces = [];
         newplayer.timeLeft = 1200000;
-        //newplayer.timeLeft = 9000;
     }
 
     return commonJoinExistingGame(game, playerId, joinKey, newPlayerFunction);

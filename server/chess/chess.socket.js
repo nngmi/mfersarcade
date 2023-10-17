@@ -1,4 +1,3 @@
-const socketIo = require("socket.io");
 let chessGames = require('./state');
 const { processMove, suggestMove, joinExistingGame, playerResign, handleDisconnect, notifyDiscord} = require('./chess.functions');
 
@@ -76,15 +75,15 @@ module.exports = (io) => {
                     setTimeout(() => {
                         chessSocket.to(gameId).emit("notify", joinedPlayer.color + " joined the game.");
                         chessSocket.to(gameId).emit("gameUpdated", game);
-                        console.log("game autoplay ", game.autoplay, game.players.length);
-                        if (game.players.length == 2) {
-                            notifyDiscord(gameId,  game.gameName + " is now underway!");
-                        }
+
                         if (game.autoplay && game.players.length === 1) {
                             console.log("auto play joining");
                             const result = joinExistingGame(game, "AI" + gameId, null);
                             chessSocket.to(gameId).emit("notify", "black (AI) joined the game.");
                             chessSocket.to(gameId).emit("gameUpdated", game);
+                        }
+                        if (game.players.length == 2) {
+                            notifyDiscord(gameId,  game.gameName + " is now underway!");
                         }
                     }, 100);  // Add a 100ms delay before emitting gameUpdated event
                 }
@@ -141,7 +140,5 @@ module.exports = (io) => {
                 notifyDiscord(gameId, resignedPlayerColor + " resigned from game " + game.gameName);
             }
         });
-
-
     });
 };
