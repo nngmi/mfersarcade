@@ -256,7 +256,17 @@ function GameChess() {
                         <p>You Win!</p>
                     </>;
                 } else {
-                    return <p>You Lose!</p>;
+                    return <>
+                        <img 
+                            src="/images/chess/alienmferchick.jpg" 
+                            alt="Alien Mfer" 
+                            style={{
+                                maxWidth: '300px',
+                                maxHeight: '300px'
+                            }}
+                        />
+                        <p>You should rethink your strategy!</p>;
+                    </>;
                 }
                 
             }
