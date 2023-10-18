@@ -115,10 +115,13 @@ const handleKeyUp = (e) => {
                 onTouchEnd={handleRightTouchEnd}
             >R</div>
 
-            <div 
-                className="controlPad shootControl"
-                onTouchStart={game.playerShoots}
-            >Shoot</div>
+<div 
+    className="controlPad shootControl"
+    onTouchStart={(e) => {
+        e.stopPropagation();
+        game.playerShoots();
+    }}
+>Shoot</div>
 
       {showGameOverModal && (
         <div className="gameOverModal">
