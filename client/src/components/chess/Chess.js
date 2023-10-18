@@ -251,10 +251,14 @@ function GameChess() {
                 const currentPlayerIndex = game.players.findIndex(player => player.id === playerId);
         
                 if (winningPlayerIndex === currentPlayerIndex) {
-                    return <p>You Win!</p>;
+                    return <>
+                        <img src="/images/chess/aww_ya.gif" alt="Aww Ya" />
+                        <p>You Win!</p>
+                    </>;
                 } else {
                     return <p>You Lose!</p>;
                 }
+                
             }
         }
         
