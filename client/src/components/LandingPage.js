@@ -54,7 +54,7 @@ function LandingPage() {
             </div>
             <div className="game-item">
                 <Link to="/mfergalaga/">
-                  <img src="/images/mferchess.png" alt="Chess" />
+                  <img src="/images/mfergalaga.png" alt="Galaga" />
                 </Link>
               <p>🚧 Mfers Galaga 🚧</p>
             </div>
