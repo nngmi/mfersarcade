@@ -3,7 +3,7 @@ const GAME_WIDTH = 400;
 const GAME_HEIGHT = 500;
 
 const basicSound = new Howl({
-    src: ["/audio/correct.mp3"], // Replace with your sound file path
+    src: ["/audio/blaster.mp3"], // Replace with your sound file path
     autoplay: false, // Play the sound right away
     loop: false, // Do not loop the sound
     volume: 0.5, // Set the volume to 50%
