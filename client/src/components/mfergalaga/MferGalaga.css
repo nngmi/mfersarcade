@@ -1,0 +1,7 @@
+.game-container {
+    display: flex;
+    flex-direction: column; /* To stack children vertically */
+    justify-content: center; /* Centers children vertically */
+    align-items: center; /* Centers children horizontally */
+    text-align: center; /* To center the text content */
+}
