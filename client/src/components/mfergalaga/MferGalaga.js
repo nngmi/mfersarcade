@@ -11,33 +11,23 @@ const MferGalaga = () => {
   const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [leftPressed, setLeftPressed] = useState(false);
   const [rightPressed, setRightPressed] = useState(false);
-      // Function to handle touch start
-      const handleTouchStart = (e) => {
-        const touchX = e.touches[0].clientX;
-        if (touchX < window.innerWidth / 2) { // Touch is on the left side
-            setLeftPressed(true);
-        } else {
-            setRightPressed(true);
-        }
-    };
+  const handleLeftTouchStart = () => {
+    setLeftPressed(true);
+};
 
-    // Function to handle touch move
-    const handleTouchMove = (e) => {
-        const touchX = e.touches[0].clientX;
-        if (touchX < window.innerWidth / 2) { // Touch has moved to the left side
-            setLeftPressed(true);
-            setRightPressed(false);
-        } else {
-            setRightPressed(true);
-            setLeftPressed(false);
-        }
-    };
+const handleLeftTouchEnd = () => {
+    setLeftPressed(false);
+};
 
-    // Function to handle touch end
-    const handleTouchEnd = (e) => {
-        setLeftPressed(false);
-        setRightPressed(false);
-    };
+// Function to handle right control touch
+const handleRightTouchStart = () => {
+    setRightPressed(true);
+};
+
+const handleRightTouchEnd = () => {
+    setRightPressed(false);
+};
+
   const handleKeyDown = (e) => {
     switch(e.keyCode) {
         case 37: // Left arrow key
@@ -113,8 +103,22 @@ const handleKeyUp = (e) => {
         {game.enemies.map((enemy, idx) => <EnemyComponent key={idx} x={enemy.x} y={enemy.y} type={enemy.type} />)}
         {game.blasters.map((blaster, idx) => <BlasterComponent key={idx} x={blaster.x} y={blaster.y} fromEnemy={blaster.fromEnemy}/>)}
       </div>
-      <div className="controlPad leftControl" onTouchStart={handleTouchStart} onTouchMove={handleTouchMove} onTouchEnd={handleTouchEnd}></div>
-            <div className="controlPad rightControl" onTouchStart={game.playerShoots}></div>
+      <div 
+                className="controlPad leftControl"
+                onTouchStart={handleLeftTouchStart}
+                onTouchEnd={handleLeftTouchEnd}
+            >L</div>
+
+            <div 
+                className="controlPad rightControl"
+                onTouchStart={handleRightTouchStart}
+                onTouchEnd={handleRightTouchEnd}
+            >R</div>
+
+            <div 
+                className="controlPad shootControl"
+                onTouchStart={game.playerShoots}
+            >Shoot</div>
 
       {showGameOverModal && (
         <div className="gameOverModal">
