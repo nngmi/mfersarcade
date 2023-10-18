@@ -1,30 +1,55 @@
-
+import { Howl } from 'howler';
 const GAME_WIDTH = 400;
 const GAME_HEIGHT = 500;
 
+const basicSound = new Howl({
+    src: ["/audio/correct.mp3"], // Replace with your sound file path
+    autoplay: false, // Play the sound right away
+    loop: false, // Do not loop the sound
+    volume: 0.5, // Set the volume to 50%
+  });
+  const winSound = new Howl({
+    src: ["/audio/success.mp3"], // Replace with your sound file path
+    autoplay: false, // Play the sound right away
+    loop: false, // Do not loop the sound
+    volume: 0.5, // Set the volume to 50%
+  });
+  const wrongSound = new Howl({
+    src: ["/audio/wrong_sound.mp3"], // Replace with your sound file path
+    autoplay: false, // Play the sound right away
+    loop: false, // Do not loop the sound
+    volume: 0.5, // Set the volume to 50%
+  });
+
 class Level {
     constructor(levelNumber) {
-      this.levelNumber = levelNumber;
-      this.enemies = this.generateEnemiesForLevel();
-      this.isCompleted = false; // Flag to check if the level is completed
+        this.levelNumber = levelNumber;
+        this.enemies = this.generateEnemiesForLevel();
+        this.isCompleted = false; 
     }
-  
+
     generateEnemiesForLevel() {
-      // Here, we generate enemies based on the current level number.
-      // The logic can be extended to generate more enemies, different types, etc., based on the level.
-      const enemies = [];
-      for (let i = 0; i < this.levelNumber * 5; i++) { // Example: each level has 5 more enemies than the previous
-        enemies.push(new Enemy(i * 50, 10, 'basic')); // Placeholder enemy creation
-      }
-      return enemies;
+        const enemiesPerRow = 5;
+        const rows = this.levelNumber; // Number of enemy rows increases with level number
+        const spacing = 50; // space between enemies
+        const enemies = [];
+
+        for (let row = 0; row < rows; row++) {
+            for (let col = 0; col < enemiesPerRow; col++) {
+                const x = col * spacing + spacing;
+                const y = row * spacing + 10; // Adjust as per the enemy height to prevent overlap
+                enemies.push(new Enemy(x, y, 'basic'));
+            }
+        }
+        return enemies;
     }
-  
+
     checkCompletion() {
-      // If all enemies are defeated, the level is considered completed
-      this.isCompleted = this.enemies.every(enemy => !enemy.isAlive);
-      return this.isCompleted;
+        this.isCompleted = this.enemies.every(enemy => !enemy.isAlive);
+        return this.isCompleted;
     }
-  }
+}
+
   
 
 class GameObject {
@@ -45,11 +70,10 @@ class GameObject {
   }
 
   class Ship extends GameObject {
-    constructor(x, y, game) {
+    constructor(x, y) {
         super(x, y);
-        this.lives = 3;
+        this.lives = 5;
         this.radius = 25; // Half of the ship's width (assuming it's 50 as per previous info)
-        this.game = game;
     }
     shoot() {
       // Create a blaster object starting at the ship's position
@@ -61,11 +85,9 @@ class GameObject {
         this.y = Math.max(0, Math.min(this.y + dy, GAME_HEIGHT - 50)); // Assuming ship height is 50
     }
     loseLife() {
-      this.lives -= 1;
-        if (this.lives <= 0) {
-            this.game.endGame();  // Assuming you have a reference to the game instance
-            console.log("after triggering end game");
-            this.destroy();
+        if (this.lives > 0) {
+            this.lives -=1;
+            wrongSound.play(); // Play the sound when firing
           }
       
     }
@@ -131,9 +153,8 @@ class GameObject {
 }
 
   
-  // galaga.js
 
-  class Game {
+class Game {
     constructor() {
         this.currentLevel = 1;
         this.level = new Level(this.currentLevel);
@@ -141,115 +162,108 @@ class GameObject {
         this.enemies = this.level.enemies;
         this.blasters = [];
         this.gameOver = false;
-      }
-  
-    // Initial setup: for simplicity, let's add a few enemies in a row
-    generateInitialEnemies() {
-      const enemies = [];
-      for (let i = 0; i < 5; i++) {
-        enemies.push(new Enemy(i * 50, 10, 'basic'));
-      }
-      return enemies;
     }
-  
-    // Add a blaster when the player shoots
-    playerShoots() {
-      this.blasters.push(this.ship.shoot());
-    }
-  
-   
-// Check for collisions
-checkCollisions() {
-    for (let blaster of this.blasters) {
-      for (let enemy of this.enemies) {
-        // Assuming enemy width and height are 50 (adjust these values as needed)
-        const enemyWidth = 50;
-        const enemyHeight = 50;
-  
-        const blasterWidth = 10; // Assuming blaster width is 10 (adjust as needed)
-        const blasterHeight = 10; // Similarly, adjust as needed
-  
-        const isOverlappingX = blaster.x + blasterWidth > enemy.x && blaster.x < enemy.x + enemyWidth;
-        const isOverlappingY = blaster.y + blasterHeight > enemy.y && blaster.y < enemy.y + enemyHeight;
 
-        // Check if the blaster is from the enemy and skip this iteration of the loop
-        if (blaster.fromEnemy) {
-          continue;
+    generateInitialEnemies() {
+        const enemies = [];
+        for (let i = 0; i < 5; i++) {
+            enemies.push(new Enemy(i * 50, 10, 'basic'));
         }
-  
-        if (isOverlappingX && isOverlappingY) {
-          blaster.destroy();
-          enemy.destroy();
-        }
-      }
-          // Check for blasters colliding with the player's ship
-    for (let blaster of this.blasters) {
-        if (blaster.fromEnemy) {
-            const dx = blaster.x - this.ship.x;
-            const dy = blaster.y - this.ship.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
+        return enemies;
+    }
+
+    playerShoots() {
+        this.blasters.push(this.ship.shoot());
+        basicSound.play(); // Play the sound when firing
+    }
+
+    checkCollisions() {
+        for (let blaster of this.blasters) {
+            for (let enemy of this.enemies) {
+                const enemyWidth = 50;
+                const enemyHeight = 50;
+
+                const blasterWidth = 10;
+                const blasterHeight = 10;
+
+                const isOverlappingX = blaster.x + blasterWidth > enemy.x && blaster.x < enemy.x + enemyWidth;
+                const isOverlappingY = blaster.y + blasterHeight > enemy.y && blaster.y < enemy.y + enemyHeight;
+
+                if (blaster.fromEnemy) {
+                    continue;
+                }
+
+                if (isOverlappingX && isOverlappingY) {
+                    blaster.destroy();
+                    enemy.destroy();
+                }
+            }
             
-            if (distance < this.ship.radius + blaster.radius) {  // assuming blaster.radius is defined
-                blaster.destroy();
-                this.ship.loseLife();
+            for (let blaster of this.blasters) {
+                if (blaster.fromEnemy) {
+                    const dx = blaster.x - this.ship.x;
+                    const dy = blaster.y - this.ship.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < this.ship.radius + blaster.radius) {
+                        blaster.destroy();
+                        this.ship.loseLife();
+                    }
+                }
+            }
+
+            this.blasters = this.blasters.filter(b => b.isAlive);
+        }
+
+        this.enemies = this.enemies.filter(enemy => enemy.isAlive);
+    }
+
+    endGame() {
+        this.gameOver = true;
+    }
+
+    tick() {
+        if (this.gameOver) {
+            return;
+        }
+        if (this.ship.lives === 0) {
+            this.gameOver = true;
+            return;
+        }
+
+        for (let blaster of this.blasters) {
+            blaster.move();
+        }
+
+        for (let enemy of this.enemies) {
+            enemy.movePattern();
+        }
+
+        if (Math.random() < 0.03) {
+            const shootingEnemy = this.enemies[Math.floor(Math.random() * this.enemies.length)];
+            if (shootingEnemy) {
+                this.blasters.push(shootingEnemy.shoot());
             }
         }
-    }
-  
-      // Remove blasters that have left the screen or collided with enemies
-      if (!blaster.isAlive) {
-        this.blasters = this.blasters.filter(b => b !== blaster);
-      }
-    }
-  
-    // Remove defeated enemies
-    this.enemies = this.enemies.filter(enemy => enemy.isAlive);
-}
 
+        this.checkCollisions();
 
-  endGame() {
-    this.gameOver = true;
-    // Any additional cleanup logic, stopping timers, etc.
-  }
-  
-    // The main game update function
-    tick() {
-      // Update blasters
-      if (this.gameOver) {
-        console.log("game is over");
-        return;
-      }
-      for (let blaster of this.blasters) {
-        blaster.move();
-      }
-  
-      // Update enemy patterns (for simplicity, only moving them horizontally)
-      for (let enemy of this.enemies) {
-        enemy.movePattern();
-      }
-  
-
-      // enemies can shoot
-  // Randomly select an enemy to shoot with some probability
-  if (Math.random() < 0.01) {  // 1% chance every tick
-    const shootingEnemy = this.enemies[Math.floor(Math.random() * this.enemies.length)];
-    if (shootingEnemy) {
-      this.blasters.push(shootingEnemy.shoot());
+        if (this.level.checkCompletion()) {
+            this.advanceToNextLevel();
+        }
     }
-  }
-      // Check for collisions
-      this.checkCollisions();
 
-      if (this.level.checkCompletion()) {
-        this.advanceToNextLevel();
-      }
-    }
     advanceToNextLevel() {
         this.currentLevel += 1;
         this.level = new Level(this.currentLevel);
         this.enemies = this.level.enemies;
-        // Optionally, reset player position, health, etc.
-      }
-  }
+        this.blasters = [];
+        this.ship.x = window.innerWidth / 2;
+        this.ship.y = window.innerHeight - 30;
+        this.ship.lives = 5;
+    }
+}
+
+
   
-  export { Game, Ship, Enemy, Blaster };
+export { Game, Ship, Enemy, Blaster };

@@ -15,6 +15,9 @@ export const EnemyComponent = ({ x, y }) => (
     <img src="/images/mfergalaga/5666.png" style={{ position: 'absolute', left: x, top: y, width: '50px', height: '50px' }} alt="blaster" />
 );
 
-export const BlasterComponent = ({ x, y }) => (
-    <img src="/images/mfergalaga/5666.png" style={{ position: 'absolute', left: x, top: y, width: '15px', height: '15px' }} alt="blaster" />
-);
+export const BlasterComponent = ({ x, y, fromEnemy }) => {
+    const blasterImageSrc = fromEnemy ? "/images/mfergalaga/1234.png" : "/images/mfergalaga/5666.png";
+    return (
+        <img src={blasterImageSrc} style={{ position: 'absolute', left: x, top: y, width: '15px', height: '15px' }} alt="blaster" />
+    );
+};

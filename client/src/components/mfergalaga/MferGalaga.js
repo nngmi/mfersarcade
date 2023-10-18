@@ -4,38 +4,57 @@ import React, { useState, useEffect } from 'react';
 import { Game } from './GalagaObjects';
 import { ShipComponent, EnemyComponent, BlasterComponent } from './GalagaComponents';
 import './MferGalaga.css'
-
+import { Howl } from 'howler';
 const MferGalaga = () => {
 
   const [game, setGame] = useState(new Game());
   const [showGameOverModal, setShowGameOverModal] = useState(false);
-
+  const [leftPressed, setLeftPressed] = useState(false);
+  const [rightPressed, setRightPressed] = useState(false);
+  
   const handleKeyDown = (e) => {
     switch(e.keyCode) {
-      case 37: // Left arrow key
-        game.ship.move(-10, 0);  // Adjust the number for speed
-        break;
-      case 39: // Right arrow key
-        game.ship.move(10, 0);  // Adjust the number for speed
-        break;
-      case 32: // Spacebar
-        game.playerShoots();
-        break;
-      default:
-        break;
+        case 37: // Left arrow key
+            setLeftPressed(true);
+            break;
+        case 39: // Right arrow key
+            setRightPressed(true);
+            break;
+        case 32: // Spacebar
+            game.playerShoots();
+            break;
+        default:
+            break;
     }
-    setGame(prevGame => {
-        const newGame = Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame);
-        return newGame;
-    });
-  }
+}
+
+const handleKeyUp = (e) => {
+    switch(e.keyCode) {
+        case 37: // Left arrow key
+            setLeftPressed(false);
+            break;
+        case 39: // Right arrow key
+            setRightPressed(false);
+            break;
+        default:
+            break;
+    }
+}
+
+
   
   useEffect(() => {
     // Add event listener for keydown
     window.addEventListener('keydown', handleKeyDown);
-  
+    window.addEventListener('keyup', handleKeyUp);
     const intervalId = setInterval(() => {
         if (!game.gameOver) {
+            if (leftPressed) {
+                game.ship.move(-10, 0);
+            }
+            if (rightPressed) {
+                game.ship.move(10, 0);
+            }
       game.tick();
       setGame(prevGame => {
         const newGame = Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame);
@@ -52,8 +71,9 @@ const MferGalaga = () => {
     return () => {
       clearInterval(intervalId);
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
-  }, [game]);
+  }, [game, leftPressed, rightPressed]);
   
 
   return (
@@ -65,7 +85,7 @@ const MferGalaga = () => {
       <div className="gameArea">
         <ShipComponent x={game.ship.x} y={game.ship.y} />
         {game.enemies.map((enemy, idx) => <EnemyComponent key={idx} x={enemy.x} y={enemy.y} type={enemy.type} />)}
-        {game.blasters.map((blaster, idx) => <BlasterComponent key={idx} x={blaster.x} y={blaster.y} />)}
+        {game.blasters.map((blaster, idx) => <BlasterComponent key={idx} x={blaster.x} y={blaster.y} fromEnemy={blaster.fromEnemy}/>)}
       </div>
       {showGameOverModal && (
         <div className="gameOverModal">
