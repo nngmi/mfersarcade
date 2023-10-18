@@ -3,11 +3,13 @@
 import React, { useState, useEffect } from 'react';
 import { Game } from './GalagaObjects';
 import { ShipComponent, EnemyComponent, BlasterComponent } from './GalagaComponents';
+import './MferGalaga.css'
 
 const MferGalaga = () => {
-  const GAME_WIDTH = 400;
-  const GAME_HEIGHT = 500;
+
   const [game, setGame] = useState(new Game());
+  const [showGameOverModal, setShowGameOverModal] = useState(false);
+
   const handleKeyDown = (e) => {
     switch(e.keyCode) {
       case 37: // Left arrow key
@@ -33,14 +35,19 @@ const MferGalaga = () => {
     window.addEventListener('keydown', handleKeyDown);
   
     const intervalId = setInterval(() => {
+        if (!game.gameOver) {
       game.tick();
       setGame(prevGame => {
         const newGame = Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame);
         newGame.tick();
         return newGame;
-    });
-    }, 1000 / 60); 
-  
+      
+    });}
+    }, 1000 / 60);
+    console.log(game.gameOver);
+    if (game.gameOver) {
+        setShowGameOverModal(true);
+      }
     // Cleanup: Remove the event listener on component unmount
     return () => {
       clearInterval(intervalId);
@@ -50,12 +57,26 @@ const MferGalaga = () => {
   
 
   return (
-    <div>
-      <ShipComponent x={game.ship.x} y={game.ship.y} />
-      {game.enemies.map((enemy, idx) => <EnemyComponent key={idx} x={enemy.x} y={enemy.y} type={enemy.type} />)}
-      {game.blasters.map((blaster, idx) => <BlasterComponent key={idx} x={blaster.x} y={blaster.y} />)}
+    <div className="gameContainer">
+      <div className="gameInfo">
+        <span>Health: {game.ship.lives}</span>
+        <span>Level: {game.currentLevel}</span>
+      </div>
+      <div className="gameArea">
+        <ShipComponent x={game.ship.x} y={game.ship.y} />
+        {game.enemies.map((enemy, idx) => <EnemyComponent key={idx} x={enemy.x} y={enemy.y} type={enemy.type} />)}
+        {game.blasters.map((blaster, idx) => <BlasterComponent key={idx} x={blaster.x} y={blaster.y} />)}
+      </div>
+      {showGameOverModal && (
+        <div className="gameOverModal">
+          <div className="modalContent">
+            <h2>Game Over</h2>
+            <button onClick={() => setShowGameOverModal(false)}>Close</button>
+          </div>
+        </div>
+      )}
     </div>
-  );
+);
 }
 
 export default MferGalaga;

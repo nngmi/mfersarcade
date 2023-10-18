@@ -1,7 +1,78 @@
-.game-container {
+.gameContainer {
     display: flex;
-    flex-direction: column; /* To stack children vertically */
-    justify-content: center; /* Centers children vertically */
-    align-items: center; /* Centers children horizontally */
-    text-align: center; /* To center the text content */
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .gameInfo {
+    margin-bottom: 10px;
+  }
+  
+.container {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .gameArea {
+    position: relative; /* This is crucial since its children are absolutely positioned */
+    width: 400px;
+    height: 500px;
+    border: 3px solid #000;
+    margin-bottom: 20px;
+    overflow: hidden; /* This ensures game objects don't spill outside the boundary */
+  }
+  
+  .gameArea::after {
+    content: "";
+    display: block;
+    clear: both;
+  }
+  
+  .instructions {
+    font-weight: bold;
+  }
+  
+  .instructions span {
+    text-decoration: underline;
+  }
+  
+
+  .modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.7); /* Black background with opacity */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* Make sure it's on top */
+}
+
+.modal-content {
+    width: 80%;
+    max-width: 400px;
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.modal-button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    background-color: #ff3333; /* Red color */
+    color: #ffffff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.modal-button:hover {
+    background-color: #e60000;
 }
