@@ -92,35 +92,61 @@ class GameObject {
       
     }
   }
-  
   class Enemy extends GameObject {
     constructor(x, y, type) {
-      super(x, y);
-      this.type = type;  // Different enemy types may have different behaviors or attributes
-      this.speed = 1;    // Example speed
-      this.direction = 1;  // 1 for right, -1 for left
+        super(x, y);
+        this.type = type;
+
+        // Configure enemy based on its type
+        switch (this.type) {
+            case 'normal':
+                this.strength = 1;
+                this.shootingRate = 1;   // shoots at a normal rate
+                break;
+            case 'ape':
+                this.strength = 3;       // takes 3 hits to kill
+                this.shootingRate = 0;   // does not shoot
+                break;
+            case 'zombie':
+                this.strength = 2;       // takes 2 hits to kill
+                this.shootingRate = 2;   // shoots at double the rate
+                break;
+            default:
+                throw new Error("Unknown enemy type");
+        }
+
+        this.speed = 1;    
+        this.direction = 1;  
     }
+
     shoot() {
-        return new Blaster(this.x, this.y + 1, true); // +1 to shoot downwards, and 'true' to indicate it's from an enemy
-      }
-    movePattern() {
-      // Move horizontally by speed
-      this.move(this.speed * this.direction, 0);
+        // If the enemy doesn't shoot (like the ape), then return nothing.
+        if (this.shootingRate === 0) return null;
 
-      // If the enemy hits the right edge
-      if (this.x >= GAME_WIDTH - 50) {  // Assuming enemy width is 50
-        this.direction = -1;  // Change direction to left
-        this.x = GAME_WIDTH - 50;  // Adjust position to ensure it's within the boundary
-      }
-      // If the enemy hits the left edge
-      else if (this.x <= 0) {
-        this.direction = 1;  // Change direction to right
-        this.x = 0;  // Adjust position to ensure it's within the boundary
-      }
-
-      // In this example, the vertical position remains constant, but you can add similar checks for vertical boundaries if needed.
+        return new Blaster(this.x, this.y + 1, true); 
     }
-  }
+
+    hit() {
+        // Decrement the strength of the enemy when hit
+        this.strength--;
+
+        // Check if enemy is destroyed after being hit
+        return this.strength <= 0;
+    }
+
+    movePattern() {
+        // Your existing movement logic
+        this.move(this.speed * this.direction, 0);
+        if (this.x >= GAME_WIDTH - 50) {
+            this.direction = -1;
+            this.x = GAME_WIDTH - 50;
+        } else if (this.x <= 0) {
+            this.direction = 1;
+            this.x = 0;
+        }
+    }
+    }
+
 
   class Blaster extends GameObject {
     constructor(x, y, fromEnemy = false) {
@@ -161,7 +187,7 @@ class Game {
         this.ship = new Ship(window.innerWidth / 2, window.innerHeight - 30, this);
         this.enemies = this.level.enemies;
         this.blasters = [];
-        this.gameOver = false;
+        this.gamestate = "ongoing";
     }
 
     generateInitialEnemies() {
@@ -219,7 +245,7 @@ class Game {
     }
 
     endGame() {
-        this.gameOver = true;
+        this.gamestate = "gameover";
     }
 
     tick() {
@@ -249,7 +275,12 @@ class Game {
         this.checkCollisions();
 
         if (this.level.checkCompletion()) {
-            this.advanceToNextLevel();
+            if (this.level.levelNumber === 9) {
+                console.log("you won!");
+                this.gamestate = "victory";
+            } else {
+                this.advanceToNextLevel();
+            }
         }
     }
 

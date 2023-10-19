@@ -56,7 +56,7 @@ function LandingPage() {
                 <Link to="/mfergalaga/">
                   <img src="/images/mfergalaga.png" alt="Galaga" />
                 </Link>
-              <p>🚧 Mfers Galaga 🚧</p>
+              <p>🚧 Mfers Shootout 🚧</p>
             </div>
         </div>
     </div>

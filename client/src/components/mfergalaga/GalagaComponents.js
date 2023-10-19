@@ -11,14 +11,14 @@ import React from 'react';
   
 export const ShipComponent = ({ x, y }) => {
     return (
-        <img src="/images/mfergalaga/ship.png" style={{ position: 'absolute', left: x, top: y, width: '70px', height: '40px' }} alt="ship" />
+        <img src="/images/mfergalaga/cowboy.png" style={{ position: 'absolute', left: x, top: y, height: '40px' }} alt="cowboy" />
     );
 };
 
 
 
 export const EnemyComponent = ({ x, y }) => (
-    <img src="/images/mfergalaga/5666.png" style={{ position: 'absolute', left: x, top: y, width: '50px', height: '50px' }} alt="blaster" />
+    <img src="/images/mfergalaga/cowboyahead.png" style={{ position: 'absolute', left: x, top: y, height: '30px' }} alt="enemy" />
 );
 
 export const BlasterComponent = ({ x, y, fromEnemy }) => {

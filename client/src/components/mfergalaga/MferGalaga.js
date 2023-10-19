@@ -8,7 +8,6 @@ import { Howl } from 'howler';
 const MferGalaga = () => {
 
   const [game, setGame] = useState(new Game());
-  const [showGameOverModal, setShowGameOverModal] = useState(false);
   const [leftPressed, setLeftPressed] = useState(false);
   const [rightPressed, setRightPressed] = useState(false);
   const handleLeftTouchStart = () => {
@@ -80,9 +79,6 @@ const handleKeyUp = (e) => {
     });}
     }, 1000 / 60);
     console.log(game.gameOver);
-    if (game.gameOver) {
-        setShowGameOverModal(true);
-      }
     // Cleanup: Remove the event listener on component unmount
     return () => {
       clearInterval(intervalId);
@@ -94,43 +90,81 @@ const handleKeyUp = (e) => {
 
   return (
     <div className="gameContainer">
+      <h2>Mfer Shootout</h2>
       <div className="gameInfo">
-        <span>Health: {game.ship.lives}</span>
-        <span>Level: {game.currentLevel}</span>
-      </div>
+        <span style={{ marginRight: '10px' }}>Level: {game.currentLevel}</span>
+        <span className="healthInfo">
+            Health: 
+            {[...Array(game.ship.lives)].map((_, index) => (
+                <img 
+                    key={index} 
+                    src="/images/mfergalaga/redcros.png" 
+                    alt="Life Icon" 
+                    style={{ 
+                        width: '15px',
+                        height: '15px',
+                        margin: '0 2px 0 2px',
+                        backgroundColor: 'white',
+                        border: '2px solid red',
+                        verticalAlign: 'middle',
+                        position: 'relative',
+                        top: '0px'  // Adjusts the image downward by 4 pixels
+                    }}
+                />
+            ))}
+        </span>
+    </div>
+
       <div className="gameArea">
         <ShipComponent x={game.ship.x} y={game.ship.y} />
         {game.enemies.map((enemy, idx) => <EnemyComponent key={idx} x={enemy.x} y={enemy.y} type={enemy.type} />)}
         {game.blasters.map((blaster, idx) => <BlasterComponent key={idx} x={blaster.x} y={blaster.y} fromEnemy={blaster.fromEnemy}/>)}
       </div>
       <div 
-                className="controlPad leftControl"
-                onTouchStart={handleLeftTouchStart}
-                onTouchEnd={handleLeftTouchEnd}
-            >L</div>
+          className="controlPad leftControl"
+          onTouchStart={(e) => {
+              e.preventDefault();  // Prevent default touch behavior
+              handleLeftTouchStart(e);
+          }}
+          onTouchEnd={(e) => {
+              e.preventDefault();  // Prevent default touch behavior
+              handleLeftTouchEnd(e);
+          }}
+      >L</div>
 
-            <div 
-                className="controlPad rightControl"
-                onTouchStart={handleRightTouchStart}
-                onTouchEnd={handleRightTouchEnd}
-            >R</div>
+      <div 
+          className="controlPad rightControl"
+          onTouchStart={(e) => {
+              e.preventDefault();  // Prevent default touch behavior
+              handleRightTouchStart(e);
+          }}
+          onTouchEnd={(e) => {
+              e.preventDefault();  // Prevent default touch behavior
+              handleRightTouchEnd(e);
+          }}
+      >R</div>
 
-<div 
-    className="controlPad shootControl"
-    onTouchStart={(e) => {
-        e.stopPropagation();
-        game.playerShoots();
-    }}
->Shoot</div>
+      <div 
+          className="controlPad shootControl"
+          onTouchStart={(e) => {
+              e.preventDefault();  // Prevent default touch behavior
+              e.stopPropagation();
+              game.playerShoots();
+          }}
+      >Shoot</div>
 
-      {showGameOverModal && (
+
+      {game.gamestate === "gameover" && (
         <div className="gameOverModal">
           <div className="modalContent">
             <h2>Game Over</h2>
-            <button onClick={() => setShowGameOverModal(false)}>Close</button>
           </div>
         </div>
       )}
+      {game.gamestate === "victory" && (
+            <h2>VICTORY!!</h2>
+      )}
+
     </div>
 );
 }
