@@ -36,7 +36,6 @@ const handleRightTouchEnd = () => {
 };
 
   const handleKeyDown = (e) => {
-    setIsGameStarted(true);
     switch(e.keyCode) {
         case 37: // Left arrow key
             setLeftPressed(true);
@@ -139,9 +138,10 @@ useEffect(() => {
 
       <div className="gameArea">
         {!isGameStarted && (
-          <button className="startButton" onClick={() => {setIsGameStarted(true); game.startGame();}}>
-            Start Game
+          <button className="startButton" onClick={() => {setIsGameStarted(true); game.startGame(); bgMusic.play();}}>
+              Start Game
           </button>
+
         )}
         <ShipComponent x={game.ship.x} y={game.ship.y} />
         {game.enemies.map((enemy, idx) => <EnemyComponent key={idx} x={enemy.x} y={enemy.y} type={enemy.type} />)}
