@@ -163,21 +163,22 @@ useEffect(() => {
       <div 
           className="controlPad rightControl"
           onTouchStart={(e) => {
-              e.preventDefault();  // Prevent default touch behavior
+
               handleRightTouchStart(e);
+              e.preventDefault();  // Prevent default touch behavior
           }}
           onTouchEnd={(e) => {
-              e.preventDefault();  // Prevent default touch behavior
+
               handleRightTouchEnd(e);
+              e.preventDefault();  // Prevent default touch behavior
           }}
       >R</div>
 
       <div 
           className="controlPad shootControl"
           onTouchStart={(e) => {
-              e.preventDefault();  // Prevent default touch behavior
-              e.stopPropagation();
               game.playerShoots();
+              e.preventDefault();  // Prevent default touch 
           }}
       >Shoot</div>
       </div>

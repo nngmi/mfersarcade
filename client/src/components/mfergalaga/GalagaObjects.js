@@ -6,7 +6,7 @@ const basicSound = new Howl({
     src: ["/audio/shot.wav"], // Replace with your sound file path
     autoplay: false, // Play the sound right away
     loop: false, // Do not loop the sound
-    volume: 0.25, // Set the volume to 50%
+    volume: 0.05, // Set the volume to 50%
   });
   const winSound = new Howl({
     src: ["/audio/success.mp3"], // Replace with your sound file path
