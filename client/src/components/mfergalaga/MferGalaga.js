@@ -10,9 +10,17 @@ const MferGalaga = () => {
   const [game, setGame] = useState(new Game());
   const [leftPressed, setLeftPressed] = useState(false);
   const [rightPressed, setRightPressed] = useState(false);
+  const [isGameStarted, setIsGameStarted] = useState(false);
   const handleLeftTouchStart = () => {
     setLeftPressed(true);
 };
+
+const bgMusic = new Howl({
+  src: ['/audio/Mississippi-Rag.mp3'],
+  loop: true, // So it loops continuously
+  volume: 0.5, // Adjust as needed
+});
+
 
 const handleLeftTouchEnd = () => {
     setLeftPressed(false);
@@ -28,6 +36,7 @@ const handleRightTouchEnd = () => {
 };
 
   const handleKeyDown = (e) => {
+    setIsGameStarted(true);
     switch(e.keyCode) {
         case 37: // Left arrow key
             setLeftPressed(true);
@@ -56,7 +65,15 @@ const handleKeyUp = (e) => {
     }
 }
 
+useEffect(() => {
+  if (isGameStarted) {
+    bgMusic.play();
+  }
 
+  return () => {
+    bgMusic.stop();
+  };
+}, [isGameStarted]);
   
   useEffect(() => {
     // Add event listener for keydown
@@ -152,7 +169,6 @@ const handleKeyUp = (e) => {
               game.playerShoots();
           }}
       >Shoot</div>
-
 
       {game.gamestate === "gameover" && (
         <div className="gameOverModal">

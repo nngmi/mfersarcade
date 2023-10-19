@@ -3,7 +3,7 @@ const GAME_WIDTH = 400;
 const GAME_HEIGHT = 500;
 
 const basicSound = new Howl({
-    src: ["/audio/blaster.mp3"], // Replace with your sound file path
+    src: ["/audio/shot.wav"], // Replace with your sound file path
     autoplay: false, // Play the sound right away
     loop: false, // Do not loop the sound
     volume: 0.5, // Set the volume to 50%
@@ -143,7 +143,7 @@ class GameObject {
     constructor(x, y) {
         super(x, y);
         this.lives = 5;
-        this.radius = 25; // Half of the ship's width (assuming it's 50 as per previous info)
+        this.radius = 15; // Half of the ship's width (assuming it's 50 as per previous info)
     }
     shoot() {
       // Create a blaster object starting at the ship's position
@@ -242,7 +242,7 @@ class GameObject {
       
       super(x, y);
       this.fromEnemy = fromEnemy;
-      this.radius = 5;
+      this.radius = 3;
       this.speed = 2;     // Blaster speed
       this.isAlive = true; // Initially, the blaster is alive
     }
