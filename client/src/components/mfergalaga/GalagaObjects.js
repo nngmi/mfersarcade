@@ -276,7 +276,7 @@ class Game {
         this.ship = new Ship(window.innerWidth / 2, window.innerHeight - 30, this);
         this.enemies = this.level.enemies;
         this.blasters = [];
-        this.gamestate = "ongoing";
+        this.gamestate = "notyetbegun";
     }
 
     generateInitialEnemies() {
@@ -335,6 +335,9 @@ class Game {
 
     endGame() {
         this.gamestate = "gameover";
+    }
+    startGame() {
+        this.gamestate = "ongoing";
     }
 
     tick() {

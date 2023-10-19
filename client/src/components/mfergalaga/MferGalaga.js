@@ -40,12 +40,15 @@ const handleRightTouchEnd = () => {
     switch(e.keyCode) {
         case 37: // Left arrow key
             setLeftPressed(true);
+            e.preventDefault(); 
             break;
         case 39: // Right arrow key
             setRightPressed(true);
+            e.preventDefault(); 
             break;
         case 32: // Spacebar
             game.playerShoots();
+            e.preventDefault(); 
             break;
         default:
             break;
@@ -81,20 +84,21 @@ useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     const intervalId = setInterval(() => {
-        if (!game.gameOver) {
+        if (game.gamestate === "ongoing") {
             if (leftPressed) {
-                game.ship.move(-10, 0);
+                game.ship.move(-7, 0);
             }
             if (rightPressed) {
-                game.ship.move(10, 0);
+                game.ship.move(7, 0);
             }
-      game.tick();
-      setGame(prevGame => {
-        const newGame = Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame);
-        newGame.tick();
-        return newGame;
-      
-    });}
+            game.tick();
+            setGame(prevGame => {
+              const newGame = Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame);
+              newGame.tick();
+              return newGame;
+            
+          });
+        }
     }, 1000 / 60);
     console.log(game.gameOver);
     // Cleanup: Remove the event listener on component unmount
@@ -134,6 +138,11 @@ useEffect(() => {
     </div>
 
       <div className="gameArea">
+        {!isGameStarted && (
+          <button className="startButton" onClick={() => {setIsGameStarted(true); game.startGame();}}>
+            Start Game
+          </button>
+        )}
         <ShipComponent x={game.ship.x} y={game.ship.y} />
         {game.enemies.map((enemy, idx) => <EnemyComponent key={idx} x={enemy.x} y={enemy.y} type={enemy.type} />)}
         {game.blasters.map((blaster, idx) => <BlasterComponent key={idx} x={blaster.x} y={blaster.y} fromEnemy={blaster.fromEnemy}/>)}
