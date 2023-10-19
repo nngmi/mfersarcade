@@ -53,7 +53,7 @@ function LandingPage() {
               <p>🚧 Mfers Castle 🚧</p>
             </div>
             <div className="game-item">
-                <Link to="/mfergalaga/">
+                <Link to="/mfersshootout/">
                   <img src="/images/mfergalaga.png" alt="Galaga" />
                 </Link>
               <p>🚧 Mfers Shootout 🚧</p>

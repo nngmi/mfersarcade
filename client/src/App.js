@@ -19,7 +19,7 @@ function App() {
         <Route path="/mferchess/" element={<ChessLandingPage />} />
         <Route path="/mferchess/:gameId" element={<GameChess />} />
         <Route path="/mfercastle/:gameId" element={<MferCastle />} />
-        <Route path="/mfergalaga/" element={<MferGalaga />} />
+        <Route path="/mfersshootout/" element={<MferGalaga />} />
       </Routes>
     </Router>
   );

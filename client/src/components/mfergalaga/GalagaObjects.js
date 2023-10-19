@@ -21,6 +21,69 @@ const basicSound = new Howl({
     volume: 0.5, // Set the volume to 50%
   });
 
+const LEVELS = [
+    [
+        { type: 'normal', count: 5 },
+        { type: 'normal', count: 5 }
+    ],
+    [
+        { type: 'normal', count: 5 },
+        { type: 'normal2', count: 5 }
+    ],
+    [
+        { type: 'normal', count: 5 },
+        { type: 'normal', count: 5 },
+        { type: 'normal2', count: 5 }
+    ],
+    [
+        { type: 'normal', count: 5 },
+        { type: 'normal2', count: 5 },
+        { type: 'normal2', count: 5 }
+    ],
+    [
+        { type: 'normal2', count: 5 },
+        { type: 'normal2', count: 5 },
+        { type: 'normal3', count: 5 }
+    ],
+    [
+        { type: 'normal3', count: 5 },
+        { type: 'normal3', count: 5 }
+    ],
+    [
+        { type: 'normal', count: 5 },
+        { type: 'normal2', count: 5 },
+        { type: 'normal3', count: 5 },
+        { type: 'normal3', count: 5 }
+    ],
+    [
+        { type: 'normal2', count: 5 },
+        { type: 'normal2', count: 5 },
+        { type: 'normal2', count: 5 },
+        { type: 'normal2b', count: 5 },
+        { type: 'normal3', count: 5 },
+        { type: 'normal3b', count: 5 }
+    ],
+    [
+        { type: 'normal2', count: 5 },
+        { type: 'normal2', count: 5 },
+        { type: 'normal2b', count: 5 },
+        { type: 'normal2', count: 5 },
+        { type: 'normal2b', count: 5 },
+        { type: 'normal2', count: 5 },
+        { type: 'normal3b', count: 5 },
+        { type: 'normal3', count: 5 },
+        { type: 'normal3b', count: 5 }
+    ],
+    [
+        { type: 'normal3', count: 7 },
+        { type: 'normal3', count: 7 },
+        { type: 'normal3b', count: 9 },
+        { type: 'normal3', count: 9 },
+        { type: 'normal3b', count: 9 }
+    ],
+];
+
+
 class Level {
     constructor(levelNumber) {
         this.levelNumber = levelNumber;
@@ -29,17 +92,25 @@ class Level {
     }
 
     generateEnemiesForLevel() {
-        const enemiesPerRow = 5;
-        const rows = this.levelNumber; // Number of enemy rows increases with level number
-        const spacing = 50; // space between enemies
+        const spacing = 50;
         const enemies = [];
 
-        for (let row = 0; row < rows; row++) {
-            for (let col = 0; col < enemiesPerRow; col++) {
+        // Get the configuration for the current level
+        const currentLevelConfig = LEVELS[this.levelNumber - 1];
+
+        let y = 10; // Starting position for the first row
+
+        for (let rowConfig of currentLevelConfig) {
+            for (let col = 0; col < rowConfig.count; col++) {
                 const x = col * spacing + spacing;
-                const y = row * spacing + 10; // Adjust as per the enemy height to prevent overlap
-                enemies.push(new Enemy(x, y, 'basic'));
+
+                // Use the enemy type specified in the rowConfig
+                const enemyType = rowConfig.type;
+                enemies.push(new Enemy(x, y, enemyType));
             }
+
+            // Adjust y for the next row
+            y += spacing;
         }
         return enemies;
     }
@@ -50,7 +121,6 @@ class Level {
     }
 }
 
-  
 
 class GameObject {
     constructor(x, y) {
@@ -95,32 +165,77 @@ class GameObject {
   
   class Enemy extends GameObject {
     constructor(x, y, type) {
-      super(x, y);
-      this.type = type;  // Different enemy types may have different behaviors or attributes
-      this.speed = 1;    // Example speed
-      this.direction = 1;  // 1 for right, -1 for left
+        super(x, y);
+        this.type = type;
+
+        // Configure enemy based on its type
+        switch (this.type) {
+            case 'normal':
+                this.strength = 1;
+                this.shootingRate = 1;
+                this.speed = 1;
+                this.direction = 1;  
+                break;
+            case 'normal2':
+                this.strength = 1;
+                this.shootingRate = 2;
+                this.speed = 2;
+                this.direction = -1;  
+                break;
+            case 'normal2b':
+                this.strength = 1;
+                this.shootingRate = 2;
+                this.speed = 2;
+                this.direction = 1;  
+                break;
+            case 'normal3':
+                this.strength = 4;
+                this.shootingRate = 3;
+                this.speed = 3;
+                this.direction = 1;  
+                break;
+            case 'normal3b':
+                this.strength = 4;
+                this.shootingRate = 3;
+                this.speed = 3;
+                this.direction = -1;  
+                break;
+            
+            default:
+                throw new Error("Unknown enemy type");
+        }
+
+        
     }
+
     shoot() {
-        return new Blaster(this.x, this.y + 1, true); // +1 to shoot downwards, and 'true' to indicate it's from an enemy
-      }
+        // If the enemy doesn't shoot (like the ape), then return nothing.
+        if (this.shootingRate === 0) return null;
+
+        return new Blaster(this.x, this.y + 1, true); 
+    }
+
+    hit() {
+        // Decrement the strength of the enemy when hit
+        this.strength--;
+
+        // Check if enemy is destroyed after being hit
+        return this.strength <= 0;
+    }
+
     movePattern() {
-      // Move horizontally by speed
-      this.move(this.speed * this.direction, 0);
-
-      // If the enemy hits the right edge
-      if (this.x >= GAME_WIDTH - 50) {  // Assuming enemy width is 50
-        this.direction = -1;  // Change direction to left
-        this.x = GAME_WIDTH - 50;  // Adjust position to ensure it's within the boundary
-      }
-      // If the enemy hits the left edge
-      else if (this.x <= 0) {
-        this.direction = 1;  // Change direction to right
-        this.x = 0;  // Adjust position to ensure it's within the boundary
-      }
-
-      // In this example, the vertical position remains constant, but you can add similar checks for vertical boundaries if needed.
+        // Your existing movement logic
+        this.move(this.speed * this.direction, 0);
+        if (this.x >= GAME_WIDTH - 50) {
+            this.direction = -1;
+            this.x = GAME_WIDTH - 50;
+        } else if (this.x <= 0) {
+            this.direction = 1;
+            this.x = 0;
+        }
     }
   }
+
 
   class Blaster extends GameObject {
     constructor(x, y, fromEnemy = false) {
@@ -239,9 +354,10 @@ class Game {
             enemy.movePattern();
         }
 
-        if (Math.random() < 0.03) {
-            const shootingEnemy = this.enemies[Math.floor(Math.random() * this.enemies.length)];
-            if (shootingEnemy) {
+        const shootingEnemy = this.enemies[Math.floor(Math.random() * this.enemies.length)];
+
+        if (shootingEnemy) {
+            if (Math.random() < 0.03 * shootingEnemy.shootingRate) {
                 this.blasters.push(shootingEnemy.shoot());
             }
         }
