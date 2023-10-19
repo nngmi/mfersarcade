@@ -23,6 +23,19 @@
     margin-bottom: 20px;
     overflow: hidden; /* This ensures game objects don't spill outside the boundary */
   }
+  .gameArea {
+    position: relative; /* This is crucial since its children are absolutely positioned */
+    width: 400px;
+    height: 500px;
+    border: 3px solid #000;
+    margin-bottom: 20px;
+    overflow: hidden; /* This ensures game objects don't spill outside the boundary */
+    background-image: url('/public/images/mfergalaga/bg.jpg'); /* Add your image path here */
+    background-size: cover; /* This will cover the entire area */
+    background-repeat: no-repeat; /* Ensures the image doesn't repeat */
+    background-position: center; /* This ensures the image is centered */
+}
+
   
   .gameArea::after {
     content: "";
@@ -77,13 +90,16 @@
     background-color: #e60000;
 }
 
-/* MferGalaga.css */
+.controlContainer {
+    position: relative; /* This ensures child elements are positioned relative to this container */
+    width: 400px; /* Adjust if needed */
+    height: 100px; /* Adjust based on your layout needs */
+}
 
 .controlPad {
-    position: absolute;
-    bottom: 10px;
-    width: 80px;
-    height: 80px;
+    position: absolute; /* This positions the pads relative to the controlContainer */
+    width: 60px;
+    height: 60px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.5);
     text-align: center;
@@ -95,13 +111,15 @@
 
 .leftControl {
     left: 10px;
+    bottom: 0;
 }
 
 .rightControl {
     left: 100px;
+    bottom: 0;
 }
 
 .shootControl {
     right: 10px;
+    bottom: 0;
 }
-

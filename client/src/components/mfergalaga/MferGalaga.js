@@ -67,6 +67,7 @@ const handleKeyUp = (e) => {
 
 useEffect(() => {
   if (isGameStarted) {
+    bgMusic.seek(10);
     bgMusic.play();
   }
 
@@ -137,6 +138,7 @@ useEffect(() => {
         {game.enemies.map((enemy, idx) => <EnemyComponent key={idx} x={enemy.x} y={enemy.y} type={enemy.type} />)}
         {game.blasters.map((blaster, idx) => <BlasterComponent key={idx} x={blaster.x} y={blaster.y} fromEnemy={blaster.fromEnemy}/>)}
       </div>
+      <div className="controlContainer">
       <div 
           className="controlPad leftControl"
           onTouchStart={(e) => {
@@ -169,6 +171,7 @@ useEffect(() => {
               game.playerShoots();
           }}
       >Shoot</div>
+      </div>
 
       {game.gamestate === "gameover" && (
         <div className="gameOverModal">
