@@ -98,8 +98,8 @@
 
 .controlPad {
     position: absolute; /* This positions the pads relative to the controlContainer */
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     background-color: rgba(255, 255, 255, 0.5);
     text-align: center;
@@ -111,15 +111,15 @@
 
 .leftControl {
     left: 10px;
-    bottom: 0;
+    top: 0;
 }
 
 .rightControl {
     left: 100px;
-    bottom: 0;
+    top: 0;
 }
 
 .shootControl {
     right: 10px;
-    bottom: 0;
+    top: 0;
 }
