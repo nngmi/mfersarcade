@@ -93,7 +93,7 @@
 .controlContainer {
     position: relative; /* This ensures child elements are positioned relative to this container */
     width: 400px; /* Adjust if needed */
-    height: 100px; /* Adjust based on your layout needs */
+    height: 200px; /* Adjust based on your layout needs */
 }
 
 .controlPad {
