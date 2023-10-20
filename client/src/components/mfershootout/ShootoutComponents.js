@@ -8,7 +8,7 @@ import React from 'react';
 //     // enemyAdvanced: "/path/to/your/advanced/enemy/image.png", // if you have multiple enemy types
 //     blaster: "/images/mfergalaga/5666.png"
 // };
-  
+
 export const ShipComponent = ({ x, y }) => {
     return (
         <img src="/images/mfergalaga/cowboy.png" style={{ position: 'absolute', left: x, top: y, height: '40px' }} alt="cowboy" />

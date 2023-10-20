@@ -1,6 +1,6 @@
 // mfercastle.socket.js
 const socketIo = require("socket.io");
-const { games, initializePlayer, endTurn, bunkerizeCard, beginTurn, checkGameState, discardCard, playCard} = require('./state');
+const { games, initializePlayer, endTurn, bunkerizeCard, beginTurn, checkGameState, discardCard, playCard } = require('./state');
 const { cards, generateSetDeck, drawCard } = require('./cards');
 
 
@@ -21,34 +21,34 @@ module.exports = (io) => {
 
     mfercastle.on("connection", (socket) => {
         console.log("New client connected", socket.id);
-    
+
         socket.on("joinGame", (gameId) => {
             console.log("joinGame emitted for gameID", gameId);
             const game = games[gameId];
-    
+
             if (!game) return socket.emit("error", "Game does not exist");
             console.log("Game found", game);
-    
+
             if (game.players.length >= 2) return socket.emit("error", "Game is full");
             console.log(`Player ${socket.id} joined game ${gameId}`);
             const playerSymbol = game.players.length === 0 ? "X" : "O";
-    
+
             initializePlayer(30, game, playerSymbol, socket.id);
-            
+
             if (game.players.length == 2) {
                 game.state = "ongoing";
                 // beginTurn sets currentPlayer
                 beginTurn(game, "X");
             }
             game.lastActivity = Date.now(),
-            socket.join(gameId);
+                socket.join(gameId);
             socket.emit("playerSymbol", playerSymbol);
             game.players.forEach((player) => {
                 console.log("emitting to player ", player.id);
                 mfercastle.to(player.id).emit("gameUpdated", maskGameForPlayer(game, player.symbol));
             });
         });
-    
+
         socket.on("makeMove", (gameId, moveType, moveDetails) => {
             console.log("handling move ", moveType, moveDetails);
             const game = games[gameId];
@@ -64,7 +64,7 @@ module.exports = (io) => {
                 if (game.state !== "ongoing") {
                     return socket.emit("error", "Game is over");
                 }
-                
+
                 // Check if it’s this player’s turn
                 if (game.currentPlayer !== player.symbol) return socket.emit("error", "Not your turn");
                 console.log("it is our turn", game.currentPlayer);
@@ -96,7 +96,7 @@ module.exports = (io) => {
 
                     // beginTurn sets currentPlayer
                     beginTurn(game, otherPlayer.symbol);
-                    
+
                 } else if (moveType === "discard") {
                     const { cardid } = moveDetails;
                     let errMessage = discardCard(game, cardid, player.symbol);
@@ -123,7 +123,7 @@ module.exports = (io) => {
                             }
                         });
                     }
-                    
+
                 } else if (moveType === "play") {
                     const { cardid } = moveDetails;
                     if (!cardid) {
@@ -150,11 +150,11 @@ module.exports = (io) => {
                 } else {
                     return socket.emit("error", "Unknown move " + moveType);
                 }
-                
+
                 game.lastActivity = Date.now(),
-                game.state = checkGameState(game) || game.state;
+                    game.state = checkGameState(game) || game.state;
                 if (game.state != "ongoing") {
-                    socket.emit("error", "Game has ended!!");              
+                    socket.emit("error", "Game has ended!!");
                 }
                 game.players.forEach((player) => {
                     console.log("emitting to player ", player.id);
@@ -162,7 +162,7 @@ module.exports = (io) => {
                 });
             } finally {
                 game.lock = false;
-            }           
+            }
         });
     });
 };

@@ -13,21 +13,21 @@ function ChessLandingPage() {
         // Fetch the list of all games
         fetch(`${SERVER_URL}/api/chess/games`)
             .then((response) => response.json())
-            .then((data) => { console.log(data); setGames(data)})
+            .then((data) => { console.log(data); setGames(data) })
             .catch((error) => console.error('Error fetching the games list:', error));
     }, []);
     const validateGameName = (name) => {
         const trimmedName = name.trim();
         return trimmedName.length > 0 && trimmedName.length <= 50;
     };
-    
+
     const createChessGame = async () => {
         if (!validateGameName(gameName)) {
             alert('Please enter a valid game name (1-50 characters).');
             return;
         }
         try {
-            const response = await fetch("/api/chess/game", { 
+            const response = await fetch("/api/chess/game", {
                 method: "POST",
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ gameName, autoplay }) // Pass game name and player name in POST request
@@ -54,50 +54,50 @@ function ChessLandingPage() {
             <section>
                 <h3>Games in Progress:</h3>
                 {games && Object.keys(games).length > 0 ? (
-                <>
-                    <ul className="games-list">
-                        {Object.entries(games)
-                        .filter(([, game]) => game.state === "waiting for players" || game.state === "ongoing")
-                        .sort(([, gameA], [, gameB]) => {
-                            if (gameA.state === "waiting for players" && gameB.state !== "waiting for players") return -1;
-                            if (gameB.state === "waiting for players" && gameA.state !== "waiting for players") return 1;
-                            return gameB.lastActivity - gameA.lastActivity; // Assuming lastActivity is a timestamp. Adjust accordingly.
-                        })
-                        .map(([uuid, game]) => (
-                            <li key={uuid}>
-                                {game.gameName} - ({game.state})
-                                {game.players && game.players.length < 2 ? (
-                                    <button onClick={() => joinGame(uuid)}>Join</button>
-                                ) : <button onClick={() => joinGame(uuid)}>View Game</button>}
-                            </li>
-                        ))}
-                    </ul>
-                </>
-            ) : (
-                <p>No active games.</p>
-            )}
+                    <>
+                        <ul className="games-list">
+                            {Object.entries(games)
+                                .filter(([, game]) => game.state === "waiting for players" || game.state === "ongoing")
+                                .sort(([, gameA], [, gameB]) => {
+                                    if (gameA.state === "waiting for players" && gameB.state !== "waiting for players") return -1;
+                                    if (gameB.state === "waiting for players" && gameA.state !== "waiting for players") return 1;
+                                    return gameB.lastActivity - gameA.lastActivity; // Assuming lastActivity is a timestamp. Adjust accordingly.
+                                })
+                                .map(([uuid, game]) => (
+                                    <li key={uuid}>
+                                        {game.gameName} - ({game.state})
+                                        {game.players && game.players.length < 2 ? (
+                                            <button onClick={() => joinGame(uuid)}>Join</button>
+                                        ) : <button onClick={() => joinGame(uuid)}>View Game</button>}
+                                    </li>
+                                ))}
+                        </ul>
+                    </>
+                ) : (
+                    <p>No active games.</p>
+                )}
             </section>
 
             <section>
                 <h3>Create a New Game</h3>
                 <p>
-                    <label>Game Name: 
-                        <input 
-                            type="text" 
-                            placeholder="Enter a Name for New Game" 
-                            value={gameName} 
-                            onChange={(e) => setGameName(e.target.value)} 
+                    <label>Game Name:
+                        <input
+                            type="text"
+                            placeholder="Enter a Name for New Game"
+                            value={gameName}
+                            onChange={(e) => setGameName(e.target.value)}
                         />
                     </label>
                 </p>
 
                 <p>
                     <label>
-                        Play Against Computer: 
-                        <input 
-                            type="checkbox" 
+                        Play Against Computer:
+                        <input
+                            type="checkbox"
                             checked={autoplay}
-                            onChange={(e) => setAutoplay(e.target.checked)} 
+                            onChange={(e) => setAutoplay(e.target.checked)}
                         />
                     </label>
                 </p>

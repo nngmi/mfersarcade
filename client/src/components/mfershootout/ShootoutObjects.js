@@ -7,13 +7,13 @@ const shootingSound = new Howl({
     autoplay: false, // Play the sound right away
     loop: false, // Do not loop the sound
     volume: 0.05, // Set the volume to 50%
-  });
-  const wrongSound = new Howl({
+});
+const wrongSound = new Howl({
     src: ["/audio/wrong_sound.mp3"], // Replace with your sound file path
     autoplay: false, // Play the sound right away
     loop: false, // Do not loop the sound
     volume: 0.5, // Set the volume to 50%
-  });
+});
 
 const LEVELS = [
     [
@@ -82,7 +82,7 @@ class Level {
     constructor(levelNumber) {
         this.levelNumber = levelNumber;
         this.enemies = this.generateEnemiesForLevel();
-        this.isCompleted = false; 
+        this.isCompleted = false;
     }
 
     generateEnemiesForLevel() {
@@ -118,30 +118,30 @@ class Level {
 
 class GameObject {
     constructor(x, y) {
-      this.x = x;  // X position
-      this.y = y;  // Y position
-      this.isAlive = true;  // Whether the object is still active in the game
+        this.x = x;  // X position
+        this.y = y;  // Y position
+        this.isAlive = true;  // Whether the object is still active in the game
     }
-    
-    move(dx, dy) {
-      this.x += dx;
-      this.y += dy;
-    }
-    
-    destroy() {
-      this.isAlive = false;
-    }
-  }
 
-  class Ship extends GameObject {
+    move(dx, dy) {
+        this.x += dx;
+        this.y += dy;
+    }
+
+    destroy() {
+        this.isAlive = false;
+    }
+}
+
+class Ship extends GameObject {
     constructor(x, y) {
         super(x, y);
         this.lives = 5;
         this.radius = 15; // Half of the ship's width (assuming it's 50 as per previous info)
     }
     shoot() {
-      // Create a blaster object starting at the ship's position
-      return new Blaster(this.x, this.y - 1);  // "-1" to shoot upwards
+        // Create a blaster object starting at the ship's position
+        return new Blaster(this.x, this.y - 1);  // "-1" to shoot upwards
     }
 
     move(dx, dy) {
@@ -150,14 +150,14 @@ class GameObject {
     }
     loseLife() {
         if (this.lives > 0) {
-            this.lives -=1;
+            this.lives -= 1;
             wrongSound.play(); // Play the sound when firing
-          }
-      
+        }
+
     }
-  }
-  
-  class Enemy extends GameObject {
+}
+
+class Enemy extends GameObject {
     constructor(x, y, type) {
         super(x, y);
         this.type = type;
@@ -168,45 +168,45 @@ class GameObject {
                 this.strength = 1;
                 this.shootingRate = 1;
                 this.speed = 1;
-                this.direction = 1;  
+                this.direction = 1;
                 break;
             case 'normal2':
                 this.strength = 1;
                 this.shootingRate = 2;
                 this.speed = 2;
-                this.direction = -1;  
+                this.direction = -1;
                 break;
             case 'normal2b':
                 this.strength = 1;
                 this.shootingRate = 2;
                 this.speed = 2;
-                this.direction = 1;  
+                this.direction = 1;
                 break;
             case 'normal3':
                 this.strength = 4;
                 this.shootingRate = 3;
                 this.speed = 3;
-                this.direction = 1;  
+                this.direction = 1;
                 break;
             case 'normal3b':
                 this.strength = 4;
                 this.shootingRate = 3;
                 this.speed = 3;
-                this.direction = -1;  
+                this.direction = -1;
                 break;
-            
+
             default:
                 throw new Error("Unknown enemy type");
         }
 
-        
+
     }
 
     shoot() {
         // If the enemy doesn't shoot (like the ape), then return nothing.
         if (this.shootingRate === 0) return null;
 
-        return new Blaster(this.x, this.y + 1, true); 
+        return new Blaster(this.x, this.y + 1, true);
     }
 
     hit() {
@@ -228,40 +228,40 @@ class GameObject {
             this.x = 0;
         }
     }
-  }
+}
 
 
-  class Blaster extends GameObject {
+class Blaster extends GameObject {
     constructor(x, y, fromEnemy = false) {
-      
-      super(x, y);
-      this.fromEnemy = fromEnemy;
-      this.radius = 3;
-      this.speed = 2;     // Blaster speed
-      this.isAlive = true; // Initially, the blaster is alive
+
+        super(x, y);
+        this.fromEnemy = fromEnemy;
+        this.radius = 3;
+        this.speed = 2;     // Blaster speed
+        this.isAlive = true; // Initially, the blaster is alive
     }
-    
+
     move() {
-      if (this.fromEnemy) {
-        this.y += this.speed;  // Move downwards if shot by enemy
-      } else {
-        this.y -= this.speed;  // Move upwards if shot by player
-      }
+        if (this.fromEnemy) {
+            this.y += this.speed;  // Move downwards if shot by enemy
+        } else {
+            this.y -= this.speed;  // Move upwards if shot by player
+        }
 
-      // Check if the blaster is off-screen vertically
-      if (this.y < 0 || this.y > GAME_HEIGHT) {
-        this.isAlive = false; // Mark blaster as not alive
-        return; // No need to continue with the remaining code if the blaster is out of bounds
-      }
+        // Check if the blaster is off-screen vertically
+        if (this.y < 0 || this.y > GAME_HEIGHT) {
+            this.isAlive = false; // Mark blaster as not alive
+            return; // No need to continue with the remaining code if the blaster is out of bounds
+        }
 
-      // This part of the code constrains the blaster's position, but with the above conditions, 
-      // the blaster shouldn't ever go out of horizontal bounds. 
-      // Still, I'm retaining this for completeness.
-      this.x = Math.max(0, Math.min(this.x, GAME_WIDTH - 10));  // Assuming blaster width is 10
+        // This part of the code constrains the blaster's position, but with the above conditions, 
+        // the blaster shouldn't ever go out of horizontal bounds. 
+        // Still, I'm retaining this for completeness.
+        this.x = Math.max(0, Math.min(this.x, GAME_WIDTH - 10));  // Assuming blaster width is 10
     }
 }
 
-  
+
 
 class Game {
     constructor() {
@@ -307,7 +307,7 @@ class Game {
                     enemy.destroy();
                 }
             }
-            
+
             for (let blaster of this.blasters) {
                 if (blaster.fromEnemy) {
                     const dx = blaster.x - this.ship.x;
@@ -383,5 +383,5 @@ class Game {
 }
 
 
-  
+
 export { Game, Ship, Enemy, Blaster };

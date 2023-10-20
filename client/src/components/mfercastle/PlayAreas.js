@@ -35,17 +35,17 @@ export const PlayerGameState = ({ game, playerSymbol, isOpponent, makeMove }) =>
       {/* Conditionally render buttons based on isOpponent */}
       {!isOpponent && (
         <div className="player-action-area">
-          <button 
-              onClick={() => makeMove("draw")}
-              disabled={game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
+          <button
+            onClick={() => makeMove("draw")}
+            disabled={game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
           >
-              Draw Card
+            Draw Card
           </button>
-          <button 
-              onClick={() => makeMove("yield")}
-              disabled={game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
+          <button
+            onClick={() => makeMove("yield")}
+            disabled={game.currentPlayer !== playerSymbol || game.state !== "ongoing"}
           >
-              Yield Turn
+            Yield Turn
           </button>
         </div>
       )}
@@ -94,21 +94,21 @@ export const StateArea = ({ game, playerSymbol, currentPlayer }) => {
   function getPlayerLife(game, playerSymbol) {
     // Find the player object where symbol equals playerSymbol
     const player = game.players.find(player => player.symbol === playerSymbol);
-    
+
     // Return the life of the player if found, otherwise return null
     return player ? player.life : null;
   }
   function getOpponentSymbol(playerSymbol) {
     return playerSymbol === 'X' ? 'O' : 'X';
   }
-  
+
   return (
     <div>
       <div className="marginSpan">Game State: {currentPlayer === playerSymbol ? 'Your Turn' : "Other Player's Turn"}</div>
       <div className="marginSpan">Turn Number: {game.turnNumber}</div>
       <div>
         <a href="/" className="back-button">
-            Quit Game
+          Quit Game
         </a>
       </div>
     </div>
@@ -153,13 +153,13 @@ export const PlayerDeck = ({ game, playerSymbol }) => {
       {count === 0 ? (
         <CardEmpty />
       ) : (
-        <CardBack/> 
+        <CardBack />
       )}
     </div>
   );
 }
 
-export const PlayerGraveyard = ({ game, playerSymbol, isOpponent, makeMove={makeMove} }) => {
+export const PlayerGraveyard = ({ game, playerSymbol, isOpponent, makeMove = { makeMove } }) => {
   const [, ref] = useDrop(() => ({
     accept: 'CARD',
     drop: (item, monitor) => {
@@ -190,7 +190,7 @@ export const PlayerGraveyard = ({ game, playerSymbol, isOpponent, makeMove={make
 };
 
 export const PlayerBunkers = ({ game, playerSymbol, isOpponent, makeMove }) => {
-  
+
   if (!playerSymbol) return null;
 
   const playerBunkers = game.bunkers[playerSymbol] || [];
@@ -198,12 +198,12 @@ export const PlayerBunkers = ({ game, playerSymbol, isOpponent, makeMove }) => {
   return (
     <div className="fixed-width-card hand game-info">
       {playerBunkers.map((bunker, index) => (
-        <Bunker 
+        <Bunker
           key={index}
-          bunker={bunker} 
-          index={index} 
-          isOpponent={isOpponent} 
-          makeMove={makeMove} 
+          bunker={bunker}
+          index={index}
+          isOpponent={isOpponent}
+          makeMove={makeMove}
         />
       ))}
     </div>
@@ -233,16 +233,16 @@ export const Battlefield = ({ game, playerSymbol, makeMove = { makeMove } }) => 
 
 
   return (
-      <div ref={playerRef} className={`grow-width hand game-info`}>
-        <div className="cards-container">
-          {playerCards.map((card, index) => (
-            <Card key={index} card={card} />
-          ))}
-          {opponentCards.map((card, index) => (
-            <Card key={index} card={card} isOpponent={true} />
-          ))}
-        </div>
+    <div ref={playerRef} className={`grow-width hand game-info`}>
+      <div className="cards-container">
+        {playerCards.map((card, index) => (
+          <Card key={index} card={card} />
+        ))}
+        {opponentCards.map((card, index) => (
+          <Card key={index} card={card} isOpponent={true} />
+        ))}
       </div>
+    </div>
   );
 };
 
@@ -261,11 +261,11 @@ export const OtherPlayerHand = ({ game, playerSymbol }) => {
       </div>
       <div className="cards-container">
         {Array.from({ length: count }).map((_, index) => (
-          <CardBack/>
+          <CardBack />
         ))}
       </div>
     </div>
-  );    
+  );
 };
 
 export const OtherPlayerDeck = ({ game, playerSymbol }) => {
@@ -280,7 +280,7 @@ export const OtherPlayerDeck = ({ game, playerSymbol }) => {
       {count === 0 ? (
         <CardEmpty />
       ) : (
-        <CardBack/> 
+        <CardBack />
       )}
     </div>
   );

@@ -30,21 +30,21 @@ function joinExistingGame(game, playerId, joinKey, newPlayerFunction) {
     }
 
     if (game.players.length >= 2) return { error: "Game is full" };
-    
-    let player = { 
-        id: playerId, 
+
+    let player = {
+        id: playerId,
         disconnected: false,
         joinKey: uuidv4() // Save the joinKey with the player
     };
     newPlayerFunction(player, game);
-    
+
     game.players.push(player);
 
     if (game.players.length === 2) {
         game.state = "ongoing";
         game.currentPlayer = game.players[0].id;
     }
-    
+
     game.lastActivity = Date.now();
 
     return { success: true, joinedPlayer: player.id };
@@ -83,8 +83,8 @@ function handleDisconnect(games, playerId) {
                 gameId: gameId,
                 disconnectingPlayer: disconnectingPlayer.id,
             };
-    
-        }        
+
+        }
     }
     return { gameUpdated: false };
 }

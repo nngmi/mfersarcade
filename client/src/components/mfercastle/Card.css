@@ -7,13 +7,15 @@
     background-color: white;
     margin: 5px;
     position: relative;
-    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
-    cursor: pointer; /* change cursor to a hand when it’s over the card */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    /* change cursor to a hand when it’s over the card */
 }
 
 .cardTitle {
     font-size: 0.9em;
 }
+
 .cardText {
     font-size: 0.6em;
 }
@@ -21,16 +23,20 @@
 .card.green {
     background-color: green;
 }
+
 .card.red {
     background-color: red;
 }
+
 .card.black {
     background-color: black;
     color: white;
 }
+
 .card.blue {
     background-color: blue;
 }
+
 .card.white {
     background-color: white;
     color: black;
@@ -40,10 +46,14 @@
 .card-back {
     border-radius: 8px;
     background-color: #2B547E;
-    background-image: url('/public/images/castle2.png'); /* Replace with the path to your logo image */
-    background-position: center; /* Center the logo */
-    background-repeat: no-repeat; /* Do not repeat the logo */
-    background-size: 50%; /* Make sure your logo is fully visible within the card */
+    background-image: url('/public/images/castle2.png');
+    /* Replace with the path to your logo image */
+    background-position: center;
+    /* Center the logo */
+    background-repeat: no-repeat;
+    /* Do not repeat the logo */
+    background-size: 50%;
+    /* Make sure your logo is fully visible within the card */
 }
 
 /* Style for the back of the card */

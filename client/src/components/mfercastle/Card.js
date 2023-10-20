@@ -3,10 +3,10 @@ import './Card.css'; // assuming you have a CSS file for styles
 import { useDrag } from 'react-dnd';
 
 export const Card = ({ card }) => {
-const [, ref] = useDrag(() => ({
+  const [, ref] = useDrag(() => ({
     type: 'CARD',
     item: { type: 'Card', id: card.id }
-    }));
+  }));
   const { name, color, text, cost } = card;
   return (
     <div>
@@ -29,8 +29,8 @@ export const CardBack = () => {
   );
 };
 export const CardEmpty = () => {
-    return (
-      <div className={`card card-empty`}>
-      </div>
-    );
-  };
+  return (
+    <div className={`card card-empty`}>
+    </div>
+  );
+};

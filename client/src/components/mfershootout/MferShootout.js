@@ -13,91 +13,91 @@ const MferGalaga = () => {
   const [isGameStarted, setIsGameStarted] = useState(false);
   const handleLeftTouchStart = () => {
     setLeftPressed(true);
-};
+  };
 
-const bgMusic = new Howl({
-  src: ['/audio/Mississippi-Rag.mp3'],
-  loop: true, // So it loops continuously
-  volume: 0.5, // Adjust as needed
-});
+  const bgMusic = new Howl({
+    src: ['/audio/Mississippi-Rag.mp3'],
+    loop: true, // So it loops continuously
+    volume: 0.5, // Adjust as needed
+  });
 
 
-const handleLeftTouchEnd = () => {
+  const handleLeftTouchEnd = () => {
     setLeftPressed(false);
-};
+  };
 
-// Function to handle right control touch
-const handleRightTouchStart = () => {
+  // Function to handle right control touch
+  const handleRightTouchStart = () => {
     setRightPressed(true);
-};
+  };
 
-const handleRightTouchEnd = () => {
+  const handleRightTouchEnd = () => {
     setRightPressed(false);
-};
+  };
 
   const handleKeyDown = (e) => {
-    switch(e.keyCode) {
-        case 37: // Left arrow key
-            setLeftPressed(true);
-            e.preventDefault(); 
-            break;
-        case 39: // Right arrow key
-            setRightPressed(true);
-            e.preventDefault(); 
-            break;
-        case 32: // Spacebar
-            game.playerShoots();
-            e.preventDefault(); 
-            break;
-        default:
-            break;
+    switch (e.keyCode) {
+      case 37: // Left arrow key
+        setLeftPressed(true);
+        e.preventDefault();
+        break;
+      case 39: // Right arrow key
+        setRightPressed(true);
+        e.preventDefault();
+        break;
+      case 32: // Spacebar
+        game.playerShoots();
+        e.preventDefault();
+        break;
+      default:
+        break;
     }
-}
-
-const handleKeyUp = (e) => {
-    switch(e.keyCode) {
-        case 37: // Left arrow key
-            setLeftPressed(false);
-            break;
-        case 39: // Right arrow key
-            setRightPressed(false);
-            break;
-        default:
-            break;
-    }
-}
-
-useEffect(() => {
-  if (isGameStarted) {
-    bgMusic.seek(10);
-    bgMusic.play();
   }
 
-  return () => {
-    bgMusic.stop();
-  };
-}, [isGameStarted]);
-  
+  const handleKeyUp = (e) => {
+    switch (e.keyCode) {
+      case 37: // Left arrow key
+        setLeftPressed(false);
+        break;
+      case 39: // Right arrow key
+        setRightPressed(false);
+        break;
+      default:
+        break;
+    }
+  }
+
+  useEffect(() => {
+    if (isGameStarted) {
+      bgMusic.seek(10);
+      bgMusic.play();
+    }
+
+    return () => {
+      bgMusic.stop();
+    };
+  }, [isGameStarted]);
+
   useEffect(() => {
     // Add event listener for keydown
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
     const intervalId = setInterval(() => {
-        if (game.gamestate === "ongoing") {
-            if (leftPressed) {
-                game.ship.move(-7, 0);
-            }
-            if (rightPressed) {
-                game.ship.move(7, 0);
-            }
-            game.tick();
-            setGame(prevGame => {
-              const newGame = Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame);
-              newGame.tick();
-              return newGame;
-            
-          });
+      if (game.gamestate === "ongoing") {
+        if (leftPressed) {
+          game.ship.move(-7, 0);
         }
+        if (rightPressed) {
+          game.ship.move(7, 0);
+        }
+        game.tick();
+        setGame(prevGame => {
+          const newGame = Object.assign(Object.create(Object.getPrototypeOf(prevGame)), prevGame);
+          newGame.tick();
+          return newGame;
+
+        });
+      }
     }, 1000 / 60);
     console.log(game.gameOver);
     // Cleanup: Remove the event listener on component unmount
@@ -107,7 +107,7 @@ useEffect(() => {
       window.removeEventListener('keyup', handleKeyUp);
     };
   }, [game, leftPressed, rightPressed]);
-  
+
 
   return (
     <div className="gameContainer">
@@ -115,72 +115,72 @@ useEffect(() => {
       <div className="gameInfo">
         <span style={{ marginRight: '10px' }}>Level: {game.currentLevel}</span>
         <span className="healthInfo">
-            Health: 
-            {[...Array(game.ship.lives)].map((_, index) => (
-                <img 
-                    key={index} 
-                    src="/images/mfergalaga/redcros.png" 
-                    alt="Life Icon" 
-                    style={{ 
-                        width: '15px',
-                        height: '15px',
-                        margin: '0 2px 0 2px',
-                        backgroundColor: 'white',
-                        border: '2px solid red',
-                        verticalAlign: 'middle',
-                        position: 'relative',
-                        top: '0px'  // Adjusts the image downward by 4 pixels
-                    }}
-                />
-            ))}
+          Health:
+          {[...Array(game.ship.lives)].map((_, index) => (
+            <img
+              key={index}
+              src="/images/mfergalaga/redcros.png"
+              alt="Life Icon"
+              style={{
+                width: '15px',
+                height: '15px',
+                margin: '0 2px 0 2px',
+                backgroundColor: 'white',
+                border: '2px solid red',
+                verticalAlign: 'middle',
+                position: 'relative',
+                top: '0px'  // Adjusts the image downward by 4 pixels
+              }}
+            />
+          ))}
         </span>
-    </div>
+      </div>
 
       <div className="gameArea">
         {!isGameStarted && (
-          <button className="startButton" onClick={() => {setIsGameStarted(true); game.startGame(); bgMusic.play();}}>
-              Start Game
+          <button className="startButton" onClick={() => { setIsGameStarted(true); game.startGame(); bgMusic.play(); }}>
+            Start Game
           </button>
 
         )}
         <ShipComponent x={game.ship.x} y={game.ship.y} />
         {game.enemies.map((enemy, idx) => <EnemyComponent key={idx} x={enemy.x} y={enemy.y} type={enemy.type} />)}
-        {game.blasters.map((blaster, idx) => <BlasterComponent key={idx} x={blaster.x} y={blaster.y} fromEnemy={blaster.fromEnemy}/>)}
+        {game.blasters.map((blaster, idx) => <BlasterComponent key={idx} x={blaster.x} y={blaster.y} fromEnemy={blaster.fromEnemy} />)}
       </div>
       <div className="controlContainer">
-      <div 
+        <div
           className="controlPad leftControl"
           onTouchStart={(e) => {
-              e.preventDefault();  // Prevent default touch behavior
-              handleLeftTouchStart(e);
+            e.preventDefault();  // Prevent default touch behavior
+            handleLeftTouchStart(e);
           }}
           onTouchEnd={(e) => {
-              e.preventDefault();  // Prevent default touch behavior
-              handleLeftTouchEnd(e);
+            e.preventDefault();  // Prevent default touch behavior
+            handleLeftTouchEnd(e);
           }}
-      >L</div>
+        >L</div>
 
-      <div 
+        <div
           className="controlPad rightControl"
           onTouchStart={(e) => {
 
-              handleRightTouchStart(e);
-              e.preventDefault();  // Prevent default touch behavior
+            handleRightTouchStart(e);
+            e.preventDefault();  // Prevent default touch behavior
           }}
           onTouchEnd={(e) => {
 
-              handleRightTouchEnd(e);
-              e.preventDefault();  // Prevent default touch behavior
+            handleRightTouchEnd(e);
+            e.preventDefault();  // Prevent default touch behavior
           }}
-      >R</div>
+        >R</div>
 
-      <div 
+        <div
           className="controlPad shootControl"
           onTouchStart={(e) => {
-              game.playerShoots();
-              e.preventDefault();  // Prevent default touch 
+            game.playerShoots();
+            e.preventDefault();  // Prevent default touch 
           }}
-      >Shoot</div>
+        >Shoot</div>
       </div>
 
       {game.gamestate === "gameover" && (
@@ -191,11 +191,11 @@ useEffect(() => {
         </div>
       )}
       {game.gamestate === "victory" && (
-            <h2>VICTORY!!</h2>
+        <h2>VICTORY!!</h2>
       )}
 
     </div>
-);
+  );
 }
 
 export default MferGalaga;

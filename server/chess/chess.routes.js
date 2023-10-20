@@ -3,7 +3,7 @@ const router = express.Router();
 
 let chessGames = require('./state');
 
-const { createChessGame} = require('./chess.functions');
+const { createChessGame } = require('./chess.functions');
 
 const cleanupGames = () => {
     const now = Date.now();
@@ -11,7 +11,7 @@ const cleanupGames = () => {
 
     for (const gameId in chessGames) {
         const game = chessGames[gameId];
-        
+
         if ((now - game.lastActivity) > timeout) {
             delete chessGames[gameId];
             console.log(`Game ${gameId} cleaned up.`);

@@ -1,7 +1,7 @@
 import PlayerTimer from './PlayerTimer';
-import {getPlayerColor, ChessColor} from './ChessLib';
+import { getPlayerColor, ChessColor } from './ChessLib';
 
-function GameInfoComponent({game}) {
+function GameInfoComponent({ game }) {
     if (!game) return;
     // Calculate the number of disconnected players
     const disconnectedPlayersCount = game.players.filter(player => player.disconnected).length;

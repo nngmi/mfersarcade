@@ -1,7 +1,7 @@
-import {graphics, ChessColor} from './ChessLib';
+import { graphics, ChessColor } from './ChessLib';
 import './CapturedPieces.css';
 
-function CapturedPieces({game}) {
+function CapturedPieces({ game }) {
     if (!game) return null; // Return null for React components when nothing should be rendered
     const whitePlayer = game.players.find(p => p.color === ChessColor.WHITE);
     const blackPlayer = game.players.find(p => p.color === ChessColor.BLACK);

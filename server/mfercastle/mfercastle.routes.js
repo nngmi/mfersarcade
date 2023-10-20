@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 const { v4: uuidv4 } = require('uuid');
-const { games, getInitialGameState} = require('./state');
+const { games, getInitialGameState } = require('./state');
 
 const cleanupGames = () => {
     const now = Date.now();
@@ -10,7 +10,7 @@ const cleanupGames = () => {
 
     for (const gameId in games) {
         const game = games[gameId];
-        
+
         // Assume game has a `lastActivity` timestamp and a `status` property
         if ((now - game.lastActivity) > timeout) {
             delete games[gameId];

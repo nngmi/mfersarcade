@@ -10,7 +10,8 @@
     text-align: center;
     font-size: 24px;
 }
-.game-container button{
+
+.game-container button {
     font-size: 24px;
 }
 
@@ -18,40 +19,55 @@
 .player-area {
     background-color: #3fffff;
 }
+
 .opponent-area {
     background-color: #888888;
 }
+
 .battlefield-area {
     background-color: #4CAF50;
 }
+
 .player-area-row {
     display: flex;
     width: 100%;
 }
+
 .flex-container {
     display: flex;
-    justify-content: center;   /* Horizontally center the items */
-    align-items: center;       /* Vertically align the items in the center, if desired */
+    justify-content: center;
+    /* Horizontally center the items */
+    align-items: center;
+    /* Vertically align the items in the center, if desired */
 }
+
 .marginLeft {
     margin-left: 10px;
 }
+
 .grow-width {
     flex-grow: 1;
 }
 
 .fixed-width {
-    width: 300px; /* adjust as needed */
+    width: 300px;
+    /* adjust as needed */
 }
+
 .fixed-width-card {
-    width: 200px; /* adjust as needed */
+    width: 200px;
+    /* adjust as needed */
 }
+
 .header-container {
     display: flex;
-    align-items: center; /* Align items vertically centered */
+    align-items: center;
+    /* Align items vertically centered */
 }
 
 .state-area-container {
-    width: 200px; /* Your fixed width */
-    margin-left: 20px; /* Space between h1 and StateArea */
+    width: 200px;
+    /* Your fixed width */
+    margin-left: 20px;
+    /* Space between h1 and StateArea */
 }

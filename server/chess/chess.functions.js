@@ -2,9 +2,9 @@ const Chess = require('chess.js').Chess;
 const { v4: uuidv4 } = require('uuid');
 const axios = require('axios');
 
-const { 
-    joinExistingGame: commonJoinExistingGame, 
-    playerResign: commonPlayerResign, 
+const {
+    joinExistingGame: commonJoinExistingGame,
+    playerResign: commonPlayerResign,
     handleDisconnect: commonHandleDisconnect,
     createGame,
 } = require('../common/playerconnect.functions');
@@ -169,13 +169,13 @@ function processMove(game, move, playerId) {
     game.moves.push(move);
 
     if (chess.isCheckmate()) {
-        const winningPlayerIndex = game.players.findIndex(p => p.id === playerId); 
+        const winningPlayerIndex = game.players.findIndex(p => p.id === playerId);
         game.state = winningPlayerIndex === 0 ? "player0-wins" : "player1-wins";
         notifyDiscord(game.id, game.players[winningPlayerIndex].color + " has achieved glorious victory in game " + game.gameName);
     } else {
         const otherPlayer = game.players.find(p => p.id !== playerId); // Find the other player
         game.currentPlayer = otherPlayer.id; // Set the currentPlayer to the other player's id
-    }    
+    }
 
     game.lastActivity = Date.now();
 
@@ -197,7 +197,7 @@ function isValidMove(board, move, playerColor, castling, moveCount) {
     }
 }
 
-function boardToFEN(board, turn = 'w', castling = 'KQkq', moveCount=1) {
+function boardToFEN(board, turn = 'w', castling = 'KQkq', moveCount = 1) {
     let fen = "";
     let empty = 0;
 
@@ -237,7 +237,7 @@ function FENToBoard(fen) {
     const moveNumber = parseInt(fenParts[5]);
 
     const board = [];
-    
+
     for (const row of rows) {
         const boardRow = [];
         for (const char of row) {
@@ -255,7 +255,7 @@ function FENToBoard(fen) {
     return { board, turn, castling, moveNumber };
 }
 
-function createChessGame(gameName, fenPosition = null, autoplay=false) {
+function createChessGame(gameName, fenPosition = null, autoplay = false) {
     if (!gameName) {
         throw new Error("Game name is required.");
     }

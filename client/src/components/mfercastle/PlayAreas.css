@@ -1,22 +1,28 @@
 .hand {
     display: flex;
-    flex-direction: column; /* Stack children (count and cards container) vertically */
-    align-items: center; /* Center children horizontally */
+    flex-direction: column;
+    /* Stack children (count and cards container) vertically */
+    align-items: center;
+    /* Center children horizontally */
 }
 
 .cards-container {
-    display: flex; /* Place cards next to each other */
-    gap: 10px; /* Add some gap between cards */
+    display: flex;
+    /* Place cards next to each other */
+    gap: 10px;
+    /* Add some gap between cards */
 }
 
 .playState {
     text-align: left;
     min-width: 250px;
 }
+
 .marginSpan {
     margin-left: 0px;
     margin-right: 10px;
 }
+
 .wallCanvas {
     margin: 5px;
 }

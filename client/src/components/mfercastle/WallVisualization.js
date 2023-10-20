@@ -28,7 +28,7 @@ const WallVisualization = ({ maxWallHeight = 10, wallHeight = 10, scaleFactor = 
 
       let currentHeight = maxHeight - TILE_HEIGHT * scaleFactor;
       for (let i = 0; i < wallHeight; i++) {
-        for (let j = 1; j < wallWidth+1; j++) {
+        for (let j = 1; j < wallWidth + 1; j++) {
           ctx.drawImage(
             tilesetImage,
             wallTile.sourceX, wallTile.sourceY, wallTile.width, wallTile.height,
@@ -41,7 +41,7 @@ const WallVisualization = ({ maxWallHeight = 10, wallHeight = 10, scaleFactor = 
     };
   }, [wallHeight]);
 
-  return <canvas ref={canvasRef} width={TILE_WIDTH * scaleFactor * (wallWidth+2)} height={maxHeight} />;
+  return <canvas ref={canvasRef} width={TILE_WIDTH * scaleFactor * (wallWidth + 2)} height={maxHeight} />;
 };
 
 export default WallVisualization;

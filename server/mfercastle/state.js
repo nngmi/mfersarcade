@@ -11,7 +11,7 @@ function checkGameState(game) {
 
     let draw = true;
     let winner = null;
-    
+
     for (const player of game.players) {
         if (player.towerStrength >= 100) {
             return `${player.symbol}-wins`; // If a player’s towerStrength is 100 or more, they win.
@@ -28,7 +28,7 @@ function checkGameState(game) {
             }
         }
     }
-    
+
     if (draw) {
         return "draw";
     } else if (winner !== null) {
@@ -46,7 +46,7 @@ const getInitialGameState = () => {
         battlefields: {},
         hands: {},
         bunkers: {},
-        graveyards: {}, 
+        graveyards: {},
         currentPlayer: "X",
         state: "waiting for other player",
         lastActivity: Date.now(),
@@ -58,22 +58,22 @@ const getInitialGameState = () => {
 
 const initializePlayer = (n_cards, game, playerSymbol, socketid) => {
     game.players.push({ id: socketid, symbol: playerSymbol, towerStrength: 50, wallStrength: 30, generators: 1, spendingResources: 3, drawsLeft: 1, discardsLeft: 1 });
-    
+
     // shuffle a deck of cards for the user
     const deck = generateSetDeck(n_cards, socketid);
-    game.decks[playerSymbol] = {"count": n_cards, "cards": deck};
-    
+    game.decks[playerSymbol] = { "count": n_cards, "cards": deck };
+
     // draw the top 5 cards from the deck and put them in the hand
     const handCards = deck.slice(0, 5);
-    game.hands[playerSymbol] = {"count": 5, "cards": handCards};
-    
+    game.hands[playerSymbol] = { "count": 5, "cards": handCards };
+
     // remove the drawn cards from the deck
     game.decks[playerSymbol].cards = deck.slice(5);
     game.decks[playerSymbol].count = n_cards - 5;
-    
-    game.battlefields[playerSymbol] = {"count": 0, "cards": []};
-    game.graveyards[playerSymbol] = {"count": 0, "cards": []};
-    game.bunkers[playerSymbol] = [{"count": 0, "cards": []}, {"count": 0, "cards": []}];
+
+    game.battlefields[playerSymbol] = { "count": 0, "cards": [] };
+    game.graveyards[playerSymbol] = { "count": 0, "cards": [] };
+    game.bunkers[playerSymbol] = [{ "count": 0, "cards": [] }, { "count": 0, "cards": [] }];
 };
 
 const endTurn = (game, playerSymbol) => {
@@ -131,21 +131,21 @@ const discardCard = (game, cardid, playerSymbol) => {
     if (!cardid) {
         return "Error with discard because cardid does not exist";
     }
-    
+
     const cardIndex = game.hands[player.symbol].cards.findIndex(card => card.id === cardid);
-    
+
     if (cardIndex === -1) {
-    return "Error with discard, card not found in hand";
+        return "Error with discard, card not found in hand";
     }
 
     if (player.discardsLeft == 0) {
         return "error", "No more discards left";
     }
-    
+
     // removing card from hand
     const [card] = game.hands[player.symbol].cards.splice(cardIndex, 1);
     game.hands[player.symbol].count--;
-    
+
     // appending card to graveyard
     game.graveyards[player.symbol].cards.push(card);
     game.graveyards[player.symbol].count++;
@@ -222,7 +222,7 @@ const playCard = (game, cardid, playerSymbol) => {
     // removing card from hand
     game.hands[player.symbol].cards.splice(cardIndex, 1);
     game.hands[player.symbol].count--;
-    
+
     // appending card to battlefield
     game.battlefields[player.symbol].cards.push(card);
     game.battlefields[player.symbol].count++;
