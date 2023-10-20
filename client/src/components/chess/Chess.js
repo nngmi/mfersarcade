@@ -48,7 +48,7 @@ function GameChess() {
     };
 
     const shareOnX = () => {
-        const gameURL = `${SERVER_URL}/mferschess/${gameId}`;
+        const gameURL = `${SERVER_URL}/mferchess/${gameId}`;
         const tweetText = `♟️♟️ mfers arcade game alert ♟️♟️\n\nCheck out the chess game ${game.gameName} on mfers arcade!\n\n👇👇👇\n\n${gameURL}`;
         const tweetIntentURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
         window.open(tweetIntentURL, '_blank');
