@@ -6,7 +6,7 @@ import Connect4LandingPage from "./components/connect4/Connect4LandingPage";
 import MferCastle from "./components/mfercastle/MferCastle";
 import ChessLandingPage from "./components/chess/ChessLandingPage";
 import GameChess from "./components/chess/Chess";
-import MferGalaga from "./components/mfergalaga/MferGalaga";
+import MferShootout from "./components/mfershootout/MferShootout";
 import './App.css';
 
 function App() {
@@ -19,7 +19,7 @@ function App() {
         <Route path="/mferchess/" element={<ChessLandingPage />} />
         <Route path="/mferchess/:gameId" element={<GameChess />} />
         <Route path="/mfercastle/:gameId" element={<MferCastle />} />
-        <Route path="/mfersshootout/" element={<MferGalaga />} />
+        <Route path="/mfersshootout/" element={<MferShootout />} />
       </Routes>
     </Router>
   );

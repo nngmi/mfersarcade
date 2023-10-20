@@ -2,17 +2,11 @@ import { Howl } from 'howler';
 const GAME_WIDTH = 400;
 const GAME_HEIGHT = 500;
 
-const basicSound = new Howl({
+const shootingSound = new Howl({
     src: ["/audio/shot.wav"], // Replace with your sound file path
     autoplay: false, // Play the sound right away
     loop: false, // Do not loop the sound
     volume: 0.05, // Set the volume to 50%
-  });
-  const winSound = new Howl({
-    src: ["/audio/success.mp3"], // Replace with your sound file path
-    autoplay: false, // Play the sound right away
-    loop: false, // Do not loop the sound
-    volume: 0.5, // Set the volume to 50%
   });
   const wrongSound = new Howl({
     src: ["/audio/wrong_sound.mp3"], // Replace with your sound file path
@@ -289,7 +283,7 @@ class Game {
 
     playerShoots() {
         this.blasters.push(this.ship.shoot());
-        basicSound.play(); // Play the sound when firing
+        shootingSound.play(); // Play the sound when firing
     }
 
     checkCollisions() {

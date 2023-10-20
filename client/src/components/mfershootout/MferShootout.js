@@ -1,9 +1,9 @@
 // GalagaGame.js
 
 import React, { useState, useEffect } from 'react';
-import { Game } from './GalagaObjects';
-import { ShipComponent, EnemyComponent, BlasterComponent } from './GalagaComponents';
-import './MferGalaga.css'
+import { Game } from './ShootoutObjects';
+import { ShipComponent, EnemyComponent, BlasterComponent } from './ShootoutComponents';
+import './MferShootout.css'
 import { Howl } from 'howler';
 const MferGalaga = () => {
 
