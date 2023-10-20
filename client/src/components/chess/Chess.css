@@ -1,34 +1,46 @@
 .game-container {
     display: flex;
-    flex-direction: column; /* To stack children vertically */
-    justify-content: center; /* Centers children vertically */
-    align-items: center; /* Centers children horizontally */
-    text-align: center; /* To center the text content */
+    flex-direction: column;
+    /* To stack children vertically */
+    justify-content: center;
+    /* Centers children vertically */
+    align-items: center;
+    /* Centers children horizontally */
+    text-align: center;
+    /* To center the text content */
 }
 
 .chessboard {
     display: grid;
-    grid-template-columns: repeat(8, 1fr);  /* This will create 8 columns with equal width */
-    width: 400px; 
+    grid-template-columns: repeat(8, 1fr);
+    /* This will create 8 columns with equal width */
+    width: 400px;
     height: 400px;
     border: 1px solid black;
 }
 
 .square {
-    width: 48px;  /* Take full width of the grid cell */
-    height: 48px;  /* Take full height of the grid cell */
-    justify-content: center;  /* Center the image horizontally */
-    align-items: center;  /* Center the image vertically */
+    width: 48px;
+    /* Take full width of the grid cell */
+    height: 48px;
+    /* Take full height of the grid cell */
+    justify-content: center;
+    /* Center the image horizontally */
+    align-items: center;
+    /* Center the image vertically */
     border: 1px solid black;
 }
+
 .white-square {
-    background-color: #f0d9b5;  /* Adjust color as needed */
+    background-color: #f0d9b5;
+    /* Adjust color as needed */
 }
 
 .legend-table img {
     width: 30px;
     height: 30px;
 }
+
 .legend-section {
     margin-top: 20px;
     text-align: center;
@@ -41,31 +53,38 @@
 
 .legend-table {
     width: 400px;
-    table-layout: fixed; /* This ensures the table takes up the full width and divides the space among columns equally */
+    table-layout: fixed;
+    /* This ensures the table takes up the full width and divides the space among columns equally */
 }
 
 .legend-table th {
-    width: calc(400px / 6); /* Assuming you have 6 pieces */
+    width: calc(400px / 6);
+    /* Assuming you have 6 pieces */
 }
 
 .black-square {
-    background-color: #b58863;  /* Adjust color as needed */
+    background-color: #b58863;
+    /* Adjust color as needed */
 }
 
 .piece-img {
-    max-width: 90%;  /* You can adjust this value if you want your pieces to be smaller or larger */
+    max-width: 90%;
+    /* You can adjust this value if you want your pieces to be smaller or larger */
     max-height: 90%;
 }
 
 .square.selected {
-    background-color: rgba(255, 255, 0, 0.3); /* semi-transparent yellow for example */
+    background-color: rgba(255, 255, 0, 0.3);
+    /* semi-transparent yellow for example */
 }
+
 .chess-container {
     display: flex;
     align-items: center;
 }
 
-.row-labels, .column-labels {
+.row-labels,
+.column-labels {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -75,21 +94,43 @@
 
 .column-labels {
     flex-direction: row;
-    margin-bottom: 10px; /* or adjust to your preference */
+    margin-bottom: 2px;
 }
 
-.row-label, .column-label {
+.column-label {
     font-size: 14px;
-    width: 50px;
-    height: 50px;
+    width: 48px;
+    height: 20px;
     margin: 1px;
     text-align: center;
 
-    display: flex;            /* Make this a flex container */
-    align-items: center;      /* Vertically center the content */
-    justify-content: center;  /* Horizontally center the content */
+    display: flex;
+    /* Make this a flex container */
+    align-items: center;
+    /* Vertically center the content */
+    justify-content: center;
+    /* Horizontally center the content */
+}
+
+.row-label {
+    font-size: 14px;
+    width: 20px;
+    height: 48px;
+    margin: 1px;
+    text-align: center;
+
+    display: flex;
+    /* Make this a flex container */
+    align-items: top;
+    /* Vertically center the content */
+    justify-content: center;
+    /* Horizontally center the content */
 }
 
 .chessboard-wrapper {
     position: relative;
+}
+
+.back-button {
+    font-size: 10px;
 }

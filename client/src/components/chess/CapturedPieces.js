@@ -25,10 +25,11 @@ function CapturedPieces({ game }) {
 
     return (
         <div>
+            <h2 className="legend-title">Captured Pieces</h2>
             <table className="captured-table">
                 <thead>
                     <tr>
-                        <th>Captured by Plain:</th>
+                        <th>Plain:</th>
                         <th>
                             {whitePlayer.capturedPieces.map(piece => (
                                 <img src={graphics[`${piece}-black`]} alt={`${piece} black`} />
@@ -36,7 +37,7 @@ function CapturedPieces({ game }) {
                         </th>
                     </tr>
                     <tr>
-                        <th>Captured by Charcoal:</th>
+                        <th>Charcoal:</th>
                         <th>
                             {blackPlayer.capturedPieces.map(piece => (
                                 <img src={graphics[`${piece}-white`]} alt={`${piece} white`} />

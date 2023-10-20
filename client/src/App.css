@@ -6,14 +6,16 @@
   height: 40vmin;
   pointer-events: none;
 }
+
 html {
   background-color: #FEAC64;
   font-family: 'Sartoshi', sans-serif;
 }
+
 @font-face {
   font-family: 'Sartoshi';
-  src: local('Sartoshi'), 
-       url('./assets/fonts/SartoshiScript-Regular.otf') format('opentype');
+  src: local('Sartoshi'),
+    url('./assets/fonts/SartoshiScript-Regular.otf') format('opentype');
   font-weight: normal;
   font-style: normal;
 }
@@ -28,6 +30,7 @@ html {
   font-size: calc(10px + 2vmin);
   color: white;
 }
+
 button {
   background-color: red;
   color: white;
@@ -40,6 +43,7 @@ button {
   margin: 5px;
   font-family: 'Sartoshi', sans-serif;
 }
+
 button:disabled {
   background-color: grey;
   color: black;
@@ -55,7 +59,7 @@ button:disabled {
 
 .depress-button:active {
   box-shadow: none;
-  transform: translateY(2px); 
+  transform: translateY(2px);
 }
 
 .App-link {

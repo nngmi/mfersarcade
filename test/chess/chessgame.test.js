@@ -22,7 +22,7 @@ describe('FEN and Board conversion', () => {
 
     test.each(testCases)("converts FEN to board and back for %s", (fen) => {
         const { board, turn, castling, moveNumber } = FENToBoard(fen);
-        const backToFEN = boardToFEN(board, turn === 'white' ? 'w' : 'b', castling, moveNumber);
+        const backToFEN = boardToFEN(board, turn === 'plain' ? 'w' : 'b', castling, moveNumber);
         expect(backToFEN).toBe(fen);
     });
 });
@@ -44,7 +44,7 @@ describe("Chess Game", () => {
     it("should reject moving when not player's turn", () => {
         joinExistingGame(game, player1);
         joinExistingGame(game, player2);
-        
+
         let moveResult = processMove(game, { from: "e7", to: "e5" }, player1); // It's white's turn but black is trying to move
         expect(moveResult.success).toBe(false);
     });
@@ -73,22 +73,22 @@ describe("Chess Game", () => {
     it("should create, join, play a 4-move checkmate, and validate captured pieces and time updates", () => {
 
         expect(game.state).toBe("waiting for players");
-    
+
         // Player 1 joins
         let joinResult = joinExistingGame(game, player1);
         expect(joinResult.success).toBe(true);
         expect(game.state).toBe("waiting for players");
-    
+
         // Player 2 joins
         joinResult = joinExistingGame(game, player2);
         expect(joinResult.success).toBe(true);
         expect(game.state).toBe("ongoing");
-    
+
         // Set initial time for players for this test
         game.players[0].timeLeft = 60000; // 1 minute
         game.players[1].timeLeft = 60000; // 1 minute
         game.lastActivity = Date.now();
-    
+
         // Four-move checkmate sequence: Scholar's Mate
         const moves = [
             { player: player1, move: { from: "e2", to: "e4" } },
@@ -99,46 +99,46 @@ describe("Chess Game", () => {
             { player: player2, move: { from: "g8", to: "f6" } },
             { player: player1, move: { from: "h5", to: "f7" } }
         ];
-    
+
         for (let moveDetails of moves) {
             const moveResult = processMove(game, moveDetails.move, moveDetails.player);
             expect(moveResult.success).toBe(true);
         }
-    
+
         // Checkmate validation
         expect(game.state).toBe("player0-wins");
         const { board } = FENToBoard("r1bqkb1r/pppp1Qpp/2n2n2/4p3/2B1P3/8/PPPP1PPP/RNB1K1NR b KQkq - 0 4");
         expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
-    
+
         // Validate captured pieces
         expect(game.players[0].capturedPieces).toContain('p'); // Black captured a white pawn.
-    
+
         // Validate the time updates
         // Assuming it took less than a minute for the entire match in this test.
         expect(game.players[0].timeLeft).toBeGreaterThan(0);
         expect(game.players[1].timeLeft).toBeGreaterThan(0);
-    
+
     });
-    
+
     it("should simulate the full Italian Game sequence", () => {
 
         expect(game.state).toBe("waiting for players");
-    
+
         // Player 1 joins
         let joinResult = joinExistingGame(game, player1);
         expect(joinResult.success).toBe(true);
         expect(game.state).toBe("waiting for players");
-    
+
         // Player 2 joins
         joinResult = joinExistingGame(game, player2);
         expect(joinResult.success).toBe(true);
         expect(game.state).toBe("ongoing");
-    
+
         // Set initial time for players for this test
         game.players[0].timeLeft = 180000; // 3 minutes
         game.players[1].timeLeft = 180000; // 3 minutes
         game.lastActivity = Date.now();
-    
+
         // Italian Game sequence (Italian Gambit Line)
         const moves = [
             { player: player1, move: { from: "e2", to: "e4" } },
@@ -155,52 +155,52 @@ describe("Chess Game", () => {
             { player: player2, move: { from: "e8", to: "f7" } }  // black captures white bishop
             // ... You can continue this further if you wish.
         ];
-    
+
         for (let moveDetails of moves) {
             const moveResult = processMove(game, moveDetails.move, moveDetails.player);
             expect(moveResult.success).toBe(true);
         }
-    
+
         // Game state validation (Assuming the game is still ongoing)
         expect(game.state).toBe("ongoing");
-    
+
         // Validate captured pieces
         expect(game.players[0].capturedPieces).toContain('p'); // White captured a black pawn.
         expect(game.players[1].capturedPieces).toContain('p'); // Black captured a white pawn.
         expect(game.players[1].capturedPieces).toContain('b'); // Black captured a white bishop.
-    
+
         // Validate the time updates
         // Assuming it took less than 3 minutes for the played moves in this test.
         expect(game.players[0].timeLeft).toBeGreaterThan(0);
         expect(game.players[1].timeLeft).toBeGreaterThan(0);
-    
+
     });
-    
+
     it("should suggest a valid move for a given game state", () => {
         // Setup initial game state
         const initialFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"; // Starting position
         const { board, turn, castling, moveNumber } = FENToBoard(initialFEN);
-    
+
         const game = {
             board: board,
-            turn: turn === 'w' ? 'white' : 'black',
+            turn: turn === 'w' ? 'plain' : 'charcoal',
             castling: castling,
             moveNumber: moveNumber,
             state: "ongoing",
             moves: [],
             currentPlayer: player1, // Assuming player1 is the white player
-            players: [ { id: player1, color: "white" }, { id: player2, color: "black" } ]
+            players: [{ id: player1, color: "plain" }, { id: player2, color: "charcoal" }]
         };
-    
+
         // Call suggestMove to get a move suggestion
-        const suggestedMove = suggestMove(game, 'white');
-    
+        const suggestedMove = suggestMove(game, 'plain');
+
         // Validate the move
         expect(suggestedMove).not.toBeNull();
         const moveResult = processMove(game, suggestedMove, player1); // Assuming player1 is the current player
         expect(moveResult.success).toBe(true);
     });
-    
+
 });
 
 
@@ -233,7 +233,7 @@ describe("Pawn Promotion", () => {
         expect(game.state).toBe("ongoing");
 
         // Move sequence to promote the pawn
-        const move = { player: player1, move: { from: "a7", to: "a8" } }; 
+        const move = { player: player1, move: { from: "a7", to: "a8" } };
         const moveResult = processMove(game, move.move, move.player);
         expect(moveResult.success).toBe(true);
 
@@ -241,6 +241,50 @@ describe("Pawn Promotion", () => {
         const { board } = FENToBoard("Q6k/8/8/8/8/8/8/7K b - - 0 2");
         expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
 
+    });
+});
+
+describe("Black Pawn Promotion", () => {
+
+    let game, gameId;
+    let player1 = "player1Id";  // Assuming player 1 is white
+    let player2 = "player2Id";  // Assuming player 2 is black
+
+    beforeEach(() => {
+        // Create a new game before each test with a custom FEN for black pawn promotion
+        const fenForPawnPromotion = "7k/8/8/8/8/8/p7/7K w - - 0 1";
+        const result = createChessGame("Test Black Pawn Promotion", fenForPawnPromotion);
+        gameId = result.gameId;
+        game = result.game;
+    });
+
+    it("should create, join, and promote a black pawn to queen", () => {
+
+        expect(game.state).toBe("waiting for players");
+
+        // Player 1 joins
+        let joinResult = joinExistingGame(game, player1);
+        expect(joinResult.success).toBe(true);
+        expect(game.state).toBe("waiting for players");
+
+        // Player 2 joins
+        joinResult = joinExistingGame(game, player2);
+        expect(joinResult.success).toBe(true);
+        expect(game.state).toBe("ongoing");
+
+        // First move by the white King
+        const kingMove = { player: player1, move: { from: "h1", to: "h2" } };
+        const kingMoveResult = processMove(game, kingMove.move, kingMove.player);
+        expect(kingMoveResult.success).toBe(true);
+
+        // Move sequence to promote the black pawn
+        const move = { player: player2, move: { from: "a2", to: "a1" } };
+        const moveResult = processMove(game, move.move, move.player);
+        expect(moveResult.success).toBe(true);
+
+        // Verify that the black pawn has been promoted to a black queen
+        const { board } = FENToBoard("7k/8/8/8/8/8/7K/q7 w - - 0 2");
+        expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
     });
 });
 
@@ -297,7 +341,7 @@ describe('Chess game flow 1', () => {
         const rejoin = joinExistingGame(chessGames[gameId], player1Id, player1JoinKey);
         expect(rejoin.success).toBe(true);
         expect(rejoin.joinedPlayer).toBe(player1Id);
-        
+
         // Player 2 resigns
         const resign = playerResign(chessGames[gameId], player2Id);
         expect(resign.success).toBe(true);

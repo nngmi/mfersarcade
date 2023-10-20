@@ -9,6 +9,10 @@ function ChessLandingPage() {
     const SERVER_URL = process.env.REACT_APP_SERVER_URL || "http://localhost:3001";
     const navigate = useNavigate();
 
+    const navigateToHome = () => {
+        navigate("/");
+    };
+
     useEffect(() => {
         // Fetch the list of all games
         fetch(`${SERVER_URL}/api/chess/games`)
@@ -16,6 +20,7 @@ function ChessLandingPage() {
             .then((data) => { console.log(data); setGames(data) })
             .catch((error) => console.error('Error fetching the games list:', error));
     }, []);
+
     const validateGameName = (name) => {
         const trimmedName = name.trim();
         return trimmedName.length > 0 && trimmedName.length <= 50;
@@ -52,7 +57,7 @@ function ChessLandingPage() {
             <h1 className="title">Mfer Chess</h1>
 
             <section>
-                <h3>Games in Progress:</h3>
+                <h3>Games in Progress</h3>
                 {games && Object.keys(games).length > 0 ? (
                     <>
                         <ul className="games-list">
@@ -106,7 +111,9 @@ function ChessLandingPage() {
                     Create New Game
                 </button>
             </section>
-
+            <button onClick={navigateToHome} className="back-button">
+                Back to Home
+            </button>
             <p>
                 <a href="/" className="back-button">
                     Back to Home

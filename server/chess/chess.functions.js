@@ -144,7 +144,7 @@ function processMove(game, move, playerId) {
     if (promotingPiece && promotingPiece.toLowerCase() === 'p') {
         if (player.color === ChessColor.WHITE && toRow === 0) {
             move.promotion = 'q';
-        } else if (player.color === 'black' && toRow === 7) {
+        } else if (player.color === ChessColor.BLACK && toRow === 7) {
             move.promotion = 'q';
         }
     }
