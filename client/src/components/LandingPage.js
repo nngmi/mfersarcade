@@ -58,7 +58,12 @@ function LandingPage() {
           <img onClick={createMferCastleGame} src="/images/mfercastle.png" alt="Mfers Castle" />
           <p>🚧 Mfers Castle 🚧</p>
         </div>
-
+        <div className="game-item">
+          <Link to="https://mirror.xyz/0xcC0Ba34FfE6107D4119FCa34dde7B09386bC8166/Msg--Ep4AWMQPJXwI04s9t6-Vj340MMh5VRdL6MlUDE">
+            <img src="/images/mferarcade.png" alt="Mfer Arcade" />
+          </Link>
+          <p>About - What is Mfers Arcade?</p>
+        </div>
       </div>
     </div>
   );
