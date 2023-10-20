@@ -111,14 +111,24 @@ function ChessLandingPage() {
                     Create New Game
                 </button>
             </section>
+            <section>
+                <h3>Credits</h3>
+                <p>
+                    Game Design: Sartocrates
+                </p>
+                <p>
+                    Dev: nngmi
+                </p>
+                <p>
+                    Artwork: mfers by sartoshi
+                </p>
+                <p>
+                    Sounds: Pixabay
+                </p>
+            </section>
             <button onClick={navigateToHome} className="back-button">
                 Back to Home
             </button>
-            <p>
-                <a href="/" className="back-button">
-                    Back to Home
-                </a>
-            </p>
         </div>
     );
 }
