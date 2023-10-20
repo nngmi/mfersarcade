@@ -134,3 +134,8 @@
 .back-button {
     font-size: 10px;
 }
+
+.share-button {
+    background-color: blue;
+    font-size: 10px;
+}

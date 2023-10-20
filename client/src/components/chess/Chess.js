@@ -23,9 +23,7 @@ import './Chess.css';
 function GameChess() {
 
     const navigate = useNavigate();
-    const navigateToHome = () => {
-        navigate("/mferchess");
-    };
+
 
     let { gameId } = useParams();
     const [socket, setSocket] = useState(null);
@@ -45,7 +43,16 @@ function GameChess() {
         socket.emit("makeMove", gameId, { from, to });
     };
 
+    const navigateToHome = () => {
+        navigate("/mferchess");
+    };
 
+    const shareOnX = () => {
+        const gameURL = `${SERVER_URL}/mferschess/${gameId}`;
+        const tweetText = `♟️♟️ mfers arcade game alert ♟️♟️\n\nCheck out the chess game ${game.gameName} on mfers arcade!\n\n👇👇👇\n\n${gameURL}`;
+        const tweetIntentURL = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
+        window.open(tweetIntentURL, '_blank');
+    };
 
     const toAlgebraicNotation = (row, col) => {
         const columns = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h'];
@@ -333,6 +340,9 @@ function GameChess() {
                     <div>
                         <button onClick={navigateToHome} className="back-button">
                             Back to Home
+                        </button>
+                        <button onClick={shareOnX} className="share-button">
+                            Share on X
                         </button>
                     </div>
                     <CapturedPieces game={game} />
