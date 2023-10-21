@@ -287,6 +287,130 @@ describe("Black Pawn Promotion", () => {
         expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
     });
 });
+describe("Castling Black", () => {
+
+    let game, gameId;
+    let player1 = "player1Id"; // This will now be the black player
+    let player2 = "player2Id"; // This will be the white player
+
+    beforeEach(() => {
+        // Create a new game before each test with a custom FEN for castling
+        const fenForCastling = "r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 0 1";
+        const result = createChessGame("Test Castling", fenForCastling);
+        gameId = result.gameId;
+        game = result.game;
+
+    });
+
+    it("should create, join, and castle kingside (short) for black", () => {
+
+        expect(game.state).toBe("waiting for players");
+
+        let joinResult = joinExistingGame(game, player1);
+        expect(joinResult.success).toBe(true);
+        expect(game.state).toBe("waiting for players");
+
+        joinResult = joinExistingGame(game, player2);
+        expect(joinResult.success).toBe(true);
+
+        game.currentPlayer = player2;
+
+        const move = { player: player2, move: { from: "e8", to: "g8" } };
+        const moveResult = processMove(game, move.move, move.player);
+        expect(moveResult.success).toBe(true);
+
+        // Verify that the king and rook have moved to their castled positions
+        const { board } = FENToBoard("r4rk1/8/8/8/8/8/8/R3K2R w KQ - 1 2");
+        expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
+    });
+
+    it("should create, join, and castle queenside (long) for black", () => {
+
+        // Player 1 (Black) joins
+        let joinResult = joinExistingGame(game, player1);
+        expect(joinResult.success).toBe(true);
+        expect(game.state).toBe("waiting for players");
+
+        // Player 2 (White) joins
+        joinResult = joinExistingGame(game, player2);
+        expect(joinResult.success).toBe(true);
+        expect(game.state).toBe("ongoing");
+        game.currentPlayer = player2;
+        // Execute queenside castling for black
+        const move = { player: player2, move: { from: "e8", to: "c8" } };
+        const moveResult = processMove(game, move.move, move.player);
+        expect(moveResult.success).toBe(true);
+
+        // Verify that the king and rook have moved to their castled positions
+        const { board } = FENToBoard("2kr3r/8/8/8/8/8/8/R3K2R w KQ - 1 2");
+        expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
+    });
+
+});
+
+
+describe("Castling", () => {
+
+    let game, gameId;
+    let player1 = "player1Id";
+    let player2 = "player2Id";
+
+    beforeEach(() => {
+        // Create a new game before each test with a custom FEN for castling
+        const fenForCastling = "r3k2r/8/8/8/8/8/8/R3K2R w KQ - 0 1";
+        const result = createChessGame("Test Castling", fenForCastling);
+        gameId = result.gameId;
+        game = result.game;
+    });
+
+    it("should create, join, and castle kingside (short)", () => {
+
+        expect(game.state).toBe("waiting for players");
+
+        // Player 1 joins
+        let joinResult = joinExistingGame(game, player1);
+        expect(joinResult.success).toBe(true);
+        expect(game.state).toBe("waiting for players");
+
+        // Player 2 joins
+        joinResult = joinExistingGame(game, player2);
+        expect(joinResult.success).toBe(true);
+        expect(game.state).toBe("ongoing");
+
+        // Execute kingside castling
+        const move = { player: player1, move: { from: "e1", to: "g1" } };
+        const moveResult = processMove(game, move.move, move.player);
+        expect(moveResult.success).toBe(true);
+
+        // Verify that the king and rook have moved to their castled positions
+        const { board } = FENToBoard("r3k2r/8/8/8/8/8/8/R4RK1 b - - 1 1");
+        expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
+    });
+
+    it("should create, join, and castle queenside (long)", () => {
+
+        // Player 1 joins
+        let joinResult = joinExistingGame(game, player1);
+        expect(joinResult.success).toBe(true);
+        expect(game.state).toBe("waiting for players");
+
+        // Player 2 joins
+        joinResult = joinExistingGame(game, player2);
+        expect(joinResult.success).toBe(true);
+        expect(game.state).toBe("ongoing");
+
+        // Execute queenside castling
+        const move = { player: player1, move: { from: "e1", to: "c1" } };
+        const moveResult = processMove(game, move.move, move.player);
+        expect(moveResult.success).toBe(true);
+
+        // Verify that the king and rook have moved to their castled positions
+        const { board } = FENToBoard("r3k2r/8/8/8/8/8/8/2KR3R b - - 1 1");
+        expect(JSON.stringify(game.board)).toBe(JSON.stringify(board));
+    });
+
+});
+
 
 describe('Chess game flow 1', () => {
 

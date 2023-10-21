@@ -271,7 +271,7 @@ function createChessGame(gameName, fenPosition = null, autoplay = false) {
         ['R', 'N', 'B', 'Q', 'K', 'B', 'N', 'R']
     ];
 
-    const initialData = fenPosition ? FENToBoard(fenPosition) : { board: initialBoard, turn: "white", castling: "KQkq", moveNumber: 0 };
+    const initialData = fenPosition ? FENToBoard(fenPosition) : { board: initialBoard, turn: ChessColor.WHITE, castling: "KQkq", moveNumber: 0 };
 
     let game = createGame(gameName);
     game.board = initialData.board;
