@@ -84,7 +84,8 @@ function suggestMove(game, turn) {
         return {
             from: topMove.from,
             to: topMove.to,
-            promotion: topMove.promotion
+            promotion: topMove.promotion,
+            piece: topMove.piece
         };
     }
 
@@ -102,7 +103,8 @@ function suggestMove(game, turn) {
         return {
             from: topCenterMove.from,
             to: topCenterMove.to,
-            promotion: topCenterMove.promotion
+            promotion: topCenterMove.promotion,
+            piece: topCenterMove.piece
         };
     }
 
@@ -114,7 +116,8 @@ function suggestMove(game, turn) {
             return {
                 from: move.from,
                 to: move.to,
-                promotion: move.promotion
+                promotion: move.promotion,
+                piece: move.piece
             };
         }
         chess.undo();
@@ -124,7 +127,8 @@ function suggestMove(game, turn) {
     return {
         from: topMove.from,
         to: topMove.to,
-        promotion: topMove.promotion
+        promotion: topMove.promotion,
+        piece: topMove.piece
     };
 }
 
@@ -132,6 +136,7 @@ function suggestMove(game, turn) {
 
 function processMove(game, move, playerId) {
     const player = game.players.find(p => p.id === playerId);
+    player.moves.push(move)
     if (!player) return { error: "Not a valid player" };
     if (game.currentPlayer !== playerId) return { error: "Not your turn" };
     if (game.state !== "ongoing") return { error: "Game is not ongoing" };
@@ -139,6 +144,7 @@ function processMove(game, move, playerId) {
     const fromCol = move.from.charCodeAt(0) - 'a'.charCodeAt(0);
     const fromRow = 8 - parseInt(move.from[1]);
     const toRow = 8 - parseInt(move.to[1]);
+    move.color = player.color;
 
     const promotingPiece = game.board[fromRow][fromCol];
     if (promotingPiece && promotingPiece.toLowerCase() === 'p') {

@@ -11,6 +11,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 // Components
 import ChessContainer from './ChessContainer';
 import CapturedPieces from './CapturedPieces';
+import Moves from './Moves';
 import GameInfoComponent from './GameInfoComponent';
 import Legend from './Legend';
 
@@ -40,7 +41,9 @@ function GameChess() {
         if (gameState !== "ongoing" || game.currentPlayer !== playerId) return;
         const from = toAlgebraicNotation(fromSquare.row, fromSquare.col);
         const to = toAlgebraicNotation(toSquare.row, toSquare.col);
-        socket.emit("makeMove", gameId, { from, to });
+        const color = game.currentPlayer.color
+        const piece = game.board[fromSquare.row][fromSquare.col]
+        socket.emit("makeMove", gameId, { from, to, color, piece });
     };
 
     const navigateToHome = () => {
@@ -109,6 +112,7 @@ function GameChess() {
 
         const gameUpdatedListenerBasic = (game) => {
             console.log("game updated");
+            console.log(game)
             setGameState(game.state);
             setGame(game);
         };
@@ -346,6 +350,7 @@ function GameChess() {
                         </button>
                     </div>
                     <CapturedPieces game={game} />
+                    <Moves game={game}></Moves>
                     <Legend pieceLegend={pieceLegend} />
                     <ToastContainer limit={3} />
                 </>
