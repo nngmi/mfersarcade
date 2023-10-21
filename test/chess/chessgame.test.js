@@ -189,7 +189,7 @@ describe("Chess Game", () => {
             state: "ongoing",
             moves: [],
             currentPlayer: player1, // Assuming player1 is the white player
-            players: [{ id: player1, color: "plain" }, { id: player2, color: "charcoal" }]
+            players: [{ id: player1, color: "plain", moves:[] }, { id: player2, color: "charcoal", moves:[] }]
         };
 
         // Call suggestMove to get a move suggestion
