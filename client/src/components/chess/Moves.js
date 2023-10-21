@@ -15,7 +15,7 @@ function Moves({ game }) {
 
     return (
         <div>
-            <h2 className="legend-title">Captured Pieces</h2>
+            <h2 className="legend-title">Moves</h2>
             <table className="captured-table">
                 <thead>
                     <tr>
