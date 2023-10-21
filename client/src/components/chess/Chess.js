@@ -112,7 +112,6 @@ function GameChess() {
 
         const gameUpdatedListenerBasic = (game) => {
             console.log("game updated");
-            console.log(game)
             setGameState(game.state);
             setGame(game);
         };

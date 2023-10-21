@@ -107,15 +107,13 @@ module.exports = (io) => {
                     chessSocket.to(gameId).emit("notify", player.color + " made a move from " + move["from"] + " to " + move["to"]);
                     chessSocket.to(gameId).emit("gameUpdated", game);
                     if (game.autoplay) {
-                        let suggestedMove = suggestMove(game, 'black');
-                        
+                        let suggestedMove = suggestMove(game, 'black');                        
                         if (suggestedMove !== null) {
                             // Validate the move
                             processMove(game, suggestedMove, game.players[1].id);
                             chessSocket.to(gameId).emit("notify", game.players[1].color + " made a move from " + suggestedMove["from"] + " to " + suggestedMove["to"]);
                             chessSocket.to(gameId).emit("gameUpdated", game);
                         } else {
-
                             chessSocket.to(gameId).emit("error", game.players[1].color + " has no more possible moves!");
                         }
 
