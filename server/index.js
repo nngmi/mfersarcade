@@ -8,7 +8,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 const bodyParser = require('body-parser');
-app.use(bodyParser.json()); 
+app.use(bodyParser.json());
+
 // mfer castle
 require('./mfercastle/mfercastle.socket')(io);
 app.use("/api/mfercastle", require("./mfercastle/mfercastle.routes"));
@@ -16,6 +17,10 @@ app.use("/api/mfercastle", require("./mfercastle/mfercastle.routes"));
 // mfer chess
 require('./chess/chess.socket')(io);
 app.use("/api/chess", require("./chess/chess.routes"));
+
+// larva legends
+require('./larvalegends/larvalegends.socket')(io);
+app.use("/api/larvalegends", require("./larvalegends/larvalegends.routes"));
 
 // connect 4
 require('./connect4/connect4.socket')(io);
