@@ -117,7 +117,7 @@ function ChessLandingPage() {
                     Game Design: Sartocrates
                 </p>
                 <p>
-                    Dev: nngmi
+                    Dev: nngmi, anonchickenlegs
                 </p>
                 <p>
                     Artwork: mfers by sartoshi
