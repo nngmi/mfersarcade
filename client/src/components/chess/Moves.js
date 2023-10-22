@@ -8,8 +8,16 @@ function Moves({ game }) {
     if (!whitePlayer || !blackPlayer) return null;
 
     const returnPlayerMoves = (player) => {
-        return player.moves.map(move => (
-            <div>piece {move.piece} from {move.from} to {move.to}</div>
+
+        return player.moves.slice().reverse().map(move => (
+            <div>
+                <img
+                    src={graphics[`${move.piece.toLowerCase()}-${move.color===ChessColor.WHITE ? "white": "black"}`]}
+                    alt={`piece ${move.piece}`}
+                    className="piece-img"
+                />
+                from {move.from} to {move.to}
+            </div>
         ))
     }
 
