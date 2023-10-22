@@ -84,7 +84,8 @@ function suggestMove(game, turn) {
         return {
             from: topMove.from,
             to: topMove.to,
-            promotion: topMove.promotion
+            promotion: topMove.promotion,
+            piece: topMove.piece
         };
     }
 
@@ -102,7 +103,8 @@ function suggestMove(game, turn) {
         return {
             from: topCenterMove.from,
             to: topCenterMove.to,
-            promotion: topCenterMove.promotion
+            promotion: topCenterMove.promotion,
+            piece: topCenterMove.piece
         };
     }
 
@@ -114,7 +116,8 @@ function suggestMove(game, turn) {
             return {
                 from: move.from,
                 to: move.to,
-                promotion: move.promotion
+                promotion: move.promotion,
+                piece: move.piece
             };
         }
         chess.undo();
@@ -124,7 +127,8 @@ function suggestMove(game, turn) {
     return {
         from: topMove.from,
         to: topMove.to,
-        promotion: topMove.promotion
+        promotion: topMove.promotion,
+        piece: topMove.piece
     };
 }
 
@@ -135,11 +139,12 @@ function processMove(game, move, playerId) {
     if (!player) return { error: "Not a valid player" };
     if (game.currentPlayer !== playerId) return { error: "Not your turn" };
     if (game.state !== "ongoing") return { error: "Game is not ongoing" };
-
+    
     const fromCol = move.from.charCodeAt(0) - 'a'.charCodeAt(0);
     const fromRow = 8 - parseInt(move.from[1]);
     const toRow = 8 - parseInt(move.to[1]);
-
+    move.color = player.color;
+    
     const promotingPiece = game.board[fromRow][fromCol];
     if (promotingPiece && promotingPiece.toLowerCase() === 'p') {
         if (player.color === ChessColor.WHITE && toRow === 0) {
@@ -148,17 +153,17 @@ function processMove(game, move, playerId) {
             move.promotion = 'q';
         }
     }
-
+    
     // Validate the move using chess.js
     if (!isValidMove(game.board, move, player.color, game.castling, game.moveNumber)) {
         return { error: "Invalid move", success: false };
     }
-
+    
     const turn = player.color === ChessColor.WHITE ? 'w' : 'b';
     const fen = boardToFEN(game.board, turn, game.castling, game.moveNumber);
     const chess = new Chess(fen);
     const chessMoveResult = chess.move(move);
-
+    
     // Check if a piece was captured during the move
     if (chessMoveResult && chessMoveResult.captured) {
         player.capturedPieces.push(chessMoveResult.captured);
@@ -167,6 +172,7 @@ function processMove(game, move, playerId) {
     game.board = board;
     game.castling = castling;
     game.moves.push(move);
+    player.moves.push(move)
 
     if (chess.isCheckmate()) {
         const winningPlayerIndex = game.players.findIndex(p => p.id === playerId);

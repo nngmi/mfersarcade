@@ -34,6 +34,7 @@ function joinExistingGame(game, playerId, joinKey, newPlayerFunction) {
     let player = {
         id: playerId,
         disconnected: false,
+        moves: [],
         joinKey: uuidv4() // Save the joinKey with the player
     };
     newPlayerFunction(player, game);
