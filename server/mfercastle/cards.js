@@ -122,7 +122,7 @@ function dealDamage(game, playerSymbol, damage, ignoreWall = false, wallDamageMu
 function violentGeneratorEffect(game, playerSymbol) {
   const { otherPlayer, player } = getPlayers(game, playerSymbol);
   player.generators += 1;
-  dealDamage(game, playerSymbol, 10);
+  dealDamage(game, playerSymbol, 5);
 }
 
 function stealEffect(game, playerSymbol) {
@@ -164,8 +164,8 @@ function explosionEffect(game, playerSymbol) {
 
 function levyEffect(game, playerSymbol) {
   const { otherPlayer, player } = getPlayers(game, playerSymbol);
-  otherPlayer.towerStrength -= (otherPlayer.towerStrength >= 10 ? 10 : otherPlayer.towerStrength);
-  player.towerStrength += 10;
+  otherPlayer.towerStrength -= (otherPlayer.towerStrength >= 12 ? 12 : otherPlayer.towerStrength);
+  player.towerStrength += 12;
 }
 
 function conjureResourcesEffectBase(game, playerSymbol) {
@@ -313,13 +313,13 @@ function repurposeEffect(game, playerSymbol) {
 const cardsData = [
   { cardid: 1, name: "Conjure Generator", type: "spell", cost: 2, text: "Add (1) generator", color: "mfer", effect: conjureGeneratorEffect },
   { cardid: 2, name: "Conjure Resources", type: "spell", cost: 3, text: "Gain 7 resources next turn", color: "mfer", effect: delayEffect(2, conjureResourcesEffectBase) },
-  { cardid: 3, name: "Violent Generator", type: "spell", cost: 5, text: "Add (1) generator. Deal 10 damage", color: "mfer", effect: violentGeneratorEffect },
+  { cardid: 3, name: "Violent Generator", type: "spell", cost: 5, text: "Add (1) generator. Deal 5 damage", color: "mfer", effect: violentGeneratorEffect },
   { cardid: 4, name: "Steal", type: "spell", cost: 7, text: "Steal (1) generator from your opponent and (1) of the corresponding spending resource", color: "mfer", effect: stealEffect },
   { cardid: 5, name: "Explosion", type: "spell", cost: 10, text: "Add (1) generator and (3) spending resources. Deal 25 damage", color: "mfer", effect: explosionEffect },
   { cardid: 6, name: "Bloody Bricks", type: "spell", cost: 6, text: "Deal damage equal to your wall", color: "mfer", effect: bloodyBricksEffect },
   { cardid: 7, name: "Sneak", type: "spell", cost: 2, text: "Deal 7 damage. Ignore wall.", color: "mfer", effect: sneakEffect },
   { cardid: 8, name: "Assassin", type: "spell", cost: 5, text: "Deal 20 damage. Ignore wall.", color: "mfer", effect: assassinEffect },
-  { cardid: 10, name: "Levy", type: "spell", cost: 5, text: "The enemy tower loses 10. Yours gains 10.", color: "mfer", effect: levyEffect },
+  { cardid: 10, name: "Levy", type: "spell", cost: 4, text: "The enemy tower loses 12. Yours gains 12.", color: "mfer", effect: levyEffect },
   { cardid: 11, name: "Brick Break", type: "spell", cost: 6, text: "Deal 20 damage. Deals double damage to walls.", color: "mfer", effect: brickBreakEffect },
   { cardid: 12, name: "Bloody Ritual", type: "spell", cost: 0, text: "Lose 10 from your tower. Gain (5) spending resources", color: "mfer", effect: bloodyRitualEffect },
   { cardid: 14, name: "Repurpose", type: "spell", cost: 2, text: "Lose 15 tower. Gain 30 wall", color: "mfer", effect: repurposeEffect },
@@ -381,12 +381,12 @@ const generateSetDeck = (n, playerID) => {
     [3, 'Steal'],
     [3, 'Abandon'],
     [3, 'Wall Fist'],
-    [3, 'Repurpose'],
+    [3, 'Massacre'],
     [3, 'Conjure Generator'],
     [2, 'Bloody Ritual'],
     [2, 'Conjure Resources'],
     [3, 'Violent Generator'],
-    [3, 'Preparation'],
+    [3, 'Levy'],
     [2, 'Reaper'],
     [2, 'Builder'],
   ];
