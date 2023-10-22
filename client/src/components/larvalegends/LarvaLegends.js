@@ -14,7 +14,6 @@ function LarvaLegends() {
 
     const navigate = useNavigate();
 
-
     let { gameId } = useParams();
     const [socket, setSocket] = useState(null);
     const [game, setGame] = useState('');

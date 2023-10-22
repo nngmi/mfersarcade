@@ -26,6 +26,8 @@ router.post("/game", (req, res) => {
 
 
         let game = createGame(gameName);
+
+        // define initial state
         const gameId = game.id;
         if (larvaLegendsGames[gameId]) {
             return res.status(400).json({ message: "Game already exists" });
