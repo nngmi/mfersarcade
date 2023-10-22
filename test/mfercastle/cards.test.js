@@ -121,31 +121,31 @@ describe('levyEffect function', () => {
     initializePlayer(30, game, otherPlayerSymbol, "3456");
   });
 
-  test('should decrease otherPlayer towerStrength by 10 and increase player towerStrength by 10 when otherPlayer towerStrength >= 10', () => {
+  test('should decrease otherPlayer towerStrength by 12 and increase player towerStrength by 12 when otherPlayer towerStrength >= 12', () => {
     let { otherPlayer, player } = getPlayers(game, playerSymbol);
     otherPlayer.towerStrength = 20;
     player.towerStrength = 20;
     levyCard.effect(game, playerSymbol);
-    expect(otherPlayer.towerStrength).toBe(10);
-    expect(player.towerStrength).toBe(30);
+    expect(otherPlayer.towerStrength).toBe(8);
+    expect(player.towerStrength).toBe(32);
   });
 
-  test('should set otherPlayer towerStrength to 0 and increase player towerStrength by 10 when 0 < otherPlayer towerStrength < 10', () => {
+  test('should set otherPlayer towerStrength to 0 and increase player towerStrength by 12 when 0 < otherPlayer towerStrength < 12', () => {
     let { otherPlayer, player } = getPlayers(game, playerSymbol);
     otherPlayer.towerStrength = 5;
     player.towerStrength = 20;
     levyCard.effect(game, playerSymbol);
     expect(otherPlayer.towerStrength).toBe(0);
-    expect(player.towerStrength).toBe(30);
+    expect(player.towerStrength).toBe(32);
   });
 
-  test('should not change otherPlayer towerStrength and increase player towerStrength by 10 when otherPlayer towerStrength <= 0', () => {
+  test('should not change otherPlayer towerStrength and increase player towerStrength by 12 when otherPlayer towerStrength <= 0', () => {
     let { otherPlayer, player } = getPlayers(game, playerSymbol);
     otherPlayer.towerStrength = 0;
     player.towerStrength = 20;
     levyCard.effect(game, playerSymbol);
     expect(otherPlayer.towerStrength).toBe(0);
-    expect(player.towerStrength).toBe(30);
+    expect(player.towerStrength).toBe(32);
   });
 });
 
@@ -304,40 +304,40 @@ describe('Reaper card in bunker', () => {
   let reaperCard;
 
   beforeEach(() => {
-      game = getInitialGameState();
-      initializePlayer(30, game, playerSymbol, "1234");
-      initializePlayer(30, game, otherPlayerSymbol, "3456");
+    game = getInitialGameState();
+    initializePlayer(30, game, playerSymbol, "1234");
+    initializePlayer(30, game, otherPlayerSymbol, "3456");
 
-      reaperCard = Object.values(cardMap).find(card => card.name === "Reaper");
-      reaperCard.setID("1234", 1);
-      reaperCardId = reaperCard.id;
+    reaperCard = Object.values(cardMap).find(card => card.name === "Reaper");
+    reaperCard.setID("1234", 1);
+    reaperCardId = reaperCard.id;
 
-      // Adding Reaper card to player's hand artificially
-      game.hands[playerSymbol].cards.push(reaperCard);
-      game.hands[playerSymbol].count++;
+    // Adding Reaper card to player's hand artificially
+    game.hands[playerSymbol].cards.push(reaperCard);
+    game.hands[playerSymbol].count++;
 
-      // Setting player's resources to be enough to bunkerize the card
-      game.players.find(p => p.symbol === playerSymbol).spendingResources = reaperCard.cost;
+    // Setting player's resources to be enough to bunkerize the card
+    game.players.find(p => p.symbol === playerSymbol).spendingResources = reaperCard.cost;
   });
 
   test('should decrement other player wallStrength by 13 after bunkerizing Reaper and beginning a new turn', () => {
-      const initialWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
+    const initialWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
 
-      // Bunkerize the Reaper
-      const bunkerIndex = 0; // First bunker
-      expect(bunkerizeCard(game, reaperCardId, bunkerIndex, playerSymbol)).toBe(null);
+    // Bunkerize the Reaper
+    const bunkerIndex = 0; // First bunker
+    expect(bunkerizeCard(game, reaperCardId, bunkerIndex, playerSymbol)).toBe(null);
 
-      // End turn for current player
-      endTurn(game, playerSymbol);
+    // End turn for current player
+    endTurn(game, playerSymbol);
 
-      // Start turn for the other player
-      beginTurn(game, otherPlayerSymbol);
-      endTurn(game, otherPlayerSymbol);
-      // start turn again
-      beginTurn(game, playerSymbol);
-      // Check wallStrength has been decremented by 13
-      const afterTurnWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
-      expect(afterTurnWallStrength).toBe(initialWallStrength - 13);
+    // Start turn for the other player
+    beginTurn(game, otherPlayerSymbol);
+    endTurn(game, otherPlayerSymbol);
+    // start turn again
+    beginTurn(game, playerSymbol);
+    // Check wallStrength has been decremented by 13
+    const afterTurnWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
+    expect(afterTurnWallStrength).toBe(initialWallStrength - 13);
   });
 });
 
@@ -348,38 +348,38 @@ describe('Builder card in bunker', () => {
   let builderCard;
 
   beforeEach(() => {
-      game = getInitialGameState();
-      initializePlayer(30, game, playerSymbol, "1234");
+    game = getInitialGameState();
+    initializePlayer(30, game, playerSymbol, "1234");
 
-      builderCard = Object.values(cardMap).find(card => card.name === "Builder");
-      builderCard.setID("1234", 2); // Assuming a different ID for the sake of uniqueness
-      builderCardId = builderCard.id;
+    builderCard = Object.values(cardMap).find(card => card.name === "Builder");
+    builderCard.setID("1234", 2); // Assuming a different ID for the sake of uniqueness
+    builderCardId = builderCard.id;
 
-      // Adding Builder card to player's hand artificially
-      game.hands[playerSymbol].cards.push(builderCard);
-      game.hands[playerSymbol].count++;
+    // Adding Builder card to player's hand artificially
+    game.hands[playerSymbol].cards.push(builderCard);
+    game.hands[playerSymbol].count++;
 
-      // Setting player's resources to be enough to bunkerize the card
-      game.players.find(p => p.symbol === playerSymbol).spendingResources = builderCard.cost;
+    // Setting player's resources to be enough to bunkerize the card
+    game.players.find(p => p.symbol === playerSymbol).spendingResources = builderCard.cost;
   });
 
   test('should increment spendingResources by 2 (plus generators) after bunkerizing Builder and beginning a new turn', () => {
-      const initialSpendingResources = game.players.find(p => p.symbol === playerSymbol).spendingResources;
-      const generators = game.players.find(p => p.symbol === playerSymbol).generators;
+    const initialSpendingResources = game.players.find(p => p.symbol === playerSymbol).spendingResources;
+    const generators = game.players.find(p => p.symbol === playerSymbol).generators;
 
-      // Bunkerize the Builder
-      const bunkerIndex = 0; // First bunker
-      expect(bunkerizeCard(game, builderCardId, bunkerIndex, playerSymbol)).toBe(null);
+    // Bunkerize the Builder
+    const bunkerIndex = 0; // First bunker
+    expect(bunkerizeCard(game, builderCardId, bunkerIndex, playerSymbol)).toBe(null);
 
-      // End turn for current player
-      endTurn(game, playerSymbol);
+    // End turn for current player
+    endTurn(game, playerSymbol);
 
-      // Start turn for the same player to see the Builder's effect
-      beginTurn(game, playerSymbol);
+    // Start turn for the same player to see the Builder's effect
+    beginTurn(game, playerSymbol);
 
-      // Check spendingResources has been incremented by 2 + generators
-      const afterTurnSpendingResources = game.players.find(p => p.symbol === playerSymbol).spendingResources;
-      expect(afterTurnSpendingResources).toBe(initialSpendingResources - builderCard.cost + 2 + generators);
+    // Check spendingResources has been incremented by 2 + generators
+    const afterTurnSpendingResources = game.players.find(p => p.symbol === playerSymbol).spendingResources;
+    expect(afterTurnSpendingResources).toBe(initialSpendingResources - builderCard.cost + 2 + generators);
   });
 });
 
@@ -393,47 +393,47 @@ describe('Interaction of Preparation and Reaper in bunker', () => {
   let preparationCard;
 
   beforeEach(() => {
-      game = getInitialGameState();
-      initializePlayer(30, game, playerSymbol, "1234");
-      initializePlayer(30, game, otherPlayerSymbol, "3456");
+    game = getInitialGameState();
+    initializePlayer(30, game, playerSymbol, "1234");
+    initializePlayer(30, game, otherPlayerSymbol, "3456");
 
-      reaperCard = Object.values(cardMap).find(card => card.name === "Reaper");
-      reaperCard.setID("1234", 1);
-      reaperCardId = reaperCard.id;
+    reaperCard = Object.values(cardMap).find(card => card.name === "Reaper");
+    reaperCard.setID("1234", 1);
+    reaperCardId = reaperCard.id;
 
-      preparationCard = Object.values(cardMap).find(card => card.name === "Preparation");
-      preparationCard.setID("1234", 104); // New unique ID
-      preparationCardId = preparationCard.id;
+    preparationCard = Object.values(cardMap).find(card => card.name === "Preparation");
+    preparationCard.setID("1234", 104); // New unique ID
+    preparationCardId = preparationCard.id;
 
-      // Adding both Reaper and Preparation cards to player's hand artificially
-      game.hands[playerSymbol].cards.push(reaperCard, preparationCard);
-      game.hands[playerSymbol].count += 2;
+    // Adding both Reaper and Preparation cards to player's hand artificially
+    game.hands[playerSymbol].cards.push(reaperCard, preparationCard);
+    game.hands[playerSymbol].count += 2;
 
-      // Setting player's resources to be enough to play and bunkerize the cards
-      game.players.find(p => p.symbol === playerSymbol).spendingResources = reaperCard.cost + preparationCard.cost;
+    // Setting player's resources to be enough to play and bunkerize the cards
+    game.players.find(p => p.symbol === playerSymbol).spendingResources = reaperCard.cost + preparationCard.cost;
   });
 
   test('should augment Reaper damage by 2 after playing Preparation and bunkerizing Reaper', () => {
-      const initialWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
+    const initialWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
 
-      // Play the Preparation card
-      expect(playCard(game, preparationCardId, playerSymbol)).toBe(null);
+    // Play the Preparation card
+    expect(playCard(game, preparationCardId, playerSymbol)).toBe(null);
 
-      // Bunkerize the Reaper
-      const bunkerIndex = 0; // First bunker
-      expect(bunkerizeCard(game, reaperCardId, bunkerIndex, playerSymbol)).toBe(null);
+    // Bunkerize the Reaper
+    const bunkerIndex = 0; // First bunker
+    expect(bunkerizeCard(game, reaperCardId, bunkerIndex, playerSymbol)).toBe(null);
 
-      // End turn for current player
-      endTurn(game, playerSymbol);
+    // End turn for current player
+    endTurn(game, playerSymbol);
 
-      // Start turn for the other player
-      beginTurn(game, otherPlayerSymbol);
-      endTurn(game, otherPlayerSymbol);
+    // Start turn for the other player
+    beginTurn(game, otherPlayerSymbol);
+    endTurn(game, otherPlayerSymbol);
 
-      // start turn again for the player who played Reaper
-      beginTurn(game, playerSymbol);
-      // Check wallStrength has been decremented by 15 (13 from Reaper + 2 from Preparation)
-      const afterTurnWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
-      expect(afterTurnWallStrength).toBe(initialWallStrength - 15);
+    // start turn again for the player who played Reaper
+    beginTurn(game, playerSymbol);
+    // Check wallStrength has been decremented by 15 (13 from Reaper + 2 from Preparation)
+    const afterTurnWallStrength = game.players.find(p => p.symbol === otherPlayerSymbol).wallStrength;
+    expect(afterTurnWallStrength).toBe(initialWallStrength - 15);
   });
 });
