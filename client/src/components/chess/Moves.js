@@ -8,11 +8,13 @@ function Moves({ game }) {
     if (!whitePlayer || !blackPlayer) return null;
 
     const returnPlayerMoves = (player) => {
+        console.log("render moves");
+        console.log(player.moves);
 
         return player.moves.slice().reverse().map(move => (
             <div>
                 <img
-                    src={graphics[`${move.piece.toLowerCase()}-${move.color===ChessColor.WHITE ? "white": "black"}`]}
+                    src={graphics[`${move.piece.toLowerCase()}-${move.color === ChessColor.WHITE ? "white" : "black"}`]}
                     alt={`piece ${move.piece}`}
                     className="piece-img"
                 />
