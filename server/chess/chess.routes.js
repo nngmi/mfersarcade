@@ -7,7 +7,8 @@ const { createChessGame } = require('./chess.functions');
 
 const cleanupGames = () => {
     const now = Date.now();
-    const timeout = 10 * 60 * 1000; // 10 minutes in milliseconds
+    const timeout = 414 * 1000;
+    //10 * 60 * 1000; // 10 minutes in milliseconds
 
     for (const gameId in chessGames) {
         const game = chessGames[gameId];
