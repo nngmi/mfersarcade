@@ -37,12 +37,13 @@ function GameChess() {
     const [ableToJoin, setAbleToJoin] = useState(false);
     const [joined, setJoined] = useState(false);
 
-    const makeMove = (fromSquare, toSquare) => {
+    const makeMove = (fromSquare, toSquare, piece) => {
+        console.log("calling makeMove with piece", piece);
         if (gameState !== "ongoing" || game.currentPlayer !== playerId) return;
         const from = toAlgebraicNotation(fromSquare.row, fromSquare.col);
         const to = toAlgebraicNotation(toSquare.row, toSquare.col);
         const color = game.currentPlayer.color
-        const piece = game.board[fromSquare.row][fromSquare.col]
+        //const piece = game.board[fromSquare.row][fromSquare.col]
         socket.emit("makeMove", gameId, { from, to, color, piece });
     };
 

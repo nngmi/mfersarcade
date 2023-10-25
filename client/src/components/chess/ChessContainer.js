@@ -6,6 +6,7 @@ function ChessContainer({ game, playerId, makeMove }) {
 
     const [selectedSquare, setSelectedSquare] = useState(null);
     const handleSquareClick = (rowIndex, cellIndex) => {
+        console.log("inside handle click square");
         const actualRow = getPlayerColor(game, playerId) === ChessColor.BLACK ? 7 - rowIndex : rowIndex;
         const selectedPiece = game.board[actualRow][cellIndex];
         console.log("clicking on ", actualRow, cellIndex, selectedPiece);
@@ -13,7 +14,7 @@ function ChessContainer({ game, playerId, makeMove }) {
         // If a piece is already selected
         if (selectedSquare) {
             // Execute the move if it's valid (You can add more validation checks here)
-            makeMove(selectedSquare, { row: rowIndex, col: cellIndex });
+            makeMove(selectedSquare, { row: rowIndex, col: cellIndex }, selectedPiece);
             setSelectedSquare(null);
         } else if (selectedPiece && ((selectedPiece === selectedPiece.toUpperCase() && getPlayerColor(game, playerId) === ChessColor.WHITE) || (selectedPiece !== selectedPiece.toUpperCase() && getPlayerColor(game, playerId) === ChessColor.BLACK))) {
             console.log("setting selected piece to ", rowIndex, cellIndex);

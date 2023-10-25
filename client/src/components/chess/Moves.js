@@ -13,11 +13,13 @@ function Moves({ game }) {
 
         return player.moves.slice().reverse().map(move => (
             <div>
-                <img
-                    src={graphics[`${move.piece.toLowerCase()}-${move.color === ChessColor.WHITE ? "white" : "black"}`]}
-                    alt={`piece ${move.piece}`}
-                    className="piece-img"
-                />
+                {move.piece && (
+                    <img
+                        src={graphics[`${move.piece.toLowerCase()}-${move.color === ChessColor.WHITE ? "white" : "black"}`]}
+                        alt={`piece ${move.piece}`}
+                        className="piece-img"
+                    />
+                )}
                 from {move.from} to {move.to}
             </div>
         ))

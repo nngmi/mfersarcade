@@ -172,6 +172,7 @@ function processMove(game, move, playerId) {
     game.board = board;
     game.castling = castling;
     game.moves.push(move);
+    console.log("pushing the move ", move);
     player.moves.push(move)
 
     if (chess.isCheckmate()) {
