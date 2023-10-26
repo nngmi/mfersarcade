@@ -1,5 +1,5 @@
 import { graphics, ChessColor } from './ChessLib';
-import './CapturedPieces.css';
+import './Moves.css';
 
 function Moves({ game }) {
     if (!game) return null; // Return null for React components when nothing should be rendered
@@ -17,7 +17,7 @@ function Moves({ game }) {
                     <img
                         src={graphics[`${move.piece.toLowerCase()}-${move.color === ChessColor.WHITE ? "white" : "black"}`]}
                         alt={`piece ${move.piece}`}
-                        className="piece-img"
+                        className="piece-img-moves"
                     />
                 )}
                 from {move.from} to {move.to}
