@@ -23,6 +23,17 @@ Quick commands:
 
 - `npm test` - run unit tests
 - `npm run build && npm start` - start up local server with your changes
+## Development Workflow
+- `git checkout main` - takes you to main branch of the repository
+- `git pull` - ensures your local is up to date
+- `git checkout -b "name-you-want"` - create new branch
+-  make desired changed to code
+- `git add *` - stages changes made for commit
+- `git commit -m "desired-message-detailing-changes"` - commits changes to local repository
+- `git push` - push local branch to github - will need to set upstream, can be found as feedback from terminal
+- go to github on browser and create pull request
+- ask nngmi for review
+- after approval squash and merge
 
 ## Local Development Setup
 
