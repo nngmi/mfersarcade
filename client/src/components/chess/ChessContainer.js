@@ -6,20 +6,19 @@ function ChessContainer({ game, playerId, makeMove }) {
 
     const [selectedSquare, setSelectedSquare] = useState(null);
     const handleSquareClick = (rowIndex, cellIndex) => {
-        console.log("inside handle click square");
-        const actualRow = getPlayerColor(game, playerId) === ChessColor.BLACK ? 7 - rowIndex : rowIndex;
-        const selectedPiece = game.board[actualRow][cellIndex];
-        console.log("clicking on ", actualRow, cellIndex, selectedPiece);
-
-        // If a piece is already selected
         if (selectedSquare) {
+            const actualRow = getPlayerColor(game, playerId) === ChessColor.BLACK ? 7 - selectedSquare.row : selectedSquare.row;
+            const selectedPiece = game.board[actualRow][selectedSquare.col];
             // Execute the move if it's valid (You can add more validation checks here)
             makeMove(selectedSquare, { row: rowIndex, col: cellIndex }, selectedPiece);
             setSelectedSquare(null);
-        } else if (selectedPiece && ((selectedPiece === selectedPiece.toUpperCase() && getPlayerColor(game, playerId) === ChessColor.WHITE) || (selectedPiece !== selectedPiece.toUpperCase() && getPlayerColor(game, playerId) === ChessColor.BLACK))) {
-            console.log("setting selected piece to ", rowIndex, cellIndex);
-            setSelectedSquare({ row: rowIndex, col: cellIndex });
-
+        } else {
+            const actualRow = getPlayerColor(game, playerId) === ChessColor.BLACK ? 7 - rowIndex : rowIndex;
+            const selectedPiece = game.board[actualRow][cellIndex];
+            if (selectedPiece && ((selectedPiece === selectedPiece.toUpperCase() && getPlayerColor(game, playerId) === ChessColor.WHITE) || (selectedPiece !== selectedPiece.toUpperCase() && getPlayerColor(game, playerId) === ChessColor.BLACK))) {
+                console.log("setting selected piece to ", rowIndex, cellIndex);
+                setSelectedSquare({ row: rowIndex, col: cellIndex });
+            }
         }
     };
     const lastMove = game.moves.length > 0 ? game.moves[game.moves.length - 1] : null;
