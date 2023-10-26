@@ -57,7 +57,7 @@ const getInitialGameState = () => {
 };
 
 const initializePlayer = (n_cards, game, playerSymbol, socketid) => {
-    game.players.push({ id: socketid, symbol: playerSymbol, towerStrength: 50, wallStrength: 30, generators: 1, spendingResources: 3, drawsLeft: 1, discardsLeft: 1 });
+    game.players.push({ id: socketid, symbol: playerSymbol, towerStrength: 50, wallStrength: 30, generators: 2, spendingResources: 3, drawsLeft: 2, discardsLeft: 2 });
 
     // shuffle a deck of cards for the user
     const deck = generateSetDeck(n_cards, socketid);
@@ -102,8 +102,8 @@ const beginTurn = (game, playerSymbol) => {
     const player = game.players.find(p => p.symbol === playerSymbol);
     game.turnNumber += 1;
     player.spendingResources += player.generators;
-    player.drawsLeft = 1;
-    player.discardsLeft = 1;
+    player.drawsLeft = 2;
+    player.discardsLeft = 2;
 
     game.currentPlayer = player.symbol;
 
