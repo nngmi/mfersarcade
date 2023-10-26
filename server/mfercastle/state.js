@@ -102,8 +102,8 @@ const beginTurn = (game, playerSymbol) => {
     const player = game.players.find(p => p.symbol === playerSymbol);
     game.turnNumber += 1;
     player.spendingResources += player.generators;
-    player.drawsLeft = 1;
-    player.discardsLeft = 1;
+    player.drawsLeft = 2;
+    player.discardsLeft = 2;
 
     game.currentPlayer = player.symbol;
 
