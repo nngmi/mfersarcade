@@ -383,7 +383,7 @@ const generateSetDeck = (n, playerID) => {
     [3, 'Wall Fist'],
     [3, 'Massacre'],
     [3, 'Conjure Generator'],
-   // [2, 'Bloody Ritual'],
+    // [2, 'Bloody Ritual'],
     [3, 'Conjure Resources'],
     [3, 'Violent Generator'],
     [3, 'Levy'],
@@ -391,21 +391,21 @@ const generateSetDeck = (n, playerID) => {
     [3, 'Builder'],
   ];
 
- // const generateSetDeck = (n, playerID) => {
+  // const generateSetDeck = (n, playerID) => {
   //  const cardList = [
-    //  [3, 'Splinter'],
-      //[3, 'Steal'],
-      //[3, 'Abandon'],
-      //[3, 'Wall Fist'],
-      //[3, 'Massacre'],
-      //[3, 'Conjure Generator'],
-      //[2, 'Bloody Ritual'],
-      //[2, 'Conjure Resources'],
-      //[3, 'Violent Generator'],
-      //[3, 'Levy'],
-      //[2, 'Reaper'],
-      //[2, 'Builder'],
-    ];
+  //  [3, 'Splinter'],
+  //[3, 'Steal'],
+  //[3, 'Abandon'],
+  //[3, 'Wall Fist'],
+  //[3, 'Massacre'],
+  //[3, 'Conjure Generator'],
+  //[2, 'Bloody Ritual'],
+  //[2, 'Conjure Resources'],
+  //[3, 'Violent Generator'],
+  //[3, 'Levy'],
+  //[2, 'Reaper'],
+  //[2, 'Builder'],
+  //];
   let deck = [];
 
   cardList.forEach(([count, name]) => {

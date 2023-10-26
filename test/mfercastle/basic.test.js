@@ -1,5 +1,5 @@
 const { cardMap, getPlayers, drawCard } = require('../../server/mfercastle/cards');
-const { initializePlayer, getInitialGameState, beginTurn, endTurn, discardCard, bunkerizeCard, playCard} = require('../../server/mfercastle/state');
+const { initializePlayer, getInitialGameState, beginTurn, endTurn, discardCard, bunkerizeCard, playCard } = require('../../server/mfercastle/state');
 
 describe('basicTest function', () => {
   let game;
@@ -21,10 +21,12 @@ describe('basicTest function', () => {
     expect(drawCard(game, game.currentPlayer)).toBe("Hand is full, cannot draw any more cards");
     expect(discardCard(game, game.hands["X"].cards[0].id, "X")).toBe(null);
     expect(game.hands["X"].count).toBe(4);
+    expect(discardCard(game, game.hands["X"].cards[0].id, "X")).toBe(null);
+    expect(game.hands["X"].count).toBe(3);
     expect(discardCard(game, game.hands["X"].cards[0].id, "X")).toBe("No more discards left");
-    expect(game.hands["X"].count).toBe(4);
+    expect(game.hands["X"].count).toBe(3);
     expect(drawCard(game, game.currentPlayer)).toBe(null);
-    expect(game.hands["X"].count).toBe(5);
+    expect(game.hands["X"].count).toBe(4);
     endTurn(game, "X");
 
     beginTurn(game, "O");
@@ -36,10 +38,12 @@ describe('basicTest function', () => {
     expect(drawCard(game, game.currentPlayer)).toBe("Hand is full, cannot draw any more cards");
     expect(discardCard(game, game.hands["O"].cards[0].id, "O")).toBe(null);
     expect(game.hands["O"].count).toBe(4);
+    expect(discardCard(game, game.hands["O"].cards[0].id, "O")).toBe(null);
+    expect(game.hands["O"].count).toBe(3);
     expect(discardCard(game, game.hands["O"].cards[0].id, "O")).toBe("No more discards left");
-    expect(game.hands["O"].count).toBe(4);
+    expect(game.hands["O"].count).toBe(3);
     expect(drawCard(game, game.currentPlayer)).toBe(null);
-    expect(game.hands["O"].count).toBe(5);
+    expect(game.hands["O"].count).toBe(4);
 
     endTurn(game, "O");
 
@@ -59,15 +63,15 @@ describe('playCard function', () => {
     game = getInitialGameState();
     initializePlayer(30, game, playerSymbol, "1234");
     initializePlayer(30, game, otherPlayerSymbol, "3456");
-    
+
     playableCard = Object.values(cardMap)[0]; // Assume that this card can be played
     playableCard.setID("1234", 1);
-    playableCardId = playableCard.id; 
-    
+    playableCardId = playableCard.id;
+
     // Adding playable card to player's hand artificially
     game.hands[playerSymbol].cards.push(playableCard);
     game.hands[playerSymbol].count++;
-    
+
     // Setting player's resources to be enough to play the card
     game.players.find(p => p.symbol === playerSymbol).spendingResources = playableCard.cost;
   });
@@ -83,7 +87,7 @@ describe('playCard function', () => {
     expect(player.spendingResources).toBe(0); // Assume the cost of the card was equal to player's resources
 
     // cannot discard card
-    expect(discardCard(game, playableCardId, playerSymbol)).toBe("Error with discard, card not found in hand");    
+    expect(discardCard(game, playableCardId, playerSymbol)).toBe("Error with discard, card not found in hand");
   });
 
   test('should return error message if not enough resources to play the card', () => {
@@ -105,15 +109,15 @@ describe('bunkerizeCard function', () => {
     game = getInitialGameState();
     initializePlayer(30, game, playerSymbol, "1234");
     initializePlayer(30, game, otherPlayerSymbol, "3456");
-    
+
     reaperCard = Object.values(cardMap).find(card => card.name === "Reaper"); // Assume this card is of type "familiar" and can be bunkerized
     reaperCard.setID("1234", 1);
-    reaperCardId = reaperCard.id; 
-    
+    reaperCardId = reaperCard.id;
+
     // Adding Reaper card to player's hand artificially
     game.hands[playerSymbol].cards.push(reaperCard);
     game.hands[playerSymbol].count++;
-    
+
     // Setting player's resources to be enough to bunkerize the card
     game.players.find(p => p.symbol === playerSymbol).spendingResources = reaperCard.cost;
   });
