@@ -26,7 +26,7 @@ const drawCard = (game, playerSymbol, ignoreLimits = false) => {
 };
 
 class Card {
-  constructor(cardid, name, cost, text, color, effect, type) {
+  constructor(cardid, name, cost, text, color, effect, type, image) {
     this.cardid = cardid;
     this.name = name;
     this.cost = cost;
@@ -34,6 +34,11 @@ class Card {
     this.color = color;
     this.effect = effect;
     this.type = type;
+    if (image) {
+      this.image = image;
+    } else {
+      this.image = "mfergalaga.png";
+    }
   }
 
   setID(playerID, index) {
@@ -311,8 +316,8 @@ function repurposeEffect(game, playerSymbol) {
 
 // Define Cards
 const cardsData = [
-  { cardid: 1, name: "Conjure Generator", type: "spell", cost: 2, text: "Add (1) generator", color: "mfer", effect: conjureGeneratorEffect },
-  { cardid: 2, name: "Conjure Resources", type: "spell", cost: 3, text: "Gain 7 resources next turn", color: "mfer", effect: delayEffect(2, conjureResourcesEffectBase) },
+  { cardid: 1, name: "Conjure Generator", type: "spell", cost: 2, text: "Add (1) generator", color: "mfer", effect: conjureGeneratorEffect, image: "connect4.png" },
+  { cardid: 2, name: "Conjure Resources", type: "spell", cost: 3, text: "Gain 7 resources next turn", color: "mfer", effect: delayEffect(2, conjureResourcesEffectBase), image: "connect4.png" },
   { cardid: 3, name: "Violent Generator", type: "spell", cost: 5, text: "Add (1) generator. Deal 5 damage", color: "mfer", effect: violentGeneratorEffect },
   { cardid: 4, name: "Steal", type: "spell", cost: 7, text: "Steal (1) generator from your opponent and (1) of the corresponding spending resource", color: "mfer", effect: stealEffect },
   { cardid: 5, name: "Explosion", type: "spell", cost: 10, text: "Add (1) generator and (3) spending resources. Deal 25 damage", color: "mfer", effect: explosionEffect },
@@ -343,7 +348,7 @@ const cardsData = [
 ];
 
 const cards = cardsData.map((data, index) => {
-  const card = new Card(data.cardid, data.name, data.cost, data.text, data.color, data.effect, data.type);
+  const card = new Card(data.cardid, data.name, data.cost, data.text, data.color, data.effect, data.type, data.image);
   return card;
 });
 
@@ -431,6 +436,7 @@ const generateSetDeck = (n, playerID) => {
         cardTemplate.color,
         cardTemplate.effect,
         cardTemplate.type,
+        cardTemplate.image,
       );
       card.setID(playerID, deck.length);
       deck.push(card);
