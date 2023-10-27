@@ -7,12 +7,16 @@ export const Card = ({ card }) => {
     type: 'CARD',
     item: { type: 'Card', id: card.id }
   }));
-  const { name, color, text, cost } = card;
+  console.log(card);
+  const { name, color, text, cost, image } = card;
   return (
     <div>
       <div ref={ref} className={`card ${color}`} alt={card.id}>
         <div className="cardTitle">
           {name} {cost}
+        </div>
+        <div className="cardImage">
+          <img src={`/images/mfercastle/cards/${image}`} alt="connect4"></img>
         </div>
         <div className="cardText">
           {text}
